@@ -25,6 +25,7 @@
             android:name=".presentation.programdetail.ProgramDetailActivity"
             android:label="@string/title_program_detail">
         </activity>
+        <service android:name=".programrunner.ProgramRunner"></service>
     </application>
 
 </manifest>

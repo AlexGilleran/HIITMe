@@ -1,22 +1,17 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.fragment.RoboFragment;
-import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Superset;
 import com.alexgilleran.hiitme.presentation.programdetail.views.RepGroupView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunner;
-import com.alexgilleran.hiitme.programrunner.ProgramRunner.ProgramObserver;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is

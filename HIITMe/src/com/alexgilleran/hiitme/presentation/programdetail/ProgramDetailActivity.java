@@ -41,17 +41,18 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 			int programId = getIntent().getIntExtra(
 					ProgramDetailFragment.ARG_ITEM_ID, 0);
 
-			programRunner = new ProgramRunner(programDao.getProgram(programId));
+			// programRunner = new
+			// ProgramRunner(programDao.getProgram(programId));
 
 			FragmentTransaction transaction = getSupportFragmentManager()
 					.beginTransaction();
 
-			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
-			detailFragment.setProgramRunner(programRunner);
-			transaction.add(R.id.program_detail_container, detailFragment);
+//			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
+//			// detailFragment.setProgramRunner(programRunner);
+//			transaction.add(R.id.program_detail_container, detailFragment);
 
 			ProgramRunFragment runFragment = new ProgramRunFragment();
-			runFragment.setProgramRunner(programRunner);
+			// runFragment.setProgramRunner(programRunner);
 			transaction.add(R.id.program_run_container, runFragment);
 
 			transaction.commit();

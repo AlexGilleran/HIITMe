@@ -10,6 +10,8 @@ import java.util.List;
  * 
  */
 public interface Program {
+	public static final String PROGRAM_ID_NAME = "programid";
+
 	/** The id of this program */
 	long getId();
 

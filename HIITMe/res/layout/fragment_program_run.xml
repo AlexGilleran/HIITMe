@@ -4,14 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
     <ProgressBar
-        android:id="@+id/rep_progressbar"
+        android:id="@+id/progressbar_exercise"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -19,8 +13,7 @@
     <TextView
         android:id="@+id/textview_time_remaining"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chronometer" />
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/rep_button_pause"

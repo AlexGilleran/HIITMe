@@ -28,7 +28,7 @@ public class ProgramDAOFake implements ProgramDAO {
 
 		Superset group = new RepGroupImpl(8, repList);
 
-		Program tabata = new ProgramImpl(0, "Tabata", "The tabata protocol",
+		Program tabata = new ProgramImpl(1, "Tabata", "The tabata protocol",
 				Arrays.asList(group));
 
 		programMap.put(tabata.getId(), tabata);
