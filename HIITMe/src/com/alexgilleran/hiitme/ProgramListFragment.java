@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.alexgilleran.hiitme.dummy.DummyContent;
+import com.alexgilleran.hiitme.model.Program;
 
 /**
  * A list fragment representing a list of Programs. This fragment
@@ -46,7 +47,7 @@ public class ProgramListFragment extends ListFragment {
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(String id);
+        public void onItemSelected(long id);
     }
 
     /**
@@ -55,7 +56,7 @@ public class ProgramListFragment extends ListFragment {
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(String id) {
+        public void onItemSelected(long id) {
         }
     };
 
@@ -71,7 +72,7 @@ public class ProgramListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
 
         // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
+        setListAdapter(new ArrayAdapter<Program>(
                 getActivity(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
@@ -115,7 +116,7 @@ public class ProgramListFragment extends ListFragment {
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).getId());
     }
 
     @Override

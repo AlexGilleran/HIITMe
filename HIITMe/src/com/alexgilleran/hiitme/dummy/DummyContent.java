@@ -1,9 +1,15 @@
 package com.alexgilleran.hiitme.dummy;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.Rep;
+import com.alexgilleran.hiitme.model.RepGroup;
+import com.alexgilleran.hiitme.model.impl.ProgramImpl;
+import com.alexgilleran.hiitme.model.impl.RepGroupImpl;
+import com.alexgilleran.hiitme.model.impl.RepImpl;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -16,40 +22,18 @@ public class DummyContent {
     /**
      * An array of sample (dummy) items.
      */
-    public static List<DummyItem> ITEMS = new ArrayList<DummyItem>();
-
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-    public static Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+    public static List<Program> ITEMS = new ArrayList<Program>();
 
     static {
-        // Add 3 sample items.
-        addItem(new DummyItem("1", "Tabata"));
-        addItem(new DummyItem("2", "Item 2"));
-        addItem(new DummyItem("3", "Item 3"));
+    	List<Rep> repList = new ArrayList<Rep>();
+    	repList.add(new RepImpl("Hard", 20000, Rep.EffortLevel.HARD));
+    	repList.add(new RepImpl("Rest", 10000, Rep.EffortLevel.REST));
+    	
+    	RepGroup group = new RepGroupImpl(8, repList);
+    	
+    	Program tabata = new ProgramImpl(0, "Tabata", "The tabata protocol", Arrays.asList(group)); 
+    	
+    	ITEMS.add(tabata);
     }
 
-    private static void addItem(DummyItem item) {
-        ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
-    }
-
-    /**
-     * A dummy item representing a piece of content.
-     */
-    public static class DummyItem {
-        public String id;
-        public String content;
-
-        public DummyItem(String id, String content) {
-            this.id = id;
-            this.content = content;
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-    }
 }
