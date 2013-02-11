@@ -1,8 +1,8 @@
 package com.alexgilleran.hiitme;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -55,7 +55,7 @@ public class ProgramListFragment extends ListFragment {
      * nothing. Used only when this fragment is not attached to an activity.
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
-        @Override
+    	@Override
         public void onItemSelected(long id) {
         }
     };
