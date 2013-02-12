@@ -8,17 +8,18 @@ import com.alexgilleran.hiitme.model.RepGroup;
 
 public class ProgramImpl implements Program {
 	private long id;
-	
+
 	/** Name of the program */
 	private String name;
 	/** Description **/
 	private String description;
 	/** List of the rep groups */
 	private List<RepGroup> repGroups;
-	
+
 	private Rep warmUp = null;
 
-	public ProgramImpl(long id, String name, String description, List<RepGroup> setGroups) {
+	public ProgramImpl(long id, String name, String description,
+			List<RepGroup> setGroups) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -49,5 +50,10 @@ public class ProgramImpl implements Program {
 	@Override
 	public Rep getWarmUp() {
 		return warmUp;
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 }

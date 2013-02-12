@@ -1,37 +1,37 @@
 package com.alexgilleran.hiitme;
 
-import android.app.Fragment;
+import roboguice.fragment.RoboFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.alexgilleran.hiitme.dummy.DummyContent;
+import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
+import com.google.inject.Inject;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is
  * either contained in a {@link ProgramListActivity} in two-pane mode (on
  * tablets) or a {@link ProgramDetailActivity} on handsets.
  */
-public class ProgramDetailFragment extends Fragment {
+public class ProgramDetailFragment extends RoboFragment {
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
 
-	/**
-	 * The dummy content this fragment is presenting.
-	 */
+	/** The dummy content this fragment is presenting. */
 	private Program mItem;
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
+	@Inject
+	private ProgramDAO programDao;
+
+	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
+
 	}
 
 	@Override
@@ -39,11 +39,7 @@ public class ProgramDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
-			mItem = DummyContent.ITEMS.get((int) getArguments().getLong(
-					ARG_ITEM_ID));
+			mItem = programDao.getProgram(getArguments().getLong(ARG_ITEM_ID));
 		}
 	}
 

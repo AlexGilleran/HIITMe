@@ -1,6 +1,6 @@
 package com.alexgilleran.hiitme;
 
-import android.app.Activity;
+import roboguice.activity.RoboFragmentActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -20,7 +20,7 @@ import android.os.Bundle;
  * {@link ProgramListFragment.Callbacks} interface to listen for item
  * selections.
  */
-public class ProgramListActivity extends Activity implements
+public class ProgramListActivity extends RoboFragmentActivity implements
 		ProgramListFragment.Callbacks {
 
 	/**
@@ -43,7 +43,9 @@ public class ProgramListActivity extends Activity implements
 
 			// In two-pane mode, list items should be given the
 			// 'activated' state when touched.
-//			this.getFragmentManager().findFragmentById(R.id.program_list);;
+			((ProgramListFragment) this.getSupportFragmentManager()
+					.findFragmentById(R.id.program_list))
+					.setActivateOnItemClick(true);
 		}
 
 		// TODO: If exposing deep links into your app, handle intents here.
@@ -62,7 +64,7 @@ public class ProgramListActivity extends Activity implements
 			arguments.putLong(ProgramDetailFragment.ARG_ITEM_ID, id);
 			ProgramDetailFragment fragment = new ProgramDetailFragment();
 			fragment.setArguments(arguments);
-			getFragmentManager().beginTransaction()
+			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.program_detail_container, fragment).commit();
 
 		} else {

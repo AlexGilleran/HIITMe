@@ -1,6 +1,6 @@
 package com.alexgilleran.hiitme;
 
-import android.app.Fragment;
+import roboguice.activity.RoboFragmentActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -14,15 +14,15 @@ import android.view.MenuItem;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link ProgramDetailFragment}.
  */
-public class ProgramDetailActivity extends Fragment {
+public class ProgramDetailActivity extends RoboFragmentActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.getActivity().setContentView(R.layout.activity_program_detail);
+		setContentView(R.layout.activity_program_detail);
 
 		// Show the Up button in the action bar.
-		this.getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// savedInstanceState is non-null when there is fragment state
 		// saved from previous configurations of this activity
@@ -37,13 +37,11 @@ public class ProgramDetailActivity extends Fragment {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(
-					ProgramDetailFragment.ARG_ITEM_ID,
-					getActivity().getIntent().getStringExtra(
-							ProgramDetailFragment.ARG_ITEM_ID));
+			arguments.putString(ProgramDetailFragment.ARG_ITEM_ID, getIntent()
+					.getStringExtra(ProgramDetailFragment.ARG_ITEM_ID));
 			ProgramDetailFragment fragment = new ProgramDetailFragment();
 			fragment.setArguments(arguments);
-			getFragmentManager().beginTransaction()
+			getSupportFragmentManager().beginTransaction()
 					.add(R.id.program_detail_container, fragment).commit();
 		}
 	}
@@ -59,8 +57,8 @@ public class ProgramDetailActivity extends Fragment {
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			NavUtils.navigateUpTo(this.getActivity(),
-					new Intent(this.getActivity(), ProgramListActivity.class));
+			NavUtils.navigateUpTo(this, new Intent(this,
+					ProgramListActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
