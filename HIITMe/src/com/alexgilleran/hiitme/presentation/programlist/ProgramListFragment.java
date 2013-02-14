@@ -1,4 +1,4 @@
-package com.alexgilleran.hiitme;
+package com.alexgilleran.hiitme.presentation.programlist;
 
 import roboguice.fragment.RoboListFragment;
 import android.app.Activity;
@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 import com.google.inject.Inject;
 
 /**

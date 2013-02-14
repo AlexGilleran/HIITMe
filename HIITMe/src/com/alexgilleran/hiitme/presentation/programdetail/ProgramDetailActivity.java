@@ -1,10 +1,13 @@
-package com.alexgilleran.hiitme;
+package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.activity.RoboFragmentActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+
+import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 
 /**
  * An activity representing a single Program detail screen. This activity is

@@ -1,4 +1,10 @@
-package com.alexgilleran.hiitme;
+package com.alexgilleran.hiitme.presentation.programlist;
+
+import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.R.id;
+import com.alexgilleran.hiitme.R.layout;
+import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailActivity;
+import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 
 import roboguice.activity.RoboFragmentActivity;
 import android.content.Intent;

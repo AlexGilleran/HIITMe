@@ -1,4 +1,4 @@
-package com.alexgilleran.hiitme;
+package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.fragment.RoboFragment;
 import android.os.Bundle;
@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.google.inject.Inject;
 
 /**
@@ -51,8 +53,8 @@ public class ProgramDetailFragment extends RoboFragment {
 
 		// Show the dummy content as text in a TextView.
 		if (mItem != null) {
-			((TextView) rootView.findViewById(R.id.program_detail))
-					.setText(mItem.getName());
+//			((TextView) rootView.findViewById(R.id.program_detail))
+//					.setText(mItem.getName());
 		}
 
 		return rootView;
