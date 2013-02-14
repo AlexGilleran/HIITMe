@@ -44,10 +44,12 @@ public class RepGroupView extends LinearLayout {
 	}
 
 	private void updateReps() {
+		LinearLayout repLayout = (LinearLayout) this.findViewById(R.id.layout_reps);
+		
 		for (Rep rep : repGroup.getReps()) {
 			TextView repLabel = new TextView(this.getContext());
 			repLabel.setText(rep.getName());
-			this.addView(repLabel);
+			repLayout.addView(repLabel);
 		}
 	}
 }
