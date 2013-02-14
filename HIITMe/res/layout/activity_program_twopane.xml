@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/program_list"
-        android:name="com.alexgilleran.hiitme.ProgramListFragment"
+        android:name="com.alexgilleran.hiitme.presentation.programlist.ProgramListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

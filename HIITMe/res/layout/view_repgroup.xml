@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.alexgilleran.hiitme.presentation.programdetail.RepGroupView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal" >
@@ -17,10 +18,10 @@
         android:src="@android:drawable/alert_dark_frame" />
 
     <LinearLayout
-        android:id="@+id/layout_repgroups"
+        android:id="@+id/layout_reps"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical" >
     </LinearLayout>
 
-</LinearLayout>
+</com.alexgilleran.hiitme.presentation.programdetail.RepGroupView>

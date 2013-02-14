@@ -5,11 +5,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.RepGroup;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.google.inject.Inject;
 
@@ -26,7 +27,7 @@ public class ProgramDetailFragment extends RoboFragment {
 	public static final String ARG_ITEM_ID = "item_id";
 
 	/** The dummy content this fragment is presenting. */
-	private Program mItem;
+	private Program program;
 
 	@Inject
 	private ProgramDAO programDao;
@@ -41,7 +42,8 @@ public class ProgramDetailFragment extends RoboFragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			mItem = programDao.getProgram(getArguments().getLong(ARG_ITEM_ID));
+			program = programDao
+					.getProgram(getArguments().getLong(ARG_ITEM_ID));
 		}
 	}
 
@@ -51,10 +53,17 @@ public class ProgramDetailFragment extends RoboFragment {
 		View rootView = inflater.inflate(R.layout.fragment_program_detail,
 				container, false);
 
-		// Show the dummy content as text in a TextView.
-		if (mItem != null) {
-//			((TextView) rootView.findViewById(R.id.program_detail))
-//					.setText(mItem.getName());
+		if (program != null) {
+			LinearLayout repGroupLayout = (LinearLayout) rootView
+					.findViewById(R.id.layout_repgroups);
+
+			for (RepGroup repGroup : program.getRepGroups()) {
+				RepGroupView repGroupView = (RepGroupView) inflater.inflate(
+						R.layout.view_repgroup, null);
+				repGroupView.setRepGroup(repGroup);
+
+				repGroupLayout.addView(repGroupView);
+			}
 		}
 
 		return rootView;

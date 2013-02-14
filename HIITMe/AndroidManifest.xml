@@ -14,16 +14,15 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" android:name="HIITMeApplication">
         <activity
-            android:name="com.alexgilleran.hiitme.ProgramListActivity"
+            android:name=".presentation.programlist.ProgramListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.alexgilleran.hiitme.ProgramDetailActivity"
+            android:name=".presentation.programdetail.ProgramDetailActivity"
             android:label="@string/title_program_detail">
         </activity>
     </application>
