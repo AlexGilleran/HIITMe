@@ -2,8 +2,10 @@ package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.fragment.RoboFragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -62,8 +64,26 @@ public class ProgramDetailFragment extends RoboFragment {
 						R.layout.view_repgroup, null);
 				repGroupView.setRepGroup(repGroup);
 
-				repGroupLayout.addView(repGroupView);
+				repGroupLayout.addView(repGroupView, 0);
 			}
+
+			repGroupLayout.findViewById(R.id.button_start_program)
+					.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							FragmentTransaction transaction = ProgramDetailFragment.this
+									.getFragmentManager().beginTransaction();
+
+							ProgramRunFragment runFragment = new ProgramRunFragment();
+
+							// transaction.hide(ProgramDetailFragment.this);
+							transaction.add(R.id.program_detail_container,
+									runFragment);
+//							transaction.show(runFragment);
+
+							transaction.commit();
+						}
+					});
 		}
 
 		return rootView;

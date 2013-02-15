@@ -8,20 +8,16 @@
     <TextView
         android:id="@+id/textview_repcount"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <ImageView
-        android:id="@+id/divider"
-        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    
+	<View
+        android:layout_width="2dip"
         android:layout_height="fill_parent"
-        android:src="@android:drawable/alert_dark_frame" />
-
-    <LinearLayout
+        android:background="#FF0000" />
+		
+    <TableLayout
         android:id="@+id/layout_reps"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
 </com.alexgilleran.hiitme.presentation.programdetail.RepGroupView>

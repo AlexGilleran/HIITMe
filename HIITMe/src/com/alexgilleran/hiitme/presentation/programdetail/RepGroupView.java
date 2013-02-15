@@ -3,6 +3,8 @@ package com.alexgilleran.hiitme.presentation.programdetail;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -15,7 +17,7 @@ public class RepGroupView extends LinearLayout {
 	public RepGroupView(Context context) {
 		super(context);
 	}
-	
+
 	public RepGroupView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
@@ -40,16 +42,25 @@ public class RepGroupView extends LinearLayout {
 
 		TextView repCountView = (TextView) this
 				.findViewById(R.id.textview_repcount);
-		repCountView.setText("x" + repGroup.getReps().size());
+		repCountView.setText("x" + repGroup.getRepCount());
 	}
 
 	private void updateReps() {
-		LinearLayout repLayout = (LinearLayout) this.findViewById(R.id.layout_reps);
-		
+		TableLayout repLayout = (TableLayout) this
+				.findViewById(R.id.layout_reps);
+
 		for (Rep rep : repGroup.getReps()) {
-			TextView repLabel = new TextView(this.getContext());
-			repLabel.setText(rep.getName());
-			repLayout.addView(repLabel);
+			TableRow repRow = new TableRow(this.getContext());
+
+			TextView repLabelView = new TextView(this.getContext());
+			repLabelView.setText(rep.getName());
+			repRow.addView(repLabelView);
+
+			TextView repDurationView = new TextView(this.getContext());
+			repDurationView.setText((rep.getDuration() / 1000) + " seconds");
+			repRow.addView(repDurationView);
+
+			repLayout.addView(repRow);
 		}
 	}
 }

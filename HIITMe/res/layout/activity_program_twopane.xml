@@ -9,17 +9,6 @@
     android:showDividers="middle"
     tools:context=".ProgramListActivity" >
 
-    <!--
-    This layout is a two-pane layout for the Programs
-    master/detail flow. See res/values-large/refs.xml and
-    res/values-sw600dp/refs.xml for an example of layout aliases
-    that replace the single-pane version of the layout with
-    this two-pane version.
-
-    For more on layout aliases, see:
-    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
-    -->
-
     <fragment
         android:id="@+id/program_list"
         android:name="com.alexgilleran.hiitme.presentation.programlist.ProgramListFragment"
@@ -28,10 +17,11 @@
         android:layout_weight="1"
         tools:layout="@android:layout/list_content" />
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/program_detail_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3" />
+        android:layout_weight="3"
+        android:orientation="vertical" />
 
 </LinearLayout>
