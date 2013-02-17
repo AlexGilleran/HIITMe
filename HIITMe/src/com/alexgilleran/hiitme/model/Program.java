@@ -20,8 +20,8 @@ public interface Program {
 	String getDescription();
 
 	/** Gets the rep groups of the program, in order */
-	List<RepGroup> getRepGroups();
+	List<Superset> getSupersets();
 
 	/** Gets the warmup rep */
-	Rep getWarmUp();
+	Exercise getWarmUp();
 }

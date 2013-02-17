@@ -11,19 +11,19 @@
         android:text="TextView" />
 
     <ProgressBar
-        android:id="@+id/rep_progress_bar"
+        android:id="@+id/rep_progressbar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Chronometer
-        android:id="@+id/rep_time_remaining"
+    <TextView
+        android:id="@+id/textview_time_remaining"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Chronometer" />
 
     <Button
-        android:id="@+id/rep_pause_button"
+        android:id="@+id/rep_button_pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pause" />

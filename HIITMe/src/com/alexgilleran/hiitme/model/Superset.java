@@ -8,11 +8,11 @@ import java.util.List;
  * @author Alex Gilleran
  * 
  */
-public interface RepGroup {
+public interface Superset {
 
-	/** Get how many times this {@link RepGroup} is to be repeated */
+	/** Get how many times this {@link Superset} is to be repeated */
 	int getRepCount();
 
-	/** Get all the sets in the {@link RepGroup}, in order */
-	List<Rep> getReps();
+	/** Get all the sets in the {@link Superset}, in order */
+	List<Exercise> getExercises();
 }

@@ -3,11 +3,15 @@ package com.alexgilleran.hiitme.presentation.programdetail;
 import roboguice.activity.RoboFragmentActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
+import com.alexgilleran.hiitme.programrunner.ProgramRunner;
+import com.google.inject.Inject;
 
 /**
  * An activity representing a single Program detail screen. This activity is
@@ -18,6 +22,10 @@ import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
  * a {@link ProgramDetailFragment}.
  */
 public class ProgramDetailActivity extends RoboFragmentActivity {
+	private ProgramRunner programRunner;
+
+	@Inject
+	private ProgramDAO programDao;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,25 +35,26 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		// savedInstanceState is non-null when there is fragment state
-		// saved from previous configurations of this activity
-		// (e.g. when rotating the screen from portrait to landscape).
-		// In this case, the fragment will automatically be re-added
-		// to its container so we don't need to manually add it.
-		// For more information, see the Fragments API guide at:
-		//
-		// http://developer.android.com/guide/components/fragments.html
-		//
 		if (savedInstanceState == null) {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
-			Bundle arguments = new Bundle();
-			arguments.putString(ProgramDetailFragment.ARG_ITEM_ID, getIntent()
-					.getStringExtra(ProgramDetailFragment.ARG_ITEM_ID));
-			ProgramDetailFragment fragment = new ProgramDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.program_detail_container, fragment).commit();
+			int programId = getIntent().getIntExtra(
+					ProgramDetailFragment.ARG_ITEM_ID, 0);
+
+			programRunner = new ProgramRunner(programDao.getProgram(programId));
+
+			FragmentTransaction transaction = getSupportFragmentManager()
+					.beginTransaction();
+
+			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
+			detailFragment.setProgramRunner(programRunner);
+			transaction.add(R.id.program_detail_container, detailFragment);
+
+			ProgramRunFragment runFragment = new ProgramRunFragment();
+			runFragment.setProgramRunner(programRunner);
+			transaction.add(R.id.program_run_container, runFragment);
+
+			transaction.commit();
 		}
 	}
 
@@ -53,17 +62,11 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
 			NavUtils.navigateUpTo(this, new Intent(this,
 					ProgramListActivity.class));
 			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 }

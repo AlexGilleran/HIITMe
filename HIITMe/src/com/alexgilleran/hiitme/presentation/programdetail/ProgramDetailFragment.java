@@ -1,20 +1,22 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.fragment.RoboFragment;
+import roboguice.inject.InjectView;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDAO;
-import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.RepGroup;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.presentation.programdetail.views.RepGroupView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
-import com.google.inject.Inject;
+import com.alexgilleran.hiitme.programrunner.ProgramRunner;
+import com.alexgilleran.hiitme.programrunner.ProgramRunner.ProgramObserver;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is
@@ -22,17 +24,14 @@ import com.google.inject.Inject;
  * tablets) or a {@link ProgramDetailActivity} on handsets.
  */
 public class ProgramDetailFragment extends RoboFragment {
+
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
 
-	/** The dummy content this fragment is presenting. */
-	private Program program;
-
-	@Inject
-	private ProgramDAO programDao;
+	private ProgramRunner programRunner;
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -42,11 +41,10 @@ public class ProgramDetailFragment extends RoboFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
 
-		if (getArguments().containsKey(ARG_ITEM_ID)) {
-			program = programDao
-					.getProgram(getArguments().getLong(ARG_ITEM_ID));
-		}
+	public void setProgramRunner(ProgramRunner programRunner) {
+		this.programRunner = programRunner;
 	}
 
 	@Override
@@ -55,11 +53,11 @@ public class ProgramDetailFragment extends RoboFragment {
 		View rootView = inflater.inflate(R.layout.fragment_program_detail,
 				container, false);
 
-		if (program != null) {
+		if (programRunner != null) {
 			LinearLayout repGroupLayout = (LinearLayout) rootView
 					.findViewById(R.id.layout_repgroups);
 
-			for (RepGroup repGroup : program.getRepGroups()) {
+			for (Superset repGroup : programRunner.getProgram().getSupersets()) {
 				RepGroupView repGroupView = (RepGroupView) inflater.inflate(
 						R.layout.view_repgroup, null);
 				repGroupView.setRepGroup(repGroup);
@@ -67,23 +65,6 @@ public class ProgramDetailFragment extends RoboFragment {
 				repGroupLayout.addView(repGroupView, 0);
 			}
 
-			repGroupLayout.findViewById(R.id.button_start_program)
-					.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							FragmentTransaction transaction = ProgramDetailFragment.this
-									.getFragmentManager().beginTransaction();
-
-							ProgramRunFragment runFragment = new ProgramRunFragment();
-
-							// transaction.hide(ProgramDetailFragment.this);
-							transaction.add(R.id.program_detail_container,
-									runFragment);
-//							transaction.show(runFragment);
-
-							transaction.commit();
-						}
-					});
 		}
 
 		return rootView;

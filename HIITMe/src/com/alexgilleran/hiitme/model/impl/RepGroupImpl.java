@@ -2,14 +2,14 @@ package com.alexgilleran.hiitme.model.impl;
 
 import java.util.List;
 
-import com.alexgilleran.hiitme.model.Rep;
-import com.alexgilleran.hiitme.model.RepGroup;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Superset;
 
-public class RepGroupImpl implements RepGroup {
+public class RepGroupImpl implements Superset {
 	private int repCount;
-	private List<Rep> reps;
+	private List<Exercise> reps;
 	
-	public RepGroupImpl(int repCount, List<Rep> reps) {
+	public RepGroupImpl(int repCount, List<Exercise> reps) {
 		super();
 		this.repCount = repCount;
 		this.reps = reps;
@@ -21,7 +21,7 @@ public class RepGroupImpl implements RepGroup {
 	}
 
 	@Override
-	public List<Rep> getReps() {
+	public List<Exercise> getExercises() {
 		return reps;
 	}
 }

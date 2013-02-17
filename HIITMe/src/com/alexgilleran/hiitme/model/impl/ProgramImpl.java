@@ -3,8 +3,8 @@ package com.alexgilleran.hiitme.model.impl;
 import java.util.List;
 
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.Rep;
-import com.alexgilleran.hiitme.model.RepGroup;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Superset;
 
 public class ProgramImpl implements Program {
 	private long id;
@@ -14,12 +14,12 @@ public class ProgramImpl implements Program {
 	/** Description **/
 	private String description;
 	/** List of the rep groups */
-	private List<RepGroup> repGroups;
+	private List<Superset> repGroups;
 
-	private Rep warmUp = null;
+	private Exercise warmUp = null;
 
 	public ProgramImpl(long id, String name, String description,
-			List<RepGroup> setGroups) {
+			List<Superset> setGroups) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -43,12 +43,12 @@ public class ProgramImpl implements Program {
 	}
 
 	@Override
-	public List<RepGroup> getRepGroups() {
+	public List<Superset> getSupersets() {
 		return repGroups;
 	}
 
 	@Override
-	public Rep getWarmUp() {
+	public Exercise getWarmUp() {
 		return warmUp;
 	}
 

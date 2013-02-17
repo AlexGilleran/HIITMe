@@ -1,8 +1,8 @@
 package com.alexgilleran.hiitme.model.impl;
 
-import com.alexgilleran.hiitme.model.Rep;
+import com.alexgilleran.hiitme.model.Exercise;
 
-public class RepImpl implements Rep {
+public class RepImpl implements Exercise {
 	private String name;
 	private int duration;
 	private EffortLevel effortLevel;

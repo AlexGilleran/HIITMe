@@ -1,4 +1,4 @@
-package com.alexgilleran.hiitme.presentation.programdetail;
+package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,11 +8,11 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.Rep;
-import com.alexgilleran.hiitme.model.RepGroup;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Superset;
 
 public class RepGroupView extends LinearLayout {
-	private RepGroup repGroup;
+	private Superset repGroup;
 
 	public RepGroupView(Context context) {
 		super(context);
@@ -31,7 +31,7 @@ public class RepGroupView extends LinearLayout {
 
 	}
 
-	public void setRepGroup(RepGroup repGroup) {
+	public void setRepGroup(Superset repGroup) {
 		this.repGroup = repGroup;
 
 		updateView();
@@ -49,7 +49,7 @@ public class RepGroupView extends LinearLayout {
 		TableLayout repLayout = (TableLayout) this
 				.findViewById(R.id.layout_reps);
 
-		for (Rep rep : repGroup.getReps()) {
+		for (Exercise rep : repGroup.getExercises()) {
 			TableRow repRow = new TableRow(this.getContext());
 
 			TextView repLabelView = new TextView(this.getContext());

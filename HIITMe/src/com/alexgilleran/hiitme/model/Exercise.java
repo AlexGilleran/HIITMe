@@ -6,20 +6,18 @@ package com.alexgilleran.hiitme.model;
  * 
  * @author Alex Gilleran
  */
-public interface Rep {
+public interface Exercise {
 	/** Get the displayable name of the rep */
 	String getName();
-	
+
 	/** Get the duration of the rep, in milliseconds */
 	int getDuration();
-	
+
 	/** Get the type of the rep */
 	EffortLevel getEffortLevel();
-	
+
 	/** A simple representation of the effort level of the set */
 	enum EffortLevel {
-		HARD,
-		EASY,
-		REST
+		HARD, EASY, REST
 	}
 }

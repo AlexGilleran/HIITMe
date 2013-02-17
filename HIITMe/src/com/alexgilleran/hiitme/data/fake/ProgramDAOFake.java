@@ -9,8 +9,8 @@ import java.util.Map;
 
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.Rep;
-import com.alexgilleran.hiitme.model.RepGroup;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Superset;
 import com.alexgilleran.hiitme.model.impl.ProgramImpl;
 import com.alexgilleran.hiitme.model.impl.RepGroupImpl;
 import com.alexgilleran.hiitme.model.impl.RepImpl;
@@ -22,11 +22,11 @@ public class ProgramDAOFake implements ProgramDAO {
 	private Map<Long, Program> programMap = new HashMap<Long, Program>();
 
 	public ProgramDAOFake() {
-		List<Rep> repList = new ArrayList<Rep>();
-		repList.add(new RepImpl("Hard", 20000, Rep.EffortLevel.HARD));
-		repList.add(new RepImpl("Rest", 10000, Rep.EffortLevel.REST));
+		List<Exercise> repList = new ArrayList<Exercise>();
+		repList.add(new RepImpl("Hard", 20000, Exercise.EffortLevel.HARD));
+		repList.add(new RepImpl("Rest", 10000, Exercise.EffortLevel.REST));
 
-		RepGroup group = new RepGroupImpl(8, repList);
+		Superset group = new RepGroupImpl(8, repList);
 
 		Program tabata = new ProgramImpl(0, "Tabata", "The tabata protocol",
 				Arrays.asList(group));
