@@ -55,19 +55,19 @@ public class ProgramRunService extends RoboIntentService {
 		currentCountDown.start();
 	}
 
-	private void tick(long msecondsRemaining) {
+	private void broadcastTick(long msecondsRemaining) {
 		for (ProgramObserver observer : observers) {
 			observer.onTick(msecondsRemaining);
 		}
 	}
 
-	private void nextExercise(Exercise newExercise) {
+	private void broadcastNextExercise(Exercise newExercise) {
 		for (ProgramObserver observer : observers) {
 			observer.onNextExercise(newExercise);
 		}
 	}
 
-	private void finish() {
+	private void broadcastFinish() {
 		for (ProgramObserver observer : observers) {
 			observer.onFinish();
 		}
@@ -76,7 +76,7 @@ public class ProgramRunService extends RoboIntentService {
 	public class ProgramBinder extends Binder {
 		public void start() {
 			startForeground(1, notification);
-			nextExercise(tracker.getCurrentExercise());
+			broadcastNextExercise(tracker.getCurrentExercise());
 			nextCountdown();
 		}
 
@@ -110,18 +110,22 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onFinish() {
-			nextExercise(tracker.next());
+			Exercise nextExercise = tracker.next();
+
+			if (nextExercise != null) {
+				broadcastNextExercise(nextExercise);
+			}
 
 			if (!tracker.isFinished()) {
 				nextCountdown();
 			} else {
-				finish();
+				broadcastFinish();
 			}
 		}
 
 		@Override
 		public void onTick(long millisUntilFinished) {
-			tick(millisUntilFinished);
+			broadcastTick(millisUntilFinished);
 		}
 	}
 }

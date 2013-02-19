@@ -7,6 +7,8 @@ package com.alexgilleran.hiitme.model;
  * @author Alex Gilleran
  */
 public interface Exercise {
+	Superset getSuperset();
+
 	/** Get the displayable name of the rep */
 	String getName();
 

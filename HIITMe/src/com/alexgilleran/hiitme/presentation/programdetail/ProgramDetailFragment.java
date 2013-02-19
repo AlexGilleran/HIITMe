@@ -1,5 +1,8 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import roboguice.fragment.RoboFragment;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,7 +18,7 @@ import android.widget.LinearLayout;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Superset;
-import com.alexgilleran.hiitme.presentation.programdetail.views.RepGroupView;
+import com.alexgilleran.hiitme.presentation.programdetail.views.SupersetView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
@@ -27,7 +30,6 @@ import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramObserver;
  * tablets) or a {@link ProgramDetailActivity} on handsets.
  */
 public class ProgramDetailFragment extends RoboFragment {
-
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -39,6 +41,8 @@ public class ProgramDetailFragment extends RoboFragment {
 	boolean bound;
 
 	private LayoutInflater inflater;
+
+	private Map<Superset, SupersetView> supersetViews = new HashMap<Superset, SupersetView>();
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -77,13 +81,14 @@ public class ProgramDetailFragment extends RoboFragment {
 				LinearLayout repGroupLayout = (LinearLayout) getView()
 						.findViewById(R.id.layout_repgroups);
 
-				for (Superset repGroup : programBinder.getProgram()
+				for (Superset superset : programBinder.getProgram()
 						.getSupersets()) {
-					RepGroupView repGroupView = (RepGroupView) inflater
+					SupersetView supersetView = (SupersetView) inflater
 							.inflate(R.layout.view_repgroup, null);
-					repGroupView.setRepGroup(repGroup);
+					supersetView.setRepGroup(superset);
 
-					repGroupLayout.addView(repGroupView, 0);
+					repGroupLayout.addView(supersetView, 0);
+					supersetViews.put(superset, supersetView);
 				}
 			}
 		}
@@ -102,7 +107,8 @@ public class ProgramDetailFragment extends RoboFragment {
 
 		@Override
 		public void onNextExercise(Exercise newExercise) {
-
+			supersetViews.get(newExercise.getSuperset()).setCurrentExercise(
+					newExercise);
 		}
 
 		@Override

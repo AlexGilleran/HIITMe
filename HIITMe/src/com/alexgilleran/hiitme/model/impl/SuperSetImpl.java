@@ -5,11 +5,11 @@ import java.util.List;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Superset;
 
-public class RepGroupImpl implements Superset {
+public class SuperSetImpl implements Superset {
 	private int repCount;
 	private List<Exercise> reps;
-	
-	public RepGroupImpl(int repCount, List<Exercise> reps) {
+
+	public SuperSetImpl(int repCount, List<Exercise> reps) {
 		super();
 		this.repCount = repCount;
 		this.reps = reps;

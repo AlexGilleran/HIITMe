@@ -111,10 +111,7 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onFinish() {
-			if (bound) {
-				getActivity().unbindService(connection);
-				bound = false;
-			}
+
 		}
 	};
 }

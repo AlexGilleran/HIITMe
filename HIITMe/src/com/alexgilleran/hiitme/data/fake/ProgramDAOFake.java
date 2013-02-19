@@ -12,8 +12,8 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Superset;
 import com.alexgilleran.hiitme.model.impl.ProgramImpl;
-import com.alexgilleran.hiitme.model.impl.RepGroupImpl;
-import com.alexgilleran.hiitme.model.impl.RepImpl;
+import com.alexgilleran.hiitme.model.impl.SuperSetImpl;
+import com.alexgilleran.hiitme.model.impl.ExerciseImpl;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -23,10 +23,12 @@ public class ProgramDAOFake implements ProgramDAO {
 
 	public ProgramDAOFake() {
 		List<Exercise> repList = new ArrayList<Exercise>();
-		repList.add(new RepImpl("Hard", 20000, Exercise.EffortLevel.HARD));
-		repList.add(new RepImpl("Rest", 10000, Exercise.EffortLevel.REST));
+		Superset group = new SuperSetImpl(8, repList);
 
-		Superset group = new RepGroupImpl(8, repList);
+		repList.add(new ExerciseImpl("Hard", 20000, Exercise.EffortLevel.HARD,
+				group));
+		repList.add(new ExerciseImpl("Rest", 10000, Exercise.EffortLevel.REST,
+				group));
 
 		Program tabata = new ProgramImpl(1, "Tabata", "The tabata protocol",
 				Arrays.asList(group));

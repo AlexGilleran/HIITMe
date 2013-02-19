@@ -1,6 +1,10 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -11,18 +15,19 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Superset;
 
-public class RepGroupView extends LinearLayout {
+public class SupersetView extends LinearLayout {
+	private Map<Exercise, TableRow> exerciseTextViews = new HashMap<Exercise, TableRow>();
 	private Superset repGroup;
 
-	public RepGroupView(Context context) {
+	public SupersetView(Context context) {
 		super(context);
 	}
 
-	public RepGroupView(Context context, AttributeSet attrs) {
+	public SupersetView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
-	public RepGroupView(Context context, AttributeSet attrs, int defStyle) {
+	public SupersetView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
@@ -35,6 +40,17 @@ public class RepGroupView extends LinearLayout {
 		this.repGroup = repGroup;
 
 		updateView();
+	}
+
+	public void setCurrentExercise(Exercise newCurrentExercise) {
+		for (Exercise exercise : repGroup.getExercises()) {
+			if (exercise.equals(newCurrentExercise)) {
+				exerciseTextViews.get(exercise).setBackgroundColor(Color.BLUE);
+			} else {
+				exerciseTextViews.get(exercise).setBackgroundColor(
+						Color.TRANSPARENT);
+			}
+		}
 	}
 
 	private void updateView() {
@@ -61,6 +77,7 @@ public class RepGroupView extends LinearLayout {
 			repRow.addView(repDurationView);
 
 			repLayout.addView(repRow);
+			this.exerciseTextViews.put(rep, repRow);
 		}
 	}
 }
