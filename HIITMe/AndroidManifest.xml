@@ -25,7 +25,7 @@
             android:name=".presentation.programdetail.ProgramDetailActivity"
             android:label="@string/title_program_detail">
         </activity>
-        <service android:name=".programrunner.ProgramRunner"></service>
+        <service android:name="com.alexgilleran.hiitme.programrunner.ProgramRunService"></service>
     </application>
 
 </manifest>

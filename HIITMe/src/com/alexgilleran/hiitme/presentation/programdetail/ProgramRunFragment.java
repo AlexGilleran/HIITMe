@@ -2,8 +2,6 @@ package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,9 +18,9 @@ import android.widget.TextView;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.programrunner.ProgramRunner;
-import com.alexgilleran.hiitme.programrunner.ProgramRunner.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramRunner.ProgramObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramRunService;
+import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
+import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramObserver;
 
 public class ProgramRunFragment extends RoboFragment {
 	@InjectView(R.id.textview_time_remaining)
@@ -33,11 +31,17 @@ public class ProgramRunFragment extends RoboFragment {
 
 	private ProgramBinder programBinder;
 
-	private boolean bound;
+	boolean bound;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Intent intent = new Intent(getActivity(), ProgramRunService.class);
+		intent.putExtra(Program.PROGRAM_ID_NAME, 1l);
+
+		bound = getActivity().getApplicationContext().bindService(intent,
+				connection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -50,6 +54,9 @@ public class ProgramRunFragment extends RoboFragment {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						while (!bound) {
+						}
+
 						programBinder.start();
 					}
 				});
@@ -60,34 +67,39 @@ public class ProgramRunFragment extends RoboFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-
-		// Bind to LocalService
-		Intent intent = new Intent(this.getActivity(), ProgramRunner.class);
-		intent.putExtra(Program.PROGRAM_ID_NAME, 1l);
-
-
-
-		this.getActivity().bindService(intent, connection,
-				Context.BIND_AUTO_CREATE);
-
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-
-		if (bound) {
-			this.getActivity().unbindService(connection);
-			bound = false;
-		}
 	}
 
-	private ProgramObserver observer = new ProgramObserver() {
+	private String formatTime(long mseconds) {
+		int minutes = (int) mseconds / 60000;
+		int seconds = (int) mseconds % 60000;
+
+		return minutes + ":" + seconds / 1000 + "." + (seconds % 1000 / 100);
+	}
+
+	private ServiceConnection connection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			// We've bound to LocalService, cast the IBinder and get
+			// LocalService instance
+			programBinder = (ProgramBinder) service;
+			programBinder.registerObserver(observer);
+		}
 
 		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			bound = false;
+		}
+	};
+
+	private ProgramObserver observer = new ProgramObserver() {
+		@Override
 		public void onTick(long msecondsRemaining) {
-			timeRemainingView.setText(Double.toString(Math
-					.ceil(msecondsRemaining / 100)));
+			timeRemainingView.setText(formatTime(msecondsRemaining));
 			progressBar
 					.setProgress((int) (progressBar.getMax() - msecondsRemaining));
 		}
@@ -99,26 +111,10 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onFinish() {
-
-		}
-
-	};
-
-	private ServiceConnection connection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			// We've bound to LocalService, cast the IBinder and get
-			// LocalService instance
-			programBinder = (ProgramBinder) service;
-			programBinder.registerObserver(observer);
-
-			bound = true;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			bound = false;
+			if (bound) {
+				getActivity().unbindService(connection);
+				bound = false;
+			}
 		}
 	};
-
 }

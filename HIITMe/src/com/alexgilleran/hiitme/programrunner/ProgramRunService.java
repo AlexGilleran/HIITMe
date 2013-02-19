@@ -5,7 +5,6 @@ import java.util.List;
 
 import roboguice.service.RoboIntentService;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.CountDownTimer;
@@ -17,7 +16,7 @@ import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.google.inject.Inject;
 
-public class ProgramRunner extends RoboIntentService {
+public class ProgramRunService extends RoboIntentService {
 
 	@Inject
 	private ProgramDAO programDao;
@@ -26,28 +25,28 @@ public class ProgramRunner extends RoboIntentService {
 	private List<ProgramObserver> observers = new ArrayList<ProgramObserver>();
 	private ExerciseCountDown currentCountDown;
 
-	public ProgramRunner() {
-		super("HIIT Me");
-	}
+	private Notification notification;
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
+	public ProgramRunService() {
+		super("HIIT Me");
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public IBinder onBind(Intent intent) {
-		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
-		Program program = programDao.getProgram(programId);
-		tracker = new ProgramTracker(program);
-
+	protected void onHandleIntent(Intent intent) {
 		Notification.Builder builder = new Notification.Builder(
 				this.getBaseContext());
 		builder.setContentTitle("HIIT Me");
 		builder.setSmallIcon(R.drawable.ic_launcher);
+		notification = builder.getNotification();
 
-		this.startForeground(1, builder.getNotification());
+		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
+		Program program = programDao.getProgram(programId);
+		tracker = new ProgramTracker(program);
+	}
 
+	@Override
+	public IBinder onBind(Intent intent) {
 		return new ProgramBinder();
 	}
 
@@ -74,12 +73,9 @@ public class ProgramRunner extends RoboIntentService {
 		}
 	}
 
-	public Program getProgram() {
-		return tracker.getProgram();
-	}
-
 	public class ProgramBinder extends Binder {
 		public void start() {
+			startForeground(1, notification);
 			nextExercise(tracker.getCurrentExercise());
 			nextCountdown();
 		}
@@ -90,6 +86,10 @@ public class ProgramRunner extends RoboIntentService {
 
 		public void registerObserver(ProgramObserver observer) {
 			observers.add(observer);
+		}
+
+		public Program getProgram() {
+			return tracker.getProgram();
 		}
 	}
 
@@ -102,7 +102,7 @@ public class ProgramRunner extends RoboIntentService {
 	}
 
 	private class ExerciseCountDown extends CountDownTimer {
-		private static final long TICK_RATE = 1000;
+		private static final long TICK_RATE = 100;
 
 		public ExerciseCountDown(Exercise rep) {
 			super(rep.getDuration(), TICK_RATE);

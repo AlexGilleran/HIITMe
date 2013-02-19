@@ -9,8 +9,9 @@ import android.view.MenuItem;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
-import com.alexgilleran.hiitme.programrunner.ProgramRunner;
+import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.google.inject.Inject;
 
 /**
@@ -22,8 +23,6 @@ import com.google.inject.Inject;
  * a {@link ProgramDetailFragment}.
  */
 public class ProgramDetailActivity extends RoboFragmentActivity {
-	private ProgramRunner programRunner;
-
 	@Inject
 	private ProgramDAO programDao;
 
@@ -35,24 +34,19 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
+		// Bind to LocalService
+		Intent intent = new Intent(this, ProgramRunService.class);
+		intent.putExtra(Program.PROGRAM_ID_NAME, 1l);
+		this.getApplicationContext().startService(intent);
+
 		if (savedInstanceState == null) {
-			// Create the detail fragment and add it to the activity
-			// using a fragment transaction.
-			int programId = getIntent().getIntExtra(
-					ProgramDetailFragment.ARG_ITEM_ID, 0);
-
-			// programRunner = new
-			// ProgramRunner(programDao.getProgram(programId));
-
 			FragmentTransaction transaction = getSupportFragmentManager()
 					.beginTransaction();
 
-//			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
-//			// detailFragment.setProgramRunner(programRunner);
-//			transaction.add(R.id.program_detail_container, detailFragment);
+			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
+			transaction.add(R.id.program_detail_container, detailFragment);
 
 			ProgramRunFragment runFragment = new ProgramRunFragment();
-			// runFragment.setProgramRunner(programRunner);
 			transaction.add(R.id.program_run_container, runFragment);
 
 			transaction.commit();
