@@ -23,11 +23,11 @@ public class ProgramDAOFake implements ProgramDAO {
 
 	public ProgramDAOFake() {
 		List<Exercise> repList = new ArrayList<Exercise>();
-		Superset group = new SuperSetImpl(8, repList);
+		Superset group = new SuperSetImpl(2, repList);
 
-		repList.add(new ExerciseImpl("Hard", 20000, Exercise.EffortLevel.HARD,
+		repList.add(new ExerciseImpl("Hard", 2000, Exercise.EffortLevel.HARD,
 				group));
-		repList.add(new ExerciseImpl("Rest", 10000, Exercise.EffortLevel.REST,
+		repList.add(new ExerciseImpl("Rest", 1000, Exercise.EffortLevel.REST,
 				group));
 
 		Program tabata = new ProgramImpl(1, "Tabata", "The tabata protocol",

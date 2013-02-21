@@ -53,6 +53,12 @@ public class SupersetView extends LinearLayout {
 		}
 	}
 
+	public void setRemainingReps(int repsLeft) {
+		TextView repCountTextView = (TextView) this
+				.findViewById(R.id.textview_repcount);
+		repCountTextView.setText(repsLeft + "/" + this.repGroup.getRepCount());
+	}
+
 	private void updateView() {
 		updateReps();
 

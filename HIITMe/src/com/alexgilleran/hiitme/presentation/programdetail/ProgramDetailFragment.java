@@ -115,5 +115,10 @@ public class ProgramDetailFragment extends RoboFragment {
 		public void onFinish() {
 
 		}
+
+		@Override
+		public void onRepFinish(Superset superset, int remainingReps) {
+			supersetViews.get(superset).setRemainingReps(remainingReps);
+		}
 	};
 }

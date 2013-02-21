@@ -14,6 +14,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.Superset;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
@@ -73,10 +74,18 @@ public class ProgramRunService extends RoboIntentService {
 		}
 	}
 
+	private void broadcastRepFinish(Superset superset, int remainingReps) {
+		for (ProgramObserver observer : observers) {
+			observer.onRepFinish(superset, remainingReps);
+		}
+	}
+
 	public class ProgramBinder extends Binder {
 		public void start() {
 			startForeground(1, notification);
 			broadcastNextExercise(tracker.getCurrentExercise());
+			broadcastRepFinish(tracker.getCurrentSuperset(),
+					tracker.getRepCount());
 			nextCountdown();
 		}
 
@@ -98,6 +107,8 @@ public class ProgramRunService extends RoboIntentService {
 
 		void onNextExercise(Exercise newExercise);
 
+		void onRepFinish(Superset superset, int remainingReps);
+
 		void onFinish();
 	}
 
@@ -110,10 +121,19 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onFinish() {
+			int oldRepCount = tracker.getRepCount();
+			Superset oldSuperset = tracker.getCurrentSuperset();
+
 			Exercise nextExercise = tracker.next();
 
 			if (nextExercise != null) {
 				broadcastNextExercise(nextExercise);
+			}
+
+			if (tracker.getRepCount() > oldRepCount
+					|| (!tracker.isFinished() && tracker.getCurrentSuperset() != oldSuperset)) {
+				broadcastRepFinish(tracker.getCurrentSuperset(),
+						tracker.getRepCount());
 			}
 
 			if (!tracker.isFinished()) {

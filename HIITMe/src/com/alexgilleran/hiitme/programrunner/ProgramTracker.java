@@ -5,11 +5,12 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Superset;
 
 public class ProgramTracker {
+	private static final int INITIAL_REP_COUNT = 1;
 	private static final int FINISHED_FLAG = -1;
 	private Program program;
 	private int currentExerciseIndex;
 	private int currentSupersetIndex;
-	private int currentRepCount;
+	private int currentRepCount = INITIAL_REP_COUNT;
 
 	public ProgramTracker(Program program) {
 		this.program = program;
@@ -41,6 +42,14 @@ public class ProgramTracker {
 				|| currentSupersetIndex == FINISHED_FLAG || currentRepCount == FINISHED_FLAG);
 	}
 
+	public int getRepCount() {
+		if (this.getCurrentSuperset() != null) {
+			return this.currentRepCount;
+		} else {
+			return -1;
+		}
+	}
+
 	public Exercise next() {
 		if (currentExerciseIndex < getCurrentSuperset().getExercises().size() - 1) {
 			// There's another exercise in this superset, move up to that
@@ -52,7 +61,7 @@ public class ProgramTracker {
 			currentExerciseIndex = 0;
 		} else if (currentSupersetIndex < program.getSupersets().size() - 1) {
 			// No more reps remaining, go to next superset
-			currentRepCount = 0;
+			currentRepCount = INITIAL_REP_COUNT;
 			currentExerciseIndex = 0;
 			currentSupersetIndex++;
 		} else {
