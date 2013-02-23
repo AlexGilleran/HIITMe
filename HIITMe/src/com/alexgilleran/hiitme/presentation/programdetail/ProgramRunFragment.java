@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -51,14 +52,21 @@ public class ProgramRunFragment extends RoboFragment {
 		View view = inflater.inflate(R.layout.fragment_program_run, container,
 				false);
 
-		view.findViewById(R.id.rep_button_pause).setOnClickListener(
+		view.findViewById(R.id.rep_button_play_pause).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						while (!bound) {
+						int iconResId;
+
+						if (programBinder.isRunning()) {
+							iconResId = android.R.drawable.ic_media_play;
+							programBinder.pause();
+						} else {
+							iconResId = android.R.drawable.ic_media_pause;
+							programBinder.start();
 						}
 
-						programBinder.start();
+						((ImageButton) v).setImageResource(iconResId);
 					}
 				});
 

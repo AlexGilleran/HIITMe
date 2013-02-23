@@ -26,6 +26,8 @@ public class ProgramRunService extends RoboIntentService {
 	private List<ProgramObserver> observers = new ArrayList<ProgramObserver>();
 	private ExerciseCountDown currentCountDown;
 
+	boolean isRunning = false;
+
 	private Notification notification;
 
 	public ProgramRunService() {
@@ -72,6 +74,9 @@ public class ProgramRunService extends RoboIntentService {
 		for (ProgramObserver observer : observers) {
 			observer.onFinish();
 		}
+
+		stopForeground(true);
+		isRunning = false;
 	}
 
 	private void broadcastRepFinish(Superset superset, int remainingReps) {
@@ -81,16 +86,31 @@ public class ProgramRunService extends RoboIntentService {
 	}
 
 	public class ProgramBinder extends Binder {
+		boolean isPaused;
+
 		public void start() {
-			startForeground(1, notification);
-			broadcastNextExercise(tracker.getCurrentExercise());
-			broadcastRepFinish(tracker.getCurrentSuperset(),
-					tracker.getRepCount());
-			nextCountdown();
+			isRunning = true;
+
+			if (isPaused) {
+				currentCountDown.start();
+			} else {
+				startForeground(1, notification);
+				broadcastNextExercise(tracker.getCurrentExercise());
+				broadcastRepFinish(tracker.getCurrentSuperset(),
+						tracker.getRepCount());
+				nextCountdown();
+			}
 		}
 
 		public void stop() {
+			isRunning = false;
 			currentCountDown.cancel();
+		}
+
+		public void pause() {
+			isPaused = true;
+			isRunning = false;
+			currentCountDown = currentCountDown.pause();
 		}
 
 		public void registerObserver(ProgramObserver observer) {
@@ -99,6 +119,10 @@ public class ProgramRunService extends RoboIntentService {
 
 		public Program getProgram() {
 			return tracker.getProgram();
+		}
+
+		public boolean isRunning() {
+			return isRunning;
 		}
 	}
 
@@ -114,9 +138,14 @@ public class ProgramRunService extends RoboIntentService {
 
 	private class ExerciseCountDown extends CountDownTimer {
 		private static final long TICK_RATE = 100;
+		private long millisUntilFinished;
 
 		public ExerciseCountDown(Exercise rep) {
 			super(rep.getDuration(), TICK_RATE);
+		}
+
+		private ExerciseCountDown(long duration) {
+			super(duration, TICK_RATE);
 		}
 
 		@Override
@@ -146,6 +175,13 @@ public class ProgramRunService extends RoboIntentService {
 		@Override
 		public void onTick(long millisUntilFinished) {
 			broadcastTick(millisUntilFinished);
+			this.millisUntilFinished = millisUntilFinished;
+		}
+
+		public ExerciseCountDown pause() {
+			this.cancel();
+
+			return new ExerciseCountDown(this.millisUntilFinished);
 		}
 	}
 }
