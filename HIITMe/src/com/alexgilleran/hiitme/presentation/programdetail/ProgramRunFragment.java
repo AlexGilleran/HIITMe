@@ -22,7 +22,7 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Superset;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramObserver;
 
 public class ProgramRunFragment extends RoboFragment {
 	@InjectView(R.id.textview_time_remaining)
@@ -31,9 +31,10 @@ public class ProgramRunFragment extends RoboFragment {
 	@InjectView(R.id.progressbar_exercise)
 	private ProgressBar progressBar;
 
-	private ProgramBinder programBinder;
+	@InjectView(R.id.rep_button_play_pause)
+	private ImageButton playButton;
 
-	boolean bound;
+	private ProgramBinder programBinder;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,8 +43,8 @@ public class ProgramRunFragment extends RoboFragment {
 		Intent intent = new Intent(getActivity(), ProgramRunService.class);
 		intent.putExtra(Program.PROGRAM_ID_NAME, 1l);
 
-		bound = getActivity().getApplicationContext().bindService(intent,
-				connection, Context.BIND_AUTO_CREATE);
+		getActivity().getApplicationContext().bindService(intent, connection,
+				Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -56,31 +57,24 @@ public class ProgramRunFragment extends RoboFragment {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						int iconResId;
-
 						if (programBinder.isRunning()) {
-							iconResId = android.R.drawable.ic_media_play;
 							programBinder.pause();
 						} else {
-							iconResId = android.R.drawable.ic_media_pause;
 							programBinder.start();
 						}
 
-						((ImageButton) v).setImageResource(iconResId);
+						refreshPlayButtonIcon();
 					}
 				});
 
 		return view;
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-	}
+	private void refreshPlayButtonIcon() {
+		int iconResId = programBinder.isRunning() ? android.R.drawable.ic_media_pause
+				: android.R.drawable.ic_media_play;
 
-	@Override
-	public void onStop() {
-		super.onStop();
+		playButton.setImageResource(iconResId);
 	}
 
 	private String formatTime(long mseconds) {
@@ -93,15 +87,13 @@ public class ProgramRunFragment extends RoboFragment {
 	private ServiceConnection connection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			// We've bound to LocalService, cast the IBinder and get
-			// LocalService instance
 			programBinder = (ProgramBinder) service;
 			programBinder.registerObserver(observer);
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
-			bound = false;
+
 		}
 	};
 
@@ -120,7 +112,9 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onFinish() {
-
+			timeRemainingView.setText(formatTime(0));
+			refreshPlayButtonIcon();
+			progressBar.setProgress(progressBar.getMax());
 		}
 
 		@Override

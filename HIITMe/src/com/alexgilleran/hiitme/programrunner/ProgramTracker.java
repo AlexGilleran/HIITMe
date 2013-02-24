@@ -1,5 +1,8 @@
 package com.alexgilleran.hiitme.programrunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Superset;
@@ -11,6 +14,7 @@ public class ProgramTracker {
 	private int currentExerciseIndex;
 	private int currentSupersetIndex;
 	private int currentRepCount = INITIAL_REP_COUNT;
+	private List<ProgramObserver> observers = new ArrayList<ProgramObserver>();
 
 	public ProgramTracker(Program program) {
 		this.program = program;
@@ -73,5 +77,43 @@ public class ProgramTracker {
 		}
 
 		return this.getCurrentExercise();
+	}
+
+	public void registerObserver(ProgramObserver observer) {
+		observers.add(observer);
+	}
+
+	protected void broadcastTick(long msecondsRemaining) {
+		for (ProgramObserver observer : observers) {
+			observer.onTick(msecondsRemaining);
+		}
+	}
+
+	protected void broadcastNextExercise(Exercise newExercise) {
+		for (ProgramObserver observer : observers) {
+			observer.onNextExercise(newExercise);
+		}
+	}
+
+	protected void broadcastFinish() {
+		for (ProgramObserver observer : observers) {
+			observer.onFinish();
+		}
+	}
+
+	protected void broadcastRepFinish(Superset superset, int remainingReps) {
+		for (ProgramObserver observer : observers) {
+			observer.onRepFinish(superset, remainingReps);
+		}
+	}
+
+	public interface ProgramObserver {
+		void onTick(long msecondsRemaining);
+
+		void onNextExercise(Exercise newExercise);
+
+		void onRepFinish(Superset superset, int remainingReps);
+
+		void onFinish();
 	}
 }

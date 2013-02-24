@@ -22,7 +22,7 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.SupersetView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramObserver;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is
@@ -37,8 +37,6 @@ public class ProgramDetailFragment extends RoboFragment {
 	public static final String ARG_ITEM_ID = "item_id";
 
 	private ProgramBinder programBinder;
-
-	boolean bound;
 
 	private LayoutInflater inflater;
 
@@ -90,12 +88,16 @@ public class ProgramDetailFragment extends RoboFragment {
 					repGroupLayout.addView(supersetView, 0);
 					supersetViews.put(superset, supersetView);
 				}
+
+				supersetViews.get(programBinder.getCurrentSuperset())
+						.setCurrentExercise(programBinder.getCurrentExercise());
+
 			}
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
-			bound = false;
+
 		}
 	};
 
