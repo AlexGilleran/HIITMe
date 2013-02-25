@@ -14,9 +14,9 @@ public class ProgramTracker {
 	private int currentExerciseIndex;
 	private int currentSupersetIndex;
 	private int currentRepCount = INITIAL_REP_COUNT;
-	private List<ProgramObserver> observers = new ArrayList<ProgramObserver>();
+	private List<ProgramTrackerObserver> observers = new ArrayList<ProgramTrackerObserver>();
 
-	public ProgramTracker(Program program) {
+	public ProgramTracker(Program program, ProgramTrackerObserver listener) {
 		this.program = program;
 	}
 
@@ -54,7 +54,14 @@ public class ProgramTracker {
 		}
 	}
 
-	public Exercise next() {
+	public void start() {
+		this.broadcastNextExercise(getCurrentExercise());
+	}
+
+	public void next() {
+		int oldRepCount = getRepCount();
+		Superset oldSuperset = getCurrentSuperset();
+
 		if (currentExerciseIndex < getCurrentSuperset().getExercises().size() - 1) {
 			// There's another exercise in this superset, move up to that
 			currentExerciseIndex++;
@@ -70,46 +77,46 @@ public class ProgramTracker {
 			currentSupersetIndex++;
 		} else {
 			// No more exercises, reps or supersets - we are done!
-
 			currentRepCount = FINISHED_FLAG;
 			currentExerciseIndex = FINISHED_FLAG;
 			currentSupersetIndex = FINISHED_FLAG;
 		}
 
-		return this.getCurrentExercise();
-	}
+		if (!isFinished()) {
+			broadcastNextExercise(getCurrentExercise());
 
-	public void registerObserver(ProgramObserver observer) {
-		observers.add(observer);
-	}
-
-	protected void broadcastTick(long msecondsRemaining) {
-		for (ProgramObserver observer : observers) {
-			observer.onTick(msecondsRemaining);
+			if (getRepCount() > oldRepCount
+					|| (!isFinished() && getCurrentSuperset() != oldSuperset)) {
+				broadcastRepFinish(getCurrentSuperset(), getRepCount());
+			}
+		} else {
+			broadcastFinish();
 		}
 	}
 
-	protected void broadcastNextExercise(Exercise newExercise) {
-		for (ProgramObserver observer : observers) {
+	public void registerObserver(ProgramTrackerObserver observer) {
+		observers.add(observer);
+	}
+
+	private void broadcastNextExercise(Exercise newExercise) {
+		for (ProgramTrackerObserver observer : observers) {
 			observer.onNextExercise(newExercise);
 		}
 	}
 
-	protected void broadcastFinish() {
-		for (ProgramObserver observer : observers) {
+	private void broadcastFinish() {
+		for (ProgramTrackerObserver observer : observers) {
 			observer.onFinish();
 		}
 	}
 
-	protected void broadcastRepFinish(Superset superset, int remainingReps) {
-		for (ProgramObserver observer : observers) {
+	private void broadcastRepFinish(Superset superset, int remainingReps) {
+		for (ProgramTrackerObserver observer : observers) {
 			observer.onRepFinish(superset, remainingReps);
 		}
 	}
 
-	public interface ProgramObserver {
-		void onTick(long msecondsRemaining);
-
+	public interface ProgramTrackerObserver {
 		void onNextExercise(Exercise newExercise);
 
 		void onRepFinish(Superset superset, int remainingReps);

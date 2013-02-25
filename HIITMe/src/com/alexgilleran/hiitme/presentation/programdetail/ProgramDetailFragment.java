@@ -22,7 +22,7 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.SupersetView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramRunObserver;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is
@@ -88,10 +88,6 @@ public class ProgramDetailFragment extends RoboFragment {
 					repGroupLayout.addView(supersetView, 0);
 					supersetViews.put(superset, supersetView);
 				}
-
-				supersetViews.get(programBinder.getCurrentSuperset())
-						.setCurrentExercise(programBinder.getCurrentExercise());
-
 			}
 		}
 
@@ -101,12 +97,7 @@ public class ProgramDetailFragment extends RoboFragment {
 		}
 	};
 
-	private ProgramObserver observer = new ProgramObserver() {
-		@Override
-		public void onTick(long msecondsRemaining) {
-
-		}
-
+	private ProgramRunObserver observer = new ProgramRunObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
 			supersetViews.get(newExercise.getSuperset()).setCurrentExercise(
@@ -121,6 +112,10 @@ public class ProgramDetailFragment extends RoboFragment {
 		@Override
 		public void onRepFinish(Superset superset, int remainingReps) {
 			supersetViews.get(superset).setRemainingReps(remainingReps);
+		}
+
+		@Override
+		public void onTick(long msecondsRemaining) {
 		}
 	};
 }

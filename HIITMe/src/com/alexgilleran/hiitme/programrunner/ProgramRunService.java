@@ -1,5 +1,8 @@
 package com.alexgilleran.hiitme.programrunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import roboguice.service.RoboIntentService;
 import android.app.Notification;
 import android.content.Intent;
@@ -11,7 +14,8 @@ import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Superset;
-import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramObserver;
+import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramTrackerObserver;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
@@ -25,6 +29,8 @@ public class ProgramRunService extends RoboIntentService {
 	boolean isRunning = false;
 
 	private Notification notification;
+
+	private List<ProgramRunObserver> observers = new ArrayList<ProgramRunObserver>();
 
 	public ProgramRunService() {
 		super("HIIT Me");
@@ -42,8 +48,7 @@ public class ProgramRunService extends RoboIntentService {
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 		Program program = programDao.getProgram(programId);
 
-		tracker = new ProgramTracker(program);
-		tracker.registerObserver(programObserver);
+		tracker = new ProgramTracker(program, programObserver);
 	}
 
 	@Override
@@ -51,21 +56,15 @@ public class ProgramRunService extends RoboIntentService {
 		return new ProgramBinder();
 	}
 
-	private void nextCountdown() {
-		currentCountDown = new ExerciseCountDown(tracker);
+	private void nextCountDown() {
+		currentCountDown = new ExerciseCountDown(tracker.getCurrentExercise()
+				.getDuration(), countDownObserver);
 		currentCountDown.start();
 	}
 
-	private ProgramObserver programObserver = new ProgramObserver() {
-		@Override
-		public void onTick(long msecondsRemaining) {
-		}
-
+	private ProgramTrackerObserver programObserver = new ProgramTrackerObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
-			if (!tracker.isFinished()) {
-				nextCountdown();
-			}
 		}
 
 		@Override
@@ -88,8 +87,9 @@ public class ProgramRunService extends RoboIntentService {
 			if (isPaused) {
 				currentCountDown.start();
 			} else {
-				nextCountdown();
 				startForeground(1, notification);
+				tracker.start();
+				nextCountDown();
 			}
 		}
 
@@ -112,7 +112,8 @@ public class ProgramRunService extends RoboIntentService {
 			return isRunning;
 		}
 
-		public void registerObserver(ProgramObserver observer) {
+		public void registerObserver(ProgramRunObserver observer) {
+			observers.add(observer);
 			tracker.registerObserver(observer);
 		}
 
@@ -123,5 +124,28 @@ public class ProgramRunService extends RoboIntentService {
 		public Exercise getCurrentExercise() {
 			return tracker.getCurrentExercise();
 		}
+	}
+
+	private CountDownObserver countDownObserver = new CountDownObserver() {
+		@Override
+		public void onTick(long msecondsRemaining) {
+			for (CountDownObserver observer : observers) {
+				observer.onTick(msecondsRemaining);
+			}
+		}
+
+		@Override
+		public void onFinish() {
+			tracker.next();
+
+			if (!tracker.isFinished()) {
+				nextCountDown();
+			}
+		}
+	};
+
+	public interface ProgramRunObserver extends ProgramTrackerObserver,
+			CountDownObserver {
+
 	}
 }

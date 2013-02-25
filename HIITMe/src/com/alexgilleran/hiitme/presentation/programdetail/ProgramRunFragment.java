@@ -22,7 +22,7 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Superset;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramRunObserver;
 
 public class ProgramRunFragment extends RoboFragment {
 	@InjectView(R.id.textview_time_remaining)
@@ -97,7 +97,7 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 	};
 
-	private ProgramObserver observer = new ProgramObserver() {
+	private ProgramRunObserver observer = new ProgramRunObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
 			timeRemainingView.setText(formatTime(msecondsRemaining));
