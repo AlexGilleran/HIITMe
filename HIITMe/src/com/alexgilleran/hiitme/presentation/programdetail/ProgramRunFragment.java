@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramRunObserver;
@@ -118,7 +118,7 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 
 		@Override
-		public void onRepFinish(Superset superset, int remainingReps) {
+		public void onRepFinish(ExerciseGroup superset, int remainingReps) {
 
 		}
 	};

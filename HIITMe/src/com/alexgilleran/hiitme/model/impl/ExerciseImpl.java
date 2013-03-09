@@ -1,21 +1,21 @@
 package com.alexgilleran.hiitme.model.impl;
 
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
 
 public class ExerciseImpl implements Exercise {
 	private String name;
 	private int duration;
 	private EffortLevel effortLevel;
-	private Superset superset;
+	private ExerciseGroup exerciseGroup;
 
 	public ExerciseImpl(String name, int duration, EffortLevel effortLevel,
-			Superset superset) {
+			ExerciseGroup superset) {
 		super();
 		this.name = name;
 		this.duration = duration;
 		this.effortLevel = effortLevel;
-		this.superset = superset;
+		this.exerciseGroup = superset;
 	}
 
 	@Override
@@ -34,8 +34,24 @@ public class ExerciseImpl implements Exercise {
 	}
 
 	@Override
-	public Superset getSuperset() {
-		return superset;
+	public ExerciseGroup getSuperset() {
+		return exerciseGroup;
+	}
+
+	@Override
+	public Exercise getNext() {
+		if (exerciseGroup.getParent() != null) {
+			int exerciseIndex = exerciseGroup.getParent().getExerciseGroups()
+					.indexOf(exerciseGroup);
+
+			if (exerciseIndex < exerciseGroup.getParent().getExerciseGroups()
+					.size() - 1) {
+				return exerciseGroup.getParent().getExerciseGroups()
+						.get(exerciseIndex + 1).getFirstExercise();
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -69,4 +85,5 @@ public class ExerciseImpl implements Exercise {
 			return false;
 		return true;
 	}
+
 }

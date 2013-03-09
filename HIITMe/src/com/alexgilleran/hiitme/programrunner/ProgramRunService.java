@@ -13,7 +13,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
 import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramTrackerObserver;
 import com.google.inject.Inject;
@@ -23,7 +23,7 @@ public class ProgramRunService extends RoboIntentService {
 	@Inject
 	private ProgramDAO programDao;
 
-	private ProgramTracker tracker;
+	private IProgramTracker tracker;
 
 	private ExerciseCountDown currentCountDown;
 	boolean isRunning = false;
@@ -68,7 +68,7 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		@Override
-		public void onRepFinish(Superset superset, int remainingReps) {
+		public void onRepFinish(ExerciseGroup superset, int remainingReps) {
 		}
 
 		@Override
@@ -117,7 +117,7 @@ public class ProgramRunService extends RoboIntentService {
 			tracker.registerObserver(observer);
 		}
 
-		public Superset getCurrentSuperset() {
+		public ExerciseGroup getCurrentSuperset() {
 			return tracker.getCurrentSuperset();
 		}
 

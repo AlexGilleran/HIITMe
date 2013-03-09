@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
 
 public class SupersetView extends LinearLayout {
 	private Map<Exercise, TableRow> exerciseTextViews = new HashMap<Exercise, TableRow>();
-	private Superset repGroup;
+	private ExerciseGroup repGroup;
 
 	public SupersetView(Context context) {
 		super(context);
@@ -36,21 +36,21 @@ public class SupersetView extends LinearLayout {
 
 	}
 
-	public void setRepGroup(Superset repGroup) {
+	public void setRepGroup(ExerciseGroup repGroup) {
 		this.repGroup = repGroup;
 
 		updateView();
 	}
 
 	public void setCurrentExercise(Exercise newCurrentExercise) {
-		for (Exercise exercise : repGroup.getExercises()) {
-			if (exercise.equals(newCurrentExercise)) {
-				exerciseTextViews.get(exercise).setBackgroundColor(Color.BLUE);
-			} else {
-				exerciseTextViews.get(exercise).setBackgroundColor(
-						Color.TRANSPARENT);
-			}
-		}
+//		for (Exercise exercise : repGroup.getContents()) {
+//			if (exercise.equals(newCurrentExercise)) {
+//				exerciseTextViews.get(exercise).setBackgroundColor(Color.BLUE);
+//			} else {
+//				exerciseTextViews.get(exercise).setBackgroundColor(
+//						Color.TRANSPARENT);
+//			}
+//		}
 	}
 
 	public void setRemainingReps(int repsLeft) {
@@ -71,19 +71,19 @@ public class SupersetView extends LinearLayout {
 		TableLayout repLayout = (TableLayout) this
 				.findViewById(R.id.layout_reps);
 
-		for (Exercise rep : repGroup.getExercises()) {
-			TableRow repRow = new TableRow(this.getContext());
-
-			TextView repLabelView = new TextView(this.getContext());
-			repLabelView.setText(rep.getName());
-			repRow.addView(repLabelView);
-
-			TextView repDurationView = new TextView(this.getContext());
-			repDurationView.setText((rep.getDuration() / 1000) + " seconds");
-			repRow.addView(repDurationView);
-
-			repLayout.addView(repRow);
-			this.exerciseTextViews.put(rep, repRow);
-		}
+//		for (Exercise rep : repGroup.getContents()) {
+//			TableRow repRow = new TableRow(this.getContext());
+//
+//			TextView repLabelView = new TextView(this.getContext());
+//			repLabelView.setText(rep.getName());
+//			repRow.addView(repLabelView);
+//
+//			TextView repDurationView = new TextView(this.getContext());
+//			repDurationView.setText((rep.getDuration() / 1000) + " seconds");
+//			repRow.addView(repDurationView);
+//
+//			repLayout.addView(repRow);
+//			this.exerciseTextViews.put(rep, repRow);
+//		}
 	}
 }

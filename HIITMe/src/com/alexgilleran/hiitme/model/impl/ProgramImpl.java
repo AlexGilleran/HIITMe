@@ -2,11 +2,11 @@ package com.alexgilleran.hiitme.model.impl;
 
 import java.util.List;
 
-import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
+import com.alexgilleran.hiitme.model.Program;
 
-public class ProgramImpl implements Program {
+public class ProgramImpl extends ExerciseGroupImpl implements Program {
 	private long id;
 
 	/** Name of the program */
@@ -14,13 +14,14 @@ public class ProgramImpl implements Program {
 	/** Description **/
 	private String description;
 	/** List of the rep groups */
-	private List<Superset> repGroups;
+	private List<ExerciseGroup> repGroups;
 
 	private Exercise warmUp = null;
 
 	public ProgramImpl(long id, String name, String description,
-			List<Superset> setGroups) {
-		super();
+			List<ExerciseGroup> setGroups) {
+		super(1, null, setGroups);
+
 		this.id = id;
 		this.name = name;
 		this.description = description;
@@ -43,7 +44,7 @@ public class ProgramImpl implements Program {
 	}
 
 	@Override
-	public List<Superset> getSupersets() {
+	public List<ExerciseGroup> getSupersets() {
 		return repGroups;
 	}
 

@@ -9,7 +9,7 @@ import java.util.List;
  * @author Alex Gilleran
  * 
  */
-public interface Program {
+public interface Program extends ExerciseGroup {
 	public static final String PROGRAM_ID_NAME = "programid";
 
 	/** The id of this program */
@@ -22,7 +22,7 @@ public interface Program {
 	String getDescription();
 
 	/** Gets the rep groups of the program, in order */
-	List<Superset> getSupersets();
+	List<ExerciseGroup> getSupersets();
 
 	/** Gets the warmup rep */
 	Exercise getWarmUp();

@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
 import com.alexgilleran.hiitme.presentation.programdetail.views.SupersetView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
@@ -40,7 +40,7 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	private LayoutInflater inflater;
 
-	private Map<Superset, SupersetView> supersetViews = new HashMap<Superset, SupersetView>();
+	private Map<ExerciseGroup, SupersetView> supersetViews = new HashMap<ExerciseGroup, SupersetView>();
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -79,7 +79,7 @@ public class ProgramDetailFragment extends RoboFragment {
 				LinearLayout repGroupLayout = (LinearLayout) getView()
 						.findViewById(R.id.layout_repgroups);
 
-				for (Superset superset : programBinder.getProgram()
+				for (ExerciseGroup superset : programBinder.getProgram()
 						.getSupersets()) {
 					SupersetView supersetView = (SupersetView) inflater
 							.inflate(R.layout.view_repgroup, null);
@@ -110,7 +110,7 @@ public class ProgramDetailFragment extends RoboFragment {
 		}
 
 		@Override
-		public void onRepFinish(Superset superset, int remainingReps) {
+		public void onRepFinish(ExerciseGroup superset, int remainingReps) {
 			supersetViews.get(superset).setRemainingReps(remainingReps);
 		}
 

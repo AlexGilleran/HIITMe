@@ -10,9 +10,9 @@ import java.util.Map;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Superset;
+import com.alexgilleran.hiitme.model.ExerciseGroup;
 import com.alexgilleran.hiitme.model.impl.ProgramImpl;
-import com.alexgilleran.hiitme.model.impl.SuperSetImpl;
+import com.alexgilleran.hiitme.model.impl.ExerciseGroupImpl;
 import com.alexgilleran.hiitme.model.impl.ExerciseImpl;
 import com.google.inject.Singleton;
 
@@ -23,7 +23,7 @@ public class ProgramDAOFake implements ProgramDAO {
 
 	public ProgramDAOFake() {
 		List<Exercise> repList = new ArrayList<Exercise>();
-		Superset group = new SuperSetImpl(2, repList);
+		ExerciseGroup group = new ExerciseGroupImpl(2, repList);
 
 		repList.add(new ExerciseImpl("Hard", 2000, Exercise.EffortLevel.HARD,
 				group));
