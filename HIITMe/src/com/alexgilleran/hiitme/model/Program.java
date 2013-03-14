@@ -1,6 +1,6 @@
 package com.alexgilleran.hiitme.model;
 
-import java.util.List;
+import com.alexgilleran.hiitme.model.impl.ProgramImpl.ProgramObserver;
 
 /**
  * Represents an entire HIIT program... e.g. the Tabata protocol is an instance
@@ -9,7 +9,7 @@ import java.util.List;
  * @author Alex Gilleran
  * 
  */
-public interface Program extends ExerciseGroup {
+public interface Program extends ProgramNode {
 	public static final String PROGRAM_ID_NAME = "programid";
 
 	/** The id of this program */
@@ -21,9 +21,10 @@ public interface Program extends ExerciseGroup {
 	/** Gets a description of the program */
 	String getDescription();
 
-	/** Gets the rep groups of the program, in order */
-	List<ExerciseGroup> getSupersets();
 
-	/** Gets the warmup rep */
-	Exercise getWarmUp();
+	int getTotalReps();
+
+	void start();
+
+	void registerObserver(ProgramObserver observer);
 }

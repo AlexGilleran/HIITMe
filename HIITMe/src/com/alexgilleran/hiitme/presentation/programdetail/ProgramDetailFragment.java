@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ExerciseGroup;
+import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.views.SupersetView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
@@ -40,7 +40,7 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	private LayoutInflater inflater;
 
-	private Map<ExerciseGroup, SupersetView> supersetViews = new HashMap<ExerciseGroup, SupersetView>();
+	private Map<ProgramNode, SupersetView> supersetViews = new HashMap<ProgramNode, SupersetView>();
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -79,8 +79,8 @@ public class ProgramDetailFragment extends RoboFragment {
 				LinearLayout repGroupLayout = (LinearLayout) getView()
 						.findViewById(R.id.layout_repgroups);
 
-				for (ExerciseGroup superset : programBinder.getProgram()
-						.getSupersets()) {
+				for (ProgramNode superset : programBinder.getProgram()
+						.getChildren()) {
 					SupersetView supersetView = (SupersetView) inflater
 							.inflate(R.layout.view_repgroup, null);
 					supersetView.setRepGroup(superset);
@@ -100,7 +100,7 @@ public class ProgramDetailFragment extends RoboFragment {
 	private ProgramRunObserver observer = new ProgramRunObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
-			supersetViews.get(newExercise.getSuperset()).setCurrentExercise(
+			supersetViews.get(newExercise.getParentNode()).setCurrentExercise(
 					newExercise);
 		}
 
@@ -110,7 +110,7 @@ public class ProgramDetailFragment extends RoboFragment {
 		}
 
 		@Override
-		public void onRepFinish(ExerciseGroup superset, int remainingReps) {
+		public void onRepFinish(ProgramNode superset, int remainingReps) {
 			supersetViews.get(superset).setRemainingReps(remainingReps);
 		}
 

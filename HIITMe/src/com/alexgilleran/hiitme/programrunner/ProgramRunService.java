@@ -13,9 +13,9 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.ExerciseGroup;
+import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.impl.ProgramImpl.ProgramObserver;
 import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
-import com.alexgilleran.hiitme.programrunner.ProgramTracker.ProgramTrackerObserver;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
@@ -23,7 +23,7 @@ public class ProgramRunService extends RoboIntentService {
 	@Inject
 	private ProgramDAO programDao;
 
-	private IProgramTracker tracker;
+	private Program program;
 
 	private ExerciseCountDown currentCountDown;
 	boolean isRunning = false;
@@ -47,8 +47,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 		Program program = programDao.getProgram(programId);
-
-		tracker = new ProgramTracker(program, programObserver);
+		program.registerObserver(programObserver);
 	}
 
 	@Override
@@ -57,18 +56,18 @@ public class ProgramRunService extends RoboIntentService {
 	}
 
 	private void nextCountDown() {
-		currentCountDown = new ExerciseCountDown(tracker.getCurrentExercise()
+		currentCountDown = new ExerciseCountDown(program.getCurrentExercise()
 				.getDuration(), countDownObserver);
 		currentCountDown.start();
 	}
 
-	private ProgramTrackerObserver programObserver = new ProgramTrackerObserver() {
+	private ProgramObserver programObserver = new ProgramObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
 		}
 
 		@Override
-		public void onRepFinish(ExerciseGroup superset, int remainingReps) {
+		public void onRepFinish(ProgramNode superset, int remainingReps) {
 		}
 
 		@Override
@@ -88,7 +87,7 @@ public class ProgramRunService extends RoboIntentService {
 				currentCountDown.start();
 			} else {
 				startForeground(1, notification);
-				tracker.start();
+				program.start();
 				nextCountDown();
 			}
 		}
@@ -105,7 +104,7 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		public Program getProgram() {
-			return tracker.getProgram();
+			return program;
 		}
 
 		public boolean isRunning() {
@@ -114,15 +113,15 @@ public class ProgramRunService extends RoboIntentService {
 
 		public void registerObserver(ProgramRunObserver observer) {
 			observers.add(observer);
-			tracker.registerObserver(observer);
+			program.registerObserver(observer);
 		}
 
-		public ExerciseGroup getCurrentSuperset() {
-			return tracker.getCurrentSuperset();
+		public ProgramNode getCurrentSuperset() {
+			return program.getCurrentNode();
 		}
 
 		public Exercise getCurrentExercise() {
-			return tracker.getCurrentExercise();
+			return program.getCurrentExercise();
 		}
 	}
 
@@ -136,15 +135,15 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onFinish() {
-			tracker.next();
+			program.next();
 
-			if (!tracker.isFinished()) {
+			if (!program.isFinished()) {
 				nextCountDown();
 			}
 		}
 	};
 
-	public interface ProgramRunObserver extends ProgramTrackerObserver,
+	public interface ProgramRunObserver extends ProgramObserver,
 			CountDownObserver {
 
 	}

@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ExerciseGroup;
+import com.alexgilleran.hiitme.model.ProgramNode;
 
 public class SupersetView extends LinearLayout {
 	private Map<Exercise, TableRow> exerciseTextViews = new HashMap<Exercise, TableRow>();
-	private ExerciseGroup repGroup;
+	private ProgramNode repGroup;
 
 	public SupersetView(Context context) {
 		super(context);
@@ -36,7 +36,7 @@ public class SupersetView extends LinearLayout {
 
 	}
 
-	public void setRepGroup(ExerciseGroup repGroup) {
+	public void setRepGroup(ProgramNode repGroup) {
 		this.repGroup = repGroup;
 
 		updateView();
@@ -56,7 +56,7 @@ public class SupersetView extends LinearLayout {
 	public void setRemainingReps(int repsLeft) {
 		TextView repCountTextView = (TextView) this
 				.findViewById(R.id.textview_repcount);
-		repCountTextView.setText(repsLeft + "/" + this.repGroup.getRepCount());
+		repCountTextView.setText(repsLeft + "/" + this.repGroup.getTotalReps());
 	}
 
 	private void updateView() {
@@ -64,7 +64,7 @@ public class SupersetView extends LinearLayout {
 
 		TextView repCountView = (TextView) this
 				.findViewById(R.id.textview_repcount);
-		repCountView.setText("x" + repGroup.getRepCount());
+		repCountView.setText("x" + repGroup.getTotalReps());
 	}
 
 	private void updateReps() {

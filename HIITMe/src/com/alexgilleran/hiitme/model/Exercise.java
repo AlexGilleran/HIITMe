@@ -7,7 +7,7 @@ package com.alexgilleran.hiitme.model;
  * @author Alex Gilleran
  */
 public interface Exercise {
-	ExerciseGroup getSuperset();
+	ProgramNode getParentNode();
 
 	/** Get the displayable name of the rep */
 	String getName();
@@ -17,8 +17,6 @@ public interface Exercise {
 
 	/** Get the type of the rep */
 	EffortLevel getEffortLevel();
-
-	Exercise getNext();
 
 	/** A simple representation of the effort level of the set */
 	enum EffortLevel {

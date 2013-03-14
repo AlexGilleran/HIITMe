@@ -1,19 +1,15 @@
 package com.alexgilleran.hiitme.data.fake;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.alexgilleran.hiitme.data.ProgramDAO;
-import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ExerciseGroup;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.impl.ProgramImpl;
-import com.alexgilleran.hiitme.model.impl.ExerciseGroupImpl;
-import com.alexgilleran.hiitme.model.impl.ExerciseImpl;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -22,16 +18,10 @@ public class ProgramDAOFake implements ProgramDAO {
 	private Map<Long, Program> programMap = new HashMap<Long, Program>();
 
 	public ProgramDAOFake() {
-		List<Exercise> repList = new ArrayList<Exercise>();
-		ExerciseGroup group = new ExerciseGroupImpl(2, repList);
+		ProgramImpl tabata = new ProgramImpl(1, "Tabata", "The tabata protocol");
 
-		repList.add(new ExerciseImpl("Hard", 2000, Exercise.EffortLevel.HARD,
-				group));
-		repList.add(new ExerciseImpl("Rest", 1000, Exercise.EffortLevel.REST,
-				group));
-
-		Program tabata = new ProgramImpl(1, "Tabata", "The tabata protocol",
-				Arrays.asList(group));
+		tabata.addChildExercise("Hard", 2000, Exercise.EffortLevel.HARD, 1);
+		tabata.addChildExercise("Rest", 1000, Exercise.EffortLevel.REST, 1);
 
 		programMap.put(tabata.getId(), tabata);
 		programList.add(tabata);
