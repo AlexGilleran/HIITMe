@@ -79,7 +79,8 @@ public class ProgramNodeImpl implements ProgramNode {
 
 	}
 
-	private boolean hasChildren() {
+	@Override
+	public boolean hasChildren() {
 		return !children.isEmpty();
 	}
 
@@ -132,6 +133,11 @@ public class ProgramNodeImpl implements ProgramNode {
 		}
 
 		return getCurrentNode().getCurrentExercise();
+	}
+
+	@Override
+	public Exercise getAttachedExercise() {
+		return exercise;
 	}
 
 	@Override

@@ -26,6 +26,10 @@ public interface ProgramNode {
 	ProgramNode getCurrentNode();
 
 	Exercise getCurrentExercise();
+	
+	Exercise getAttachedExercise();
+	
+	boolean hasChildren();
 
 	ProgramNode addChildNode(int repCount);
 
