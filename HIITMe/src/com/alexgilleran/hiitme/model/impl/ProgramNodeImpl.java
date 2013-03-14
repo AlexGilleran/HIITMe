@@ -52,9 +52,12 @@ public class ProgramNodeImpl implements ProgramNode {
 	@Override
 	public Exercise addChildExercise(String name, int duration,
 			Exercise.EffortLevel effortLevel, int repCount) {
-		Exercise exercise = new ExerciseImpl(name, duration, effortLevel, this);
+		ProgramNodeImpl containerNode = new ProgramNodeImpl(repCount);
+		Exercise newExercise = new ExerciseImpl(name, duration, effortLevel,
+				containerNode);
+		containerNode.setAttachedExercise(newExercise);
 
-		children.add(new ProgramNodeImpl(repCount, exercise));
+		children.add(containerNode);
 
 		return exercise;
 	}
@@ -96,6 +99,12 @@ public class ProgramNodeImpl implements ProgramNode {
 		completedReps++;
 		currentChildIndex = 0;
 
+		if (!this.isFinished()) {
+			resetChildren();
+		}
+	}
+
+	private void resetChildren() {
 		for (ProgramNode node : children) {
 			node.reset();
 		}
@@ -110,6 +119,8 @@ public class ProgramNodeImpl implements ProgramNode {
 	public void reset() {
 		completedReps = 0;
 		currentChildIndex = 0;
+
+		resetChildren();
 	}
 
 	@Override
@@ -138,6 +149,10 @@ public class ProgramNodeImpl implements ProgramNode {
 	@Override
 	public Exercise getAttachedExercise() {
 		return exercise;
+	}
+
+	private void setAttachedExercise(Exercise exercise) {
+		this.exercise = exercise;
 	}
 
 	@Override
