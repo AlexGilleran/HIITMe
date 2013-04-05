@@ -18,7 +18,8 @@ public class ProgramDAOFake implements ProgramDAO {
 	private Map<Long, Program> programMap = new HashMap<Long, Program>();
 
 	public ProgramDAOFake() {
-		ProgramImpl tabata = new ProgramImpl(1, "Tabata", "The tabata protocol");
+		ProgramImpl tabata = new ProgramImpl(1, "Tabata",
+				"The tabata protocol", 1);
 
 		tabata.addChildExercise("Hard", 2000, Exercise.EffortLevel.HARD, 1);
 		tabata.addChildExercise("Rest", 1000, Exercise.EffortLevel.REST, 1);

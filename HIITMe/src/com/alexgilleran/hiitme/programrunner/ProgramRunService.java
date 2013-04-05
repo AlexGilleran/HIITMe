@@ -14,7 +14,7 @@ import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.impl.ProgramImpl.ProgramObserver;
+import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
 import com.google.inject.Inject;
 
@@ -61,7 +61,7 @@ public class ProgramRunService extends RoboIntentService {
 		currentCountDown.start();
 	}
 
-	private ProgramObserver programObserver = new ProgramObserver() {
+	private ProgramNodeObserver programObserver = new ProgramNodeObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
 		}
@@ -71,7 +71,7 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		@Override
-		public void onFinish() {
+		public void onFinish(ProgramNode node) {
 			stopForeground(true);
 			isRunning = false;
 		}
@@ -133,17 +133,17 @@ public class ProgramRunService extends RoboIntentService {
 			}
 		}
 
-		@Override
-		public void onFinish() {
-			program.next();
-
-			if (!program.isFinished()) {
-				nextCountDown();
-			}
-		}
+		// @Override
+		// public void onFinish() {
+		// program.next();
+		//
+		// if (!program.isFinished()) {
+		// nextCountDown();
+		// }
+		// }
 	};
 
-	public interface ProgramRunObserver extends ProgramObserver,
+	public interface ProgramRunObserver extends ProgramNodeObserver,
 			CountDownObserver {
 
 	}

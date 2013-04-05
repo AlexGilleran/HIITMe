@@ -5,13 +5,15 @@ import java.util.List;
 
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
 public class ProgramNodeImpl implements ProgramNode {
 	private int totalReps;
 	private int completedReps;
 	private int currentChildIndex;
 	private List<ProgramNode> children = new ArrayList<ProgramNode>();
-	private Exercise exercise;
+	private Exercise attachedExercise;
+	private List<ProgramNodeObserver> observers = new ArrayList<ProgramNodeObserver>();
 
 	public ProgramNodeImpl(int repCount) {
 		this.totalReps = repCount;
@@ -19,10 +21,11 @@ public class ProgramNodeImpl implements ProgramNode {
 		reset();
 	}
 
-	protected ProgramNodeImpl(int repCount, Exercise exercise) {
+	protected ProgramNodeImpl(ProgramNode parent, int repCount,
+			Exercise exercise) {
 		this(repCount);
 
-		this.exercise = exercise;
+		this.attachedExercise = exercise;
 	}
 
 	@Override
@@ -59,7 +62,7 @@ public class ProgramNodeImpl implements ProgramNode {
 
 		children.add(containerNode);
 
-		return exercise;
+		return newExercise;
 	}
 
 	@Override
@@ -71,6 +74,7 @@ public class ProgramNodeImpl implements ProgramNode {
 
 		if (!this.hasChildren()) {
 			nextNode();
+			broadcastNextExercise();
 		} else {
 			ProgramNode currentNode = getCurrentNode();
 			currentNode.next();
@@ -79,7 +83,6 @@ public class ProgramNodeImpl implements ProgramNode {
 				nextNode();
 			}
 		}
-
 	}
 
 	@Override
@@ -97,10 +100,14 @@ public class ProgramNodeImpl implements ProgramNode {
 
 	private void nextRep() {
 		completedReps++;
+		broadcastRepFinish();
+
 		currentChildIndex = 0;
 
-		if (!this.isFinished()) {
+		if (!isFinished()) {
 			resetChildren();
+		} else {
+			broadcastFinish();
 		}
 	}
 
@@ -139,8 +146,8 @@ public class ProgramNodeImpl implements ProgramNode {
 
 	@Override
 	public Exercise getCurrentExercise() {
-		if (exercise != null) {
-			return exercise;
+		if (attachedExercise != null) {
+			return attachedExercise;
 		}
 
 		return getCurrentNode().getCurrentExercise();
@@ -148,11 +155,37 @@ public class ProgramNodeImpl implements ProgramNode {
 
 	@Override
 	public Exercise getAttachedExercise() {
-		return exercise;
+		return attachedExercise;
 	}
 
 	private void setAttachedExercise(Exercise exercise) {
-		this.exercise = exercise;
+		this.attachedExercise = exercise;
+	}
+
+	private void broadcastNextExercise() {
+		for (ProgramNodeObserver observer : observers) {
+			observer.onNextExercise(getCurrentExercise());
+		}
+	}
+
+	private void broadcastFinish() {
+		for (ProgramNodeObserver observer : observers) {
+			observer.onFinish(this);
+		}
+	}
+
+	private void broadcastRepFinish() {
+		for (ProgramNodeObserver observer : observers) {
+			observer.onRepFinish(this, completedReps);
+		}
+	}
+
+	public void registerObserver(ProgramNodeObserver observer) {
+		observers.add(observer);
+
+		for (ProgramNode child : children) {
+			child.registerObserver(observer);
+		}
 	}
 
 	@Override
@@ -161,8 +194,9 @@ public class ProgramNodeImpl implements ProgramNode {
 		int result = 1;
 		result = prime * result
 				+ ((children == null) ? 0 : children.hashCode());
-		result = prime * result
-				+ ((exercise == null) ? 0 : exercise.hashCode());
+		result = prime
+				* result
+				+ ((attachedExercise == null) ? 0 : attachedExercise.hashCode());
 		result = prime * result + totalReps;
 		return result;
 	}
@@ -181,10 +215,10 @@ public class ProgramNodeImpl implements ProgramNode {
 				return false;
 		} else if (!children.equals(other.children))
 			return false;
-		if (exercise == null) {
-			if (other.exercise != null)
+		if (attachedExercise == null) {
+			if (other.attachedExercise != null)
 				return false;
-		} else if (!exercise.equals(other.exercise))
+		} else if (!attachedExercise.equals(other.attachedExercise))
 			return false;
 		if (totalReps != other.totalReps)
 			return false;

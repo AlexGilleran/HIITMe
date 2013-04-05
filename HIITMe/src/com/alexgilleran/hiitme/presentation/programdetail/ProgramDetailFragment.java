@@ -105,7 +105,7 @@ public class ProgramDetailFragment extends RoboFragment {
 		}
 
 		@Override
-		public void onFinish() {
+		public void onFinish(ProgramNode node) {
 
 		}
 

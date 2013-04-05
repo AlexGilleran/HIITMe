@@ -1,7 +1,5 @@
 package com.alexgilleran.hiitme.model;
 
-import com.alexgilleran.hiitme.model.impl.ProgramImpl.ProgramObserver;
-
 /**
  * Represents an entire HIIT program... e.g. the Tabata protocol is an instance
  * of {@link Program}.
@@ -21,10 +19,8 @@ public interface Program extends ProgramNode {
 	/** Gets a description of the program */
 	String getDescription();
 
-
 	int getTotalReps();
 
 	void start();
 
-	void registerObserver(ProgramObserver observer);
 }

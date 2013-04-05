@@ -26,12 +26,14 @@ public interface ProgramNode {
 	ProgramNode getCurrentNode();
 
 	Exercise getCurrentExercise();
-	
+
 	Exercise getAttachedExercise();
-	
+
 	boolean hasChildren();
 
 	ProgramNode addChildNode(int repCount);
+
+	void registerObserver(ProgramNodeObserver observer);
 
 	Exercise addChildExercise(String name, int duration,
 			Exercise.EffortLevel effortLevel, int repCount);

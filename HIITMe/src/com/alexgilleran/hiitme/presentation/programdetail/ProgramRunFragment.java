@@ -111,7 +111,7 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 
 		@Override
-		public void onFinish() {
+		public void onFinish(ProgramNode node) {
 			timeRemainingView.setText(formatTime(0));
 			refreshPlayButtonIcon();
 			progressBar.setProgress(progressBar.getMax());
