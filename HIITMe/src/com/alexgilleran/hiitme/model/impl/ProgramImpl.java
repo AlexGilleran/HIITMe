@@ -3,6 +3,7 @@ package com.alexgilleran.hiitme.model.impl;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
 public class ProgramImpl extends ProgramNodeImpl implements Program {
 	private long id;
@@ -42,6 +43,21 @@ public class ProgramImpl extends ProgramNodeImpl implements Program {
 
 	@Override
 	public void start() {
+		// this.broadcastNextExercise(getCurrentExercise());
+	}
 
+	@Override
+	public void next() {
+		super.next();
+
+		if (!this.isFinished()) {
+			this.broadcastNextExercise();
+		}
+	}
+
+	private void broadcastNextExercise() {
+		for (ProgramNodeObserver observer : getObservers()) {
+			observer.onNextExercise(getCurrentExercise());
+		}
 	}
 }

@@ -69,4 +69,9 @@ public class ExerciseImpl implements Exercise {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

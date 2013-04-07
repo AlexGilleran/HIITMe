@@ -69,19 +69,20 @@ public class ProgramNodeImpl implements ProgramNode {
 	public void next() {
 		if (isFinished()) {
 			throw new RuntimeException(
-					"next() called on finished node - node must be reset before next is called again");
+					"next() called on finished node - node must be reset before next() is called again");
 		}
 
-		if (!this.hasChildren()) {
-			nextNode();
-			broadcastNextExercise();
-		} else {
+		if (this.hasChildren()) {
+			// the next node.
 			ProgramNode currentNode = getCurrentNode();
 			currentNode.next();
 
 			if (currentNode.isFinished()) {
+				// Current node finished, go to the next one
 				nextNode();
 			}
+		} else {
+			nextNode();
 		}
 	}
 
@@ -104,10 +105,10 @@ public class ProgramNodeImpl implements ProgramNode {
 
 		currentChildIndex = 0;
 
-		if (!isFinished()) {
-			resetChildren();
-		} else {
+		if (isFinished()) {
 			broadcastFinish();
+		} else {
+			resetChildren();
 		}
 	}
 
@@ -162,10 +163,8 @@ public class ProgramNodeImpl implements ProgramNode {
 		this.attachedExercise = exercise;
 	}
 
-	private void broadcastNextExercise() {
-		for (ProgramNodeObserver observer : observers) {
-			observer.onNextExercise(getCurrentExercise());
-		}
+	protected List<ProgramNodeObserver> getObservers() {
+		return observers;
 	}
 
 	private void broadcastFinish() {
@@ -223,5 +222,11 @@ public class ProgramNodeImpl implements ProgramNode {
 		if (totalReps != other.totalReps)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ProgramNodeImpl [children=" + children + ", exercise="
+				+ attachedExercise + "]";
 	}
 }
