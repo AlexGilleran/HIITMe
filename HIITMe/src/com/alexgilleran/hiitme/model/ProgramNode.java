@@ -37,4 +37,6 @@ public interface ProgramNode {
 
 	Exercise addChildExercise(String name, int duration,
 			Exercise.EffortLevel effortLevel, int repCount);
+	
+	void triggerExerciseBroadcast();
 }

@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.presentation.programdetail.views.SupersetView;
+import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
@@ -40,7 +40,7 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	private LayoutInflater inflater;
 
-	private Map<ProgramNode, SupersetView> supersetViews = new HashMap<ProgramNode, SupersetView>();
+	private Map<ProgramNode, ProgramNodeView> supersetViews = new HashMap<ProgramNode, ProgramNodeView>();
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -81,9 +81,9 @@ public class ProgramDetailFragment extends RoboFragment {
 
 				for (ProgramNode superset : programBinder.getProgram()
 						.getChildren()) {
-					SupersetView supersetView = (SupersetView) inflater
+					ProgramNodeView supersetView = (ProgramNodeView) inflater
 							.inflate(R.layout.view_repgroup, null);
-					supersetView.setRepGroup(superset);
+					supersetView.setProgramNode(superset);
 
 					repGroupLayout.addView(supersetView, 0);
 					supersetViews.put(superset, supersetView);
@@ -100,8 +100,8 @@ public class ProgramDetailFragment extends RoboFragment {
 	private ProgramRunObserver observer = new ProgramRunObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
-			supersetViews.get(newExercise.getParentNode()).setCurrentExercise(
-					newExercise);
+//			supersetViews.get(newExercise.getParentNode()).setCurrentExercise(
+//					newExercise);
 		}
 
 		@Override

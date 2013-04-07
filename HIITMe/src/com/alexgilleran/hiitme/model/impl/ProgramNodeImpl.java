@@ -45,8 +45,9 @@ public class ProgramNodeImpl implements ProgramNode {
 
 	@Override
 	public ProgramNode addChildNode(int repCount) {
-		ProgramNode newNode = new ProgramNodeImpl(repCount);
+		checkCanHaveChildren();
 
+		ProgramNode newNode = new ProgramNodeImpl(repCount);
 		children.add(newNode);
 
 		return newNode;
@@ -55,6 +56,8 @@ public class ProgramNodeImpl implements ProgramNode {
 	@Override
 	public Exercise addChildExercise(String name, int duration,
 			Exercise.EffortLevel effortLevel, int repCount) {
+		checkCanHaveChildren();
+
 		ProgramNodeImpl containerNode = new ProgramNodeImpl(repCount);
 		Exercise newExercise = new ExerciseImpl(name, duration, effortLevel,
 				containerNode);
@@ -63,6 +66,13 @@ public class ProgramNodeImpl implements ProgramNode {
 		children.add(containerNode);
 
 		return newExercise;
+	}
+
+	private void checkCanHaveChildren() {
+		if (attachedExercise != null) {
+			throw new RuntimeException(
+					"This ProgramNode was created with an attached exercise - it cannot have children.");
+		}
 	}
 
 	@Override
@@ -80,6 +90,11 @@ public class ProgramNodeImpl implements ProgramNode {
 			if (currentNode.isFinished()) {
 				// Current node finished, go to the next one
 				nextNode();
+
+				if (!this.isFinished()) {
+					getCurrentExercise().getParentNode()
+							.triggerExerciseBroadcast();
+				}
 			}
 		} else {
 			nextNode();
@@ -138,10 +153,10 @@ public class ProgramNodeImpl implements ProgramNode {
 					"getCurrentNode() called on finished ProgramNode");
 		}
 
-		if (children.isEmpty()) {
-			return this;
-		} else {
+		if (this.hasChildren()) {
 			return this.children.get(currentChildIndex);
+		} else {
+			return this;
 		}
 	}
 
@@ -179,12 +194,19 @@ public class ProgramNodeImpl implements ProgramNode {
 		}
 	}
 
+	private void broadcastNextExercise() {
+		for (ProgramNodeObserver observer : getObservers()) {
+			observer.onNextExercise(getCurrentExercise());
+		}
+	}
+
 	public void registerObserver(ProgramNodeObserver observer) {
 		observers.add(observer);
+	}
 
-		for (ProgramNode child : children) {
-			child.registerObserver(observer);
-		}
+	@Override
+	public void triggerExerciseBroadcast() {
+		this.broadcastNextExercise();
 	}
 
 	@Override

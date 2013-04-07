@@ -1,99 +1,127 @@
 package com.alexgilleran.hiitme.model.impl.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.model.impl.ProgramImpl;
 
 public class ProgramImplTest extends BaseProgramTest {
-	@Test
-	public void testRunThrough() {
-		ProgramNodeObserver observer = EasyMock
-				.createStrictMock(ProgramNodeObserver.class);
+	private List<ProgramNodeObserver> observers = new ArrayList<ProgramNodeObserver>();
 
+	@Test
+	public void testNestedRunThrough() {
 		Program nestedProgram = new ProgramImpl(0, "Test", "Test description",
 				2);
 		setupNestedNode(nestedProgram);
-		nestedProgram.registerObserver(observer);
+
+		ProgramNodeObserver step1Observer = addObserver(step1.getParentNode());
+		ProgramNodeObserver step2Observer = addObserver(step2.getParentNode());
+		ProgramNodeObserver step3Observer = addObserver(step3.getParentNode());
+		ProgramNodeObserver step4Observer = addObserver(step4.getParentNode());
+		ProgramNodeObserver sub3Node1Observer = addObserver(sub3Node1);
+		ProgramNodeObserver sub2Node1Observer = addObserver(sub2Node1);
+		ProgramNodeObserver subNode1Observer = addObserver(subNode1);
+		ProgramNodeObserver programObserver = addObserver(nestedProgram);
 
 		int callCount = 0;
-
 		for (int i = 0; i < 2; i++) {
 			if (i > 0) {
-				observer.onNextExercise(step1);
+				step1Observer.onNextExercise(step1);
 				EasyMock.expectLastCall();
 			}
 			callCount++;
-			observer.onRepFinish(step1.getParentNode(), 1);
-			EasyMock.expectLastCall();
-			observer.onNextExercise(step1);
+			step1Observer.onRepFinish(step1.getParentNode(), 1);
 			EasyMock.expectLastCall();
 			callCount++;
-			observer.onRepFinish(step1.getParentNode(), 2);
+			step1Observer.onRepFinish(step1.getParentNode(), 2);
 			EasyMock.expectLastCall();
-			observer.onFinish(step1.getParentNode());
+			step1Observer.onFinish(step1.getParentNode());
 			EasyMock.expectLastCall();
 
 			for (int j = 0; j < 2; j++) {
 				for (int k = 0; k < 3; k++) {
-					observer.onNextExercise(step2);
+					step2Observer.onNextExercise(step2);
 					EasyMock.expectLastCall();
 					callCount++;
-					observer.onRepFinish(step2.getParentNode(), 1);
+					step2Observer.onRepFinish(step2.getParentNode(), 1);
 					EasyMock.expectLastCall();
-					observer.onFinish(step2.getParentNode());
+					step2Observer.onFinish(step2.getParentNode());
 					EasyMock.expectLastCall();
 
+					step3Observer.onNextExercise(step3);
+					EasyMock.expectLastCall();
 					for (int l = 0; l < 3; l++) {
-						observer.onNextExercise(step3);
-						EasyMock.expectLastCall();
 						callCount++;
-						observer.onRepFinish(step3.getParentNode(), l + 1);
+						step3Observer.onRepFinish(step3.getParentNode(), l + 1);
 						EasyMock.expectLastCall();
 					}
 
-					observer.onFinish(step3.getParentNode());
+					step3Observer.onFinish(step3.getParentNode());
 					EasyMock.expectLastCall();
-					observer.onRepFinish(sub3Node1, k + 1);
+					sub3Node1Observer.onRepFinish(sub3Node1, k + 1);
 					EasyMock.expectLastCall();
 				}
 
-				observer.onFinish(sub3Node1);
+				sub3Node1Observer.onFinish(sub3Node1);
 				EasyMock.expectLastCall();
 
-				observer.onNextExercise(step4);
+				step4Observer.onNextExercise(step4);
 				EasyMock.expectLastCall();
 				callCount++;
-				observer.onRepFinish(step4.getParentNode(), 1);
+				step4Observer.onRepFinish(step4.getParentNode(), 1);
 				EasyMock.expectLastCall();
-				observer.onFinish(step4.getParentNode());
+				step4Observer.onFinish(step4.getParentNode());
 				EasyMock.expectLastCall();
 
-				observer.onRepFinish(sub2Node1, j + 1);
+				sub2Node1Observer.onRepFinish(sub2Node1, j + 1);
 				EasyMock.expectLastCall();
 			}
 
-			observer.onFinish(sub2Node1);
+			sub2Node1Observer.onFinish(sub2Node1);
 			EasyMock.expectLastCall();
-			observer.onRepFinish(subNode1, 1);
+			subNode1Observer.onRepFinish(subNode1, 1);
 			EasyMock.expectLastCall();
-			observer.onFinish(subNode1);
+			subNode1Observer.onFinish(subNode1);
 			EasyMock.expectLastCall();
-			observer.onRepFinish(nestedProgram, i + 1);
+			programObserver.onRepFinish(nestedProgram, i + 1);
 			EasyMock.expectLastCall();
 		}
-		observer.onFinish(nestedProgram);
+		programObserver.onFinish(nestedProgram);
 		EasyMock.expectLastCall();
 
-		EasyMock.replay(observer);
+		for (ProgramNodeObserver observer : observers) {
+			EasyMock.replay(observer);
+		}
 
 		nestedProgram.start();
 		for (int i = 0; i < callCount; i++) {
 			nestedProgram.next();
 		}
 
-		EasyMock.verify(observer);
+		for (ProgramNodeObserver observer : observers) {
+			EasyMock.verify(observer);
+		}
+
+		try {
+			nestedProgram.next();
+			Assert.fail();
+		} catch (RuntimeException e) {
+			// yay
+		}
+	}
+
+	private ProgramNodeObserver addObserver(ProgramNode node) {
+		ProgramNodeObserver observer = EasyMock
+				.createStrictMock(ProgramNodeObserver.class);
+		observers.add(observer);
+		node.registerObserver(observer);
+		return observer;
 	}
 }
