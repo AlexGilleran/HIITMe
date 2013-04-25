@@ -30,13 +30,12 @@ public class ProgramRunService extends RoboIntentService {
 
 	private Notification notification;
 
-	private List<ProgramRunObserver> observers = new ArrayList<ProgramRunObserver>();
+	private List<CountDownObserver> observers = new ArrayList<CountDownObserver>();
 
 	public ProgramRunService() {
 		super("HIIT Me");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Notification.Builder builder = new Notification.Builder(
@@ -46,7 +45,7 @@ public class ProgramRunService extends RoboIntentService {
 		notification = builder.getNotification();
 
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
-		Program program = programDao.getProgram(programId);
+		program = programDao.getProgram(programId);
 		program.registerObserver(programObserver);
 	}
 
@@ -55,9 +54,16 @@ public class ProgramRunService extends RoboIntentService {
 		return new ProgramBinder();
 	}
 
-	private void nextCountDown() {
-		currentCountDown = new ExerciseCountDown(program.getCurrentExercise()
-				.getDuration(), countDownObserver);
+	private void next() {
+		program.next();
+		if (!program.isFinished()) {
+			newCountDown();
+		}
+	}
+	
+	private void newCountDown() {
+		currentCountDown = new ExerciseCountDown(program
+				.getCurrentExercise().getDuration(), countDownObserver);
 		currentCountDown.start();
 	}
 
@@ -88,7 +94,7 @@ public class ProgramRunService extends RoboIntentService {
 			} else {
 				startForeground(1, notification);
 				program.start();
-				nextCountDown();
+				newCountDown();
 			}
 		}
 
@@ -111,9 +117,8 @@ public class ProgramRunService extends RoboIntentService {
 			return isRunning;
 		}
 
-		public void registerObserver(ProgramRunObserver observer) {
+		public void registerObserver(CountDownObserver observer) {
 			observers.add(observer);
-			program.registerObserver(observer);
 		}
 
 		public ProgramNode getCurrentSuperset() {
@@ -133,18 +138,9 @@ public class ProgramRunService extends RoboIntentService {
 			}
 		}
 
-		// @Override
-		// public void onFinish() {
-		// program.next();
-		//
-		// if (!program.isFinished()) {
-		// nextCountDown();
-		// }
-		// }
+		@Override
+		public void onFinish() {
+			next();
+		}
 	};
-
-	public interface ProgramRunObserver extends ProgramNodeObserver,
-			CountDownObserver {
-
-	}
 }

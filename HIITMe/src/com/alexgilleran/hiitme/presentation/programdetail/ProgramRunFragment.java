@@ -20,9 +20,10 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.ProgramNodeObserver;
+import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramRunObserver;
 
 public class ProgramRunFragment extends RoboFragment {
 	@InjectView(R.id.textview_time_remaining)
@@ -88,7 +89,9 @@ public class ProgramRunFragment extends RoboFragment {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
-			programBinder.registerObserver(observer);
+			programBinder.getProgram().registerObserver(observer);
+			programBinder.registerObserver(countdownObserver);
+			progressBar.setProgress(0);
 		}
 
 		@Override
@@ -97,17 +100,28 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 	};
 
-	private ProgramRunObserver observer = new ProgramRunObserver() {
+	private CountDownObserver countdownObserver = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
 			timeRemainingView.setText(formatTime(msecondsRemaining));
 			progressBar
-					.setProgress((int) (progressBar.getMax() - msecondsRemaining));
+					.setProgress(getProgressAsPercentage(msecondsRemaining));
 		}
 
 		@Override
+		public void onFinish() {
+		}
+		
+		private int getProgressAsPercentage(long msecondsRemaining) {
+			int duration = programBinder.getProgram().getCurrentExercise().getDuration();
+			return (duration - (int) msecondsRemaining) / (duration / 100); 
+		}
+	};
+
+	private ProgramNodeObserver observer = new ProgramNodeObserver() {
+		@Override
 		public void onNextExercise(Exercise newExercise) {
-			progressBar.setMax(newExercise.getDuration());
+			progressBar.setProgress(0);
 		}
 
 		@Override

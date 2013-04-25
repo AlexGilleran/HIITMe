@@ -16,7 +16,7 @@ public class ExerciseCountDown extends CountDownTimer {
 
 	@Override
 	public void onFinish() {
-		// observer.onFinish();
+		observer.onFinish();
 	}
 
 	@Override
@@ -33,5 +33,7 @@ public class ExerciseCountDown extends CountDownTimer {
 
 	public interface CountDownObserver {
 		void onTick(long msecondsRemaining);
+
+		void onFinish();
 	}
 }

@@ -1,7 +1,9 @@
 package com.alexgilleran.hiitme.model.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
@@ -13,7 +15,7 @@ public class ProgramNodeImpl implements ProgramNode {
 	private int currentChildIndex;
 	private List<ProgramNode> children = new ArrayList<ProgramNode>();
 	private Exercise attachedExercise;
-	private List<ProgramNodeObserver> observers = new ArrayList<ProgramNodeObserver>();
+	private Set<ProgramNodeObserver> observers = new HashSet<ProgramNodeObserver>();
 
 	public ProgramNodeImpl(int repCount) {
 		this.totalReps = repCount;
@@ -178,7 +180,7 @@ public class ProgramNodeImpl implements ProgramNode {
 		this.attachedExercise = exercise;
 	}
 
-	protected List<ProgramNodeObserver> getObservers() {
+	private Set<ProgramNodeObserver> getObservers() {
 		return observers;
 	}
 
@@ -194,7 +196,7 @@ public class ProgramNodeImpl implements ProgramNode {
 		}
 	}
 
-	private void broadcastNextExercise() {
+	protected void broadcastNextExercise() {
 		for (ProgramNodeObserver observer : getObservers()) {
 			observer.onNextExercise(getCurrentExercise());
 		}

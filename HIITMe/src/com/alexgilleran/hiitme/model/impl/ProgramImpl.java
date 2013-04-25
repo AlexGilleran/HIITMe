@@ -40,6 +40,6 @@ public class ProgramImpl extends ProgramNodeImpl implements Program {
 
 	@Override
 	public void start() {
-		// this.broadcastNextExercise(getCurrentExercise());
+		broadcastNextExercise();
 	}
 }

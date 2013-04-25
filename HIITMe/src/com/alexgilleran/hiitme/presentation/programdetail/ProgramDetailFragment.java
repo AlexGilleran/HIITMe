@@ -18,11 +18,11 @@ import android.widget.LinearLayout;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramRunObserver;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is
@@ -39,8 +39,6 @@ public class ProgramDetailFragment extends RoboFragment {
 	private ProgramBinder programBinder;
 
 	private LayoutInflater inflater;
-
-	private Map<ProgramNode, ProgramNodeView> supersetViews = new HashMap<ProgramNode, ProgramNodeView>();
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -73,49 +71,22 @@ public class ProgramDetailFragment extends RoboFragment {
 			// We've bound to LocalService, cast the IBinder and get
 			// LocalService instance
 			programBinder = (ProgramBinder) service;
-			programBinder.registerObserver(observer);
 
 			if (programBinder.getProgram() != null) {
 				LinearLayout repGroupLayout = (LinearLayout) getView()
 						.findViewById(R.id.layout_repgroups);
 
-				for (ProgramNode superset : programBinder.getProgram()
-						.getChildren()) {
-					ProgramNodeView supersetView = (ProgramNodeView) inflater
-							.inflate(R.layout.view_repgroup, null);
-					supersetView.setProgramNode(superset);
+				ProgramNodeView nodeView = (ProgramNodeView) inflater
+						.inflate(R.layout.view_repgroup, null);
+				nodeView.setProgramNode(programBinder.getProgram());
 
-					repGroupLayout.addView(supersetView, 0);
-					supersetViews.put(superset, supersetView);
-				}
+				repGroupLayout.addView(nodeView, 0);
 			}
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
 
-		}
-	};
-
-	private ProgramRunObserver observer = new ProgramRunObserver() {
-		@Override
-		public void onNextExercise(Exercise newExercise) {
-//			supersetViews.get(newExercise.getParentNode()).setCurrentExercise(
-//					newExercise);
-		}
-
-		@Override
-		public void onFinish(ProgramNode node) {
-
-		}
-
-		@Override
-		public void onRepFinish(ProgramNode superset, int remainingReps) {
-			supersetViews.get(superset).setRemainingReps(remainingReps);
-		}
-
-		@Override
-		public void onTick(long msecondsRemaining) {
 		}
 	};
 }

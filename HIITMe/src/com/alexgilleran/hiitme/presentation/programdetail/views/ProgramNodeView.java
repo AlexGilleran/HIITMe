@@ -55,6 +55,7 @@ public class ProgramNodeView extends LinearLayout implements
 
 			if (child.getAttachedExercise() != null) {
 				populateExerciseRow(newRow, child.getAttachedExercise());
+				child.registerObserver(this);
 				exerciseRows.put(child.getAttachedExercise(), newRow);
 			} else {
 				populateProgramNodeRow(newRow, child);
@@ -109,10 +110,17 @@ public class ProgramNodeView extends LinearLayout implements
 
 	@Override
 	public void onNextExercise(Exercise newExercise) {
-		TableRow newRow = exerciseRows.get(newExercise);
+		highlightExercise(newExercise);
+	}
+
+	public void highlightExercise(Exercise exercise) {
+		TableRow newRow = exerciseRows.get(exercise);
 
 		if (newRow != null) {
-			currentRow.setBackgroundColor(Color.TRANSPARENT);
+			if (currentRow != null) {
+				currentRow.setBackgroundColor(Color.TRANSPARENT);
+			}
+
 			newRow.setBackgroundColor(Color.GREEN);
 			currentRow = newRow;
 		}
@@ -120,13 +128,13 @@ public class ProgramNodeView extends LinearLayout implements
 
 	@Override
 	public void onRepFinish(ProgramNode node, int completedReps) {
-		if (this == node) {
+		if (programNode == node) {
 			this.setRemainingReps(completedReps);
 		}
 	}
 
 	@Override
 	public void onFinish(ProgramNode node) {
-		
+
 	}
 }
