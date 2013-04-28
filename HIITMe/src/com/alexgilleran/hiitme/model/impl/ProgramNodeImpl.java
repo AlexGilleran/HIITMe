@@ -168,7 +168,12 @@ public class ProgramNodeImpl implements ProgramNode {
 			return attachedExercise;
 		}
 
-		return getCurrentNode().getCurrentExercise();
+		ProgramNode currentNode = getCurrentNode();
+		if (currentNode != this) {
+			return getCurrentNode().getCurrentExercise();
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -252,5 +257,16 @@ public class ProgramNodeImpl implements ProgramNode {
 	public String toString() {
 		return "ProgramNodeImpl [children=" + children + ", exercise="
 				+ attachedExercise + "]";
+	}
+
+	@Override
+	public void start() {
+		ProgramNode node = getCurrentNode();
+
+		if (this == node) {
+			broadcastNextExercise();
+		} else {
+			node.start();
+		}
 	}
 }

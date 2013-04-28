@@ -20,7 +20,4 @@ public interface Program extends ProgramNode {
 	String getDescription();
 
 	int getTotalReps();
-
-	void start();
-
 }

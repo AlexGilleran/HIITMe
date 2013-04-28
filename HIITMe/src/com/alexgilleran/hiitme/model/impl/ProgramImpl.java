@@ -37,9 +37,4 @@ public class ProgramImpl extends ProgramNodeImpl implements Program {
 	public String toString() {
 		return name;
 	}
-
-	@Override
-	public void start() {
-		broadcastNextExercise();
-	}
 }

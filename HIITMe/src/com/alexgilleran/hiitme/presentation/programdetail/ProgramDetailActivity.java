@@ -36,7 +36,8 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 
 		// Bind to LocalService
 		Intent intent = new Intent(this, ProgramRunService.class);
-		intent.putExtra(Program.PROGRAM_ID_NAME, 1l);
+		intent.putExtra(Program.PROGRAM_ID_NAME,
+				this.getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
 		this.getApplicationContext().startService(intent);
 
 		if (savedInstanceState == null) {

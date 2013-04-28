@@ -57,10 +57,10 @@ public class ProgramDetailFragment extends RoboFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		this.inflater = inflater;
 		View rootView = inflater.inflate(R.layout.fragment_program_detail,
 				container, false);
 
-		this.inflater = inflater;
 
 		return rootView;
 	}
@@ -77,7 +77,7 @@ public class ProgramDetailFragment extends RoboFragment {
 						.findViewById(R.id.layout_repgroups);
 
 				ProgramNodeView nodeView = (ProgramNodeView) inflater
-						.inflate(R.layout.view_repgroup, null);
+						.inflate(R.layout.view_program_node, null);
 				nodeView.setProgramNode(programBinder.getProgram());
 
 				repGroupLayout.addView(nodeView, 0);

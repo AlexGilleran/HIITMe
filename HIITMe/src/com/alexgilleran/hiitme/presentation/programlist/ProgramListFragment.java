@@ -1,11 +1,17 @@
 package com.alexgilleran.hiitme.presentation.programlist;
 
+import java.util.List;
+
 import roboguice.fragment.RoboListFragment;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
@@ -77,9 +83,7 @@ public class ProgramListFragment extends RoboListFragment {
 		super.onCreate(savedInstanceState);
 
 		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<Program>(getActivity(),
-				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, programDao.getAllPrograms()));
+		setListAdapter(new Adapter(programDao.getAllPrograms()));
 	}
 
 	@Override
@@ -155,4 +159,44 @@ public class ProgramListFragment extends RoboListFragment {
 
 		mActivatedPosition = position;
 	}
+
+	private class Adapter extends BaseAdapter {
+		private LayoutInflater inflater = (LayoutInflater) getActivity()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		private List<Program> programList;
+
+		private Adapter(List<Program> programList) {
+			this.programList = programList;
+		}
+
+		@Override
+		public int getCount() {
+			return programList.size();
+		}
+
+		@Override
+		public Object getItem(int location) {
+			return programList.get(location);
+		}
+
+		@Override
+		public long getItemId(int location) {
+			return programList.get(location).getId();
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = inflater.inflate(
+						android.R.layout.simple_list_item_activated_1, parent,
+						false);
+			}
+
+			TextView textView = (TextView) convertView
+					.findViewById(android.R.id.text1);
+			textView.setText(programList.get(position).getName());
+
+			return convertView;
+		}
+	};
 }

@@ -3,6 +3,7 @@ package com.alexgilleran.hiitme.presentation.programlist;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.R.id;
 import com.alexgilleran.hiitme.R.layout;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailActivity;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 
@@ -67,7 +68,7 @@ public class ProgramListActivity extends RoboFragmentActivity implements
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putLong(ProgramDetailFragment.ARG_ITEM_ID, id);
+			arguments.putLong(Program.PROGRAM_ID_NAME, id + 1);
 			ProgramDetailFragment fragment = new ProgramDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
@@ -77,7 +78,7 @@ public class ProgramListActivity extends RoboFragmentActivity implements
 			// In single-pane mode, simply start the detail activity
 			// for the selected item ID.
 			Intent detailIntent = new Intent(this, ProgramDetailActivity.class);
-			detailIntent.putExtra(ProgramDetailFragment.ARG_ITEM_ID, id);
+			detailIntent.putExtra(Program.PROGRAM_ID_NAME, id);
 			startActivity(detailIntent);
 		}
 	}

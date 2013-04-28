@@ -1,11 +1,14 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -19,6 +22,8 @@ import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 public class ProgramNodeView extends LinearLayout implements
 		ProgramNodeObserver {
 	private Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
+	private Map<ProgramNode, TextView> repViews = new HashMap<ProgramNode, TextView>();
+	private List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
 	private ProgramNode programNode;
 	private TableRow currentRow;
 
@@ -34,14 +39,12 @@ public class ProgramNodeView extends LinearLayout implements
 		super(context, attrs, defStyle);
 	}
 
-	@Override
-	public void onFinishInflate() {
-
-	}
-
 	public void setProgramNode(ProgramNode programNode) {
 		this.programNode = programNode;
 		programNode.registerObserver(this);
+
+		repViews.put(programNode,
+				(TextView) this.findViewById(R.id.textview_repcount));
 
 		render();
 	}
@@ -78,6 +81,11 @@ public class ProgramNodeView extends LinearLayout implements
 	 *            The {@link Exercise} to source data from.
 	 */
 	private void populateExerciseRow(TableRow row, Exercise exercise) {
+		TextView repCountView = new TextView(this.getContext());
+		repCountView.setText(exercise.getParentNode().getTotalReps() + "x");
+		row.addView(repCountView);
+		repViews.put(exercise.getParentNode(), repCountView);
+
 		TextView repLabelView = new TextView(this.getContext());
 		repLabelView.setText(exercise.getName());
 		row.addView(repLabelView);
@@ -96,16 +104,22 @@ public class ProgramNodeView extends LinearLayout implements
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
 	private void populateProgramNodeRow(TableRow row, ProgramNode node) {
-		ProgramNodeView childView = new ProgramNodeView(row.getContext());
+		LayoutInflater inflater = (LayoutInflater) this.getContext()
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
+				R.layout.view_program_node, null);
+		nodeView.setProgramNode(node);
+		subViews.add(nodeView);
 
-		childView.setProgramNode(node);
+		row.addView(nodeView);
 	}
 
-	public void setRemainingReps(int repsLeft) {
-		TextView repCountTextView = (TextView) this
-				.findViewById(R.id.textview_repcount);
-		repCountTextView.setText(repsLeft + "/"
-				+ this.programNode.getTotalReps());
+	public void setRemainingReps(ProgramNode node, int repsLeft) {
+		TextView targetView = repViews.get(node);
+
+		if (targetView != null) {
+			targetView.setText(repsLeft + "/" + node.getTotalReps());
+		}
 	}
 
 	@Override
@@ -114,27 +128,35 @@ public class ProgramNodeView extends LinearLayout implements
 	}
 
 	public void highlightExercise(Exercise exercise) {
+		if (currentRow != null) {
+			currentRow.setBackgroundColor(Color.TRANSPARENT);
+		}
+
 		TableRow newRow = exerciseRows.get(exercise);
 
 		if (newRow != null) {
-			if (currentRow != null) {
-				currentRow.setBackgroundColor(Color.TRANSPARENT);
-			}
-
 			newRow.setBackgroundColor(Color.GREEN);
 			currentRow = newRow;
 		}
 	}
 
-	@Override
-	public void onRepFinish(ProgramNode node, int completedReps) {
-		if (programNode == node) {
-			this.setRemainingReps(completedReps);
+	public void resetRepcounts() {
+		for (ProgramNodeView view : subViews) {
+			view.resetRepcounts();
+		}
+
+		for (ProgramNode node : repViews.keySet()) {
+			setRemainingReps(node, 0);
 		}
 	}
 
 	@Override
-	public void onFinish(ProgramNode node) {
+	public void onRepFinish(ProgramNode node, int completedReps) {
+		setRemainingReps(node, completedReps);
+	}
 
+	@Override
+	public void onFinish(ProgramNode node) {
+		highlightExercise(null);
 	}
 }
