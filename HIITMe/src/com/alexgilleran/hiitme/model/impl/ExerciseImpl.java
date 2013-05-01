@@ -37,7 +37,6 @@ public class ExerciseImpl implements Exercise {
 		return exerciseGroup;
 	}
 
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -74,5 +73,4 @@ public class ExerciseImpl implements Exercise {
 	public String toString() {
 		return name;
 	}
-
 }

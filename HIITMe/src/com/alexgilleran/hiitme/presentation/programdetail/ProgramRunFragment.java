@@ -135,5 +135,11 @@ public class ProgramRunFragment extends RoboFragment {
 		public void onRepFinish(ProgramNode superset, int remainingReps) {
 
 		}
+
+		@Override
+		public void onReset(ProgramNode node) {
+			// TODO Auto-generated method stub
+			
+		}
 	};
 }

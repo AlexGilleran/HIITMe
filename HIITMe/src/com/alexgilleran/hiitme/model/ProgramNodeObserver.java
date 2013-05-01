@@ -6,4 +6,6 @@ public interface ProgramNodeObserver {
 	void onRepFinish(ProgramNode node, int completedReps);
 
 	void onFinish(ProgramNode node);
+	
+	void onReset(ProgramNode node);
 }

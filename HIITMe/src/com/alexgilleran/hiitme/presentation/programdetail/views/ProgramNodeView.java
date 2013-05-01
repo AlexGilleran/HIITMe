@@ -140,9 +140,9 @@ public class ProgramNodeView extends LinearLayout implements
 		}
 	}
 
-	public void resetRepcounts() {
+	public void resetRepCounts() {
 		for (ProgramNodeView view : subViews) {
-			view.resetRepcounts();
+			view.resetRepCounts();
 		}
 
 		for (ProgramNode node : repViews.keySet()) {
@@ -158,5 +158,12 @@ public class ProgramNodeView extends LinearLayout implements
 	@Override
 	public void onFinish(ProgramNode node) {
 		highlightExercise(null);
+	}
+
+	@Override
+	public void onReset(ProgramNode node) {
+		if (node == this.programNode) {
+			this.resetRepCounts();
+		}
 	}
 }

@@ -129,12 +129,6 @@ public class ProgramNodeImpl implements ProgramNode {
 		}
 	}
 
-	private void resetChildren() {
-		for (ProgramNode node : children) {
-			node.reset();
-		}
-	}
-
 	@Override
 	public boolean isFinished() {
 		return completedReps >= totalReps;
@@ -146,6 +140,14 @@ public class ProgramNodeImpl implements ProgramNode {
 		currentChildIndex = 0;
 
 		resetChildren();
+
+		broadcastReset();
+	}
+
+	private void resetChildren() {
+		for (ProgramNode node : children) {
+			node.reset();
+		}
 	}
 
 	@Override
@@ -204,6 +206,12 @@ public class ProgramNodeImpl implements ProgramNode {
 	protected void broadcastNextExercise() {
 		for (ProgramNodeObserver observer : getObservers()) {
 			observer.onNextExercise(getCurrentExercise());
+		}
+	}
+
+	private void broadcastReset() {
+		for (ProgramNodeObserver observer : getObservers()) {
+			observer.onReset(this);
 		}
 	}
 

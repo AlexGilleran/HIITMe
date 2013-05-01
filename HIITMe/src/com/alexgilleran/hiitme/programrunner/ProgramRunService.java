@@ -81,6 +81,11 @@ public class ProgramRunService extends RoboIntentService {
 			stopForeground(true);
 			isRunning = false;
 		}
+
+		@Override
+		public void onReset(ProgramNode node) {
+			
+		}
 	};
 
 	public class ProgramBinder extends Binder {
