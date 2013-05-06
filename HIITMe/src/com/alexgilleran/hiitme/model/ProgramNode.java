@@ -42,4 +42,5 @@ public interface ProgramNode {
 
 	void start();
 
+	int getTotalDuration();
 }

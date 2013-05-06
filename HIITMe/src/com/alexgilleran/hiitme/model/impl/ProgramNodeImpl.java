@@ -277,4 +277,19 @@ public class ProgramNodeImpl implements ProgramNode {
 			node.start();
 		}
 	}
+
+	@Override
+	public int getTotalDuration() {
+		if (this.attachedExercise != null) {
+			return attachedExercise.getDuration();
+		} else {
+			int total = 0;
+
+			for (ProgramNode child : children) {
+				total += child.getTotalDuration();
+			}
+
+			return total;
+		}
+	}
 }

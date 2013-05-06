@@ -3,8 +3,9 @@ package com.alexgilleran.hiitme.model.impl.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.alexgilleran.hiitme.model.Program;
@@ -32,10 +33,8 @@ public class ProgramImplTest extends BaseProgramTest {
 
 		int callCount = 0;
 		for (int i = 0; i < 2; i++) {
-			if (i > 0) {
-				step1Observer.onNextExercise(step1);
-				EasyMock.expectLastCall();
-			}
+			step1Observer.onNextExercise(step1);
+			EasyMock.expectLastCall();
 			callCount++;
 			step1Observer.onRepFinish(step1.getParentNode(), 1);
 			EasyMock.expectLastCall();
@@ -44,6 +43,10 @@ public class ProgramImplTest extends BaseProgramTest {
 			EasyMock.expectLastCall();
 			step1Observer.onFinish(step1.getParentNode());
 			EasyMock.expectLastCall();
+			if (i < 1) {
+				step1Observer.onReset(step1.getParentNode());
+				EasyMock.expectLastCall();
+			}
 
 			for (int j = 0; j < 2; j++) {
 				for (int k = 0; k < 3; k++) {
@@ -54,7 +57,10 @@ public class ProgramImplTest extends BaseProgramTest {
 					EasyMock.expectLastCall();
 					step2Observer.onFinish(step2.getParentNode());
 					EasyMock.expectLastCall();
-
+					if (!(k == 2 && j == 1 && i == 1)) {
+						step2Observer.onReset(step2.getParentNode());
+						EasyMock.expectLastCall();
+					}
 					step3Observer.onNextExercise(step3);
 					EasyMock.expectLastCall();
 					for (int l = 0; l < 3; l++) {
@@ -65,12 +71,23 @@ public class ProgramImplTest extends BaseProgramTest {
 
 					step3Observer.onFinish(step3.getParentNode());
 					EasyMock.expectLastCall();
+
+					if (!(k == 2 && j == 1 && i == 1)) {
+						step3Observer.onReset(step3.getParentNode());
+						EasyMock.expectLastCall();
+					}
+
 					sub3Node1Observer.onRepFinish(sub3Node1, k + 1);
 					EasyMock.expectLastCall();
 				}
 
 				sub3Node1Observer.onFinish(sub3Node1);
 				EasyMock.expectLastCall();
+
+				if (!(j == 1 && i == 1)) {
+					sub3Node1Observer.onReset(sub3Node1);
+					EasyMock.expectLastCall();
+				}
 
 				step4Observer.onNextExercise(step4);
 				EasyMock.expectLastCall();
@@ -80,16 +97,33 @@ public class ProgramImplTest extends BaseProgramTest {
 				step4Observer.onFinish(step4.getParentNode());
 				EasyMock.expectLastCall();
 
+				if (!(j == 1 && i == 1)) {
+					step4Observer.onReset(step4.getParentNode());
+					EasyMock.expectLastCall();
+				}
+
 				sub2Node1Observer.onRepFinish(sub2Node1, j + 1);
 				EasyMock.expectLastCall();
 			}
 
 			sub2Node1Observer.onFinish(sub2Node1);
 			EasyMock.expectLastCall();
+
+			if (i < 1) {
+				sub2Node1Observer.onReset(sub2Node1);
+				EasyMock.expectLastCall();
+			}
+
 			subNode1Observer.onRepFinish(subNode1, 1);
 			EasyMock.expectLastCall();
 			subNode1Observer.onFinish(subNode1);
 			EasyMock.expectLastCall();
+
+			if (i < 1) {
+				subNode1Observer.onReset(subNode1);
+				EasyMock.expectLastCall();
+			}
+
 			programObserver.onRepFinish(nestedProgram, i + 1);
 			EasyMock.expectLastCall();
 		}

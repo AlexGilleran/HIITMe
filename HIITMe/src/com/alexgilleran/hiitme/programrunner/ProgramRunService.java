@@ -25,12 +25,15 @@ public class ProgramRunService extends RoboIntentService {
 
 	private Program program;
 
-	private ExerciseCountDown currentCountDown;
+	private ExerciseCountDown exerciseCountDown;
+	private ExerciseCountDown programCountDown;
+
 	boolean isRunning = false;
 
 	private Notification notification;
 
-	private List<CountDownObserver> observers = new ArrayList<CountDownObserver>();
+	private List<CountDownObserver> exerciseObservers = new ArrayList<CountDownObserver>();
+	private List<CountDownObserver> programObservers = new ArrayList<CountDownObserver>();
 
 	public ProgramRunService() {
 		super("HIIT Me");
@@ -60,11 +63,11 @@ public class ProgramRunService extends RoboIntentService {
 			newCountDown();
 		}
 	}
-	
+
 	private void newCountDown() {
-		currentCountDown = new ExerciseCountDown(program
-				.getCurrentExercise().getDuration(), countDownObserver);
-		currentCountDown.start();
+		exerciseCountDown = new ExerciseCountDown(program.getCurrentExercise()
+				.getDuration(), exerciseCountDownObs);
+		exerciseCountDown.start();
 	}
 
 	private ProgramNodeObserver programObserver = new ProgramNodeObserver() {
@@ -84,7 +87,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onReset(ProgramNode node) {
-			
+
 		}
 	};
 
@@ -95,23 +98,31 @@ public class ProgramRunService extends RoboIntentService {
 			isRunning = true;
 
 			if (isPaused) {
-				currentCountDown.start();
+				exerciseCountDown.start();
+				programCountDown.start();
+
 			} else {
 				startForeground(1, notification);
+				programCountDown = new ExerciseCountDown(
+						program.getTotalDuration(), programCountDownObs);
 				program.start();
+
 				newCountDown();
+				programCountDown.start();
 			}
 		}
 
 		public void stop() {
 			isRunning = false;
-			currentCountDown.cancel();
+			exerciseCountDown.cancel();
+			programCountDown.cancel();
 		}
 
 		public void pause() {
 			isPaused = true;
 			isRunning = false;
-			currentCountDown = currentCountDown.pause();
+			exerciseCountDown = exerciseCountDown.pause();
+			programCountDown = programCountDown.pause();
 		}
 
 		public Program getProgram() {
@@ -122,8 +133,12 @@ public class ProgramRunService extends RoboIntentService {
 			return isRunning;
 		}
 
-		public void registerObserver(CountDownObserver observer) {
-			observers.add(observer);
+		public void regExerciseCountDownObs(CountDownObserver observer) {
+			exerciseObservers.add(observer);
+		}
+
+		public void regProgCountDownObs(CountDownObserver observer) {
+			programObservers.add(observer);
 		}
 
 		public ProgramNode getCurrentSuperset() {
@@ -135,10 +150,10 @@ public class ProgramRunService extends RoboIntentService {
 		}
 	}
 
-	private CountDownObserver countDownObserver = new CountDownObserver() {
+	private CountDownObserver exerciseCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
-			for (CountDownObserver observer : observers) {
+			for (CountDownObserver observer : exerciseObservers) {
 				observer.onTick(msecondsRemaining);
 			}
 		}
@@ -146,6 +161,20 @@ public class ProgramRunService extends RoboIntentService {
 		@Override
 		public void onFinish() {
 			next();
+		}
+	};
+
+	private CountDownObserver programCountDownObs = new CountDownObserver() {
+		@Override
+		public void onTick(long msecondsRemaining) {
+			for (CountDownObserver observer : programObservers) {
+				observer.onTick(msecondsRemaining);
+			}
+		}
+
+		@Override
+		public void onFinish() {
+
 		}
 	};
 }

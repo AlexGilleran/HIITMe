@@ -30,12 +30,16 @@ public class ProgramRunFragment extends RoboFragment {
 	private TextView timeRemainingView;
 
 	@InjectView(R.id.progressbar_exercise)
-	private ProgressBar progressBar;
+	private ProgressBar exerciseProgressBar;
+	@InjectView(R.id.progressbar_program)
+	private ProgressBar programProgressBar;
 
 	@InjectView(R.id.rep_button_play_pause)
 	private ImageButton playButton;
 
 	private ProgramBinder programBinder;
+
+	private int duration;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -85,13 +89,21 @@ public class ProgramRunFragment extends RoboFragment {
 		return minutes + ":" + seconds / 1000 + "." + (seconds % 1000 / 100);
 	}
 
+	private int getPercentage(long msecondsRemaining, long duration) {
+		return ((int) duration - (int) msecondsRemaining)
+				/ ((int) duration / 100);
+	}
+
 	private ServiceConnection connection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
 			programBinder.getProgram().registerObserver(observer);
-			programBinder.registerObserver(countdownObserver);
-			progressBar.setProgress(0);
+			programBinder.regExerciseCountDownObs(exCountDownObs);
+			programBinder.regProgCountDownObs(progCountDownObs);
+			exerciseProgressBar.setProgress(0);
+
+			duration = programBinder.getProgram().getTotalDuration();
 		}
 
 		@Override
@@ -100,35 +112,44 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 	};
 
-	private CountDownObserver countdownObserver = new CountDownObserver() {
+	private CountDownObserver exCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
 			timeRemainingView.setText(formatTime(msecondsRemaining));
-			progressBar
-					.setProgress(getProgressAsPercentage(msecondsRemaining));
+			int currentExerciseDuration = programBinder.getProgram()
+					.getCurrentExercise().getDuration();
+			programProgressBar.setProgress(getPercentage(msecondsRemaining,
+					currentExerciseDuration));
 		}
 
 		@Override
 		public void onFinish() {
 		}
-		
-		private int getProgressAsPercentage(long msecondsRemaining) {
-			int duration = programBinder.getProgram().getCurrentExercise().getDuration();
-			return (duration - (int) msecondsRemaining) / (duration / 100); 
+	};
+
+	private CountDownObserver progCountDownObs = new CountDownObserver() {
+		@Override
+		public void onTick(long msecondsRemaining) {
+			exerciseProgressBar.setProgress(getPercentage(msecondsRemaining,
+					duration));
+		}
+
+		@Override
+		public void onFinish() {
 		}
 	};
 
 	private ProgramNodeObserver observer = new ProgramNodeObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
-			progressBar.setProgress(0);
+			exerciseProgressBar.setProgress(0);
 		}
 
 		@Override
 		public void onFinish(ProgramNode node) {
 			timeRemainingView.setText(formatTime(0));
 			refreshPlayButtonIcon();
-			progressBar.setProgress(progressBar.getMax());
+			exerciseProgressBar.setProgress(exerciseProgressBar.getMax());
 		}
 
 		@Override
@@ -138,8 +159,7 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onReset(ProgramNode node) {
-			// TODO Auto-generated method stub
-			
+
 		}
 	};
 }
