@@ -1,8 +1,5 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import roboguice.fragment.RoboFragment;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,9 +13,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
@@ -61,11 +55,10 @@ public class ProgramDetailFragment extends RoboFragment {
 		View rootView = inflater.inflate(R.layout.fragment_program_detail,
 				container, false);
 
-
 		return rootView;
 	}
 
-	private ServiceConnection connection = new ServiceConnection() {
+	private final ServiceConnection connection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			// We've bound to LocalService, cast the IBinder and get
@@ -76,9 +69,10 @@ public class ProgramDetailFragment extends RoboFragment {
 				LinearLayout repGroupLayout = (LinearLayout) getView()
 						.findViewById(R.id.layout_repgroups);
 
-				ProgramNodeView nodeView = (ProgramNodeView) inflater
-						.inflate(R.layout.view_program_node, null);
-				nodeView.setProgramNode(programBinder.getProgram());
+				ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
+						R.layout.view_program_node, null);
+				nodeView.setProgramNode(programBinder.getProgram()
+						.getAssociatedNode());
 
 				repGroupLayout.addView(nodeView, 0);
 			}

@@ -1,15 +1,13 @@
 package com.alexgilleran.hiitme.presentation.programlist;
 
-import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.R.id;
-import com.alexgilleran.hiitme.R.layout;
-import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailActivity;
-import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
-
 import roboguice.activity.RoboFragmentActivity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailActivity;
+import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 
 /**
  * An activity representing a list of Programs. This activity has different
@@ -62,6 +60,7 @@ public class ProgramListActivity extends RoboFragmentActivity implements
 	 * Callback method from {@link ProgramListFragment.Callbacks} indicating
 	 * that the item with the given ID was selected.
 	 */
+	@Override
 	public void onItemSelected(long id) {
 		if (mTwoPane) {
 			// In two-pane mode, show the detail view in this activity by

@@ -1,5 +1,6 @@
 package com.alexgilleran.hiitme.programrunner;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,8 @@ import android.os.IBinder;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDao;
-import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.data.ProgramDaoProvider;
+import com.alexgilleran.hiitme.model.ExerciseData;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
@@ -21,9 +23,11 @@ import com.google.inject.Inject;
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
-	private ProgramDao programDao;
+	private ProgramDaoProvider daoProvider;
 
+	private ProgramDao programDao;
 	private Program program;
+	private ProgramNode programNode;
 
 	private ExerciseCountDown exerciseCountDown;
 	private ExerciseCountDown programCountDown;
@@ -32,11 +36,18 @@ public class ProgramRunService extends RoboIntentService {
 
 	private Notification notification;
 
-	private List<CountDownObserver> exerciseObservers = new ArrayList<CountDownObserver>();
-	private List<CountDownObserver> programObservers = new ArrayList<CountDownObserver>();
+	private final List<CountDownObserver> exerciseObservers = new ArrayList<CountDownObserver>();
+	private final List<CountDownObserver> programObservers = new ArrayList<CountDownObserver>();
 
 	public ProgramRunService() {
 		super("HIIT Me");
+	}
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+
+		programDao = daoProvider.get();
 	}
 
 	@Override
@@ -46,10 +57,21 @@ public class ProgramRunService extends RoboIntentService {
 		builder.setContentTitle("HIIT Me");
 		builder.setSmallIcon(R.drawable.ic_launcher);
 		notification = builder.getNotification();
-
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
-		program = programDao.getProgram(programId);
-		program.registerObserver(programObserver);
+		try {
+			program = programDao.getProgram(programId);
+			programNode = program.getAssociatedNode();
+			programNode.registerObserver(programObserver);
+		} catch (SQLException e) {
+			throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		daoProvider.release();
 	}
 
 	@Override
@@ -58,21 +80,21 @@ public class ProgramRunService extends RoboIntentService {
 	}
 
 	private void next() {
-		program.next();
-		if (!program.isFinished()) {
+		programNode.next();
+		if (!programNode.isFinished()) {
 			newCountDown();
 		}
 	}
 
 	private void newCountDown() {
-		exerciseCountDown = new ExerciseCountDown(program.getCurrentExercise()
-				.getDuration(), exerciseCountDownObs);
+		exerciseCountDown = new ExerciseCountDown(programNode
+				.getCurrentExercise().getDuration(), exerciseCountDownObs);
 		exerciseCountDown.start();
 	}
 
-	private ProgramNodeObserver programObserver = new ProgramNodeObserver() {
+	private final ProgramNodeObserver programObserver = new ProgramNodeObserver() {
 		@Override
-		public void onNextExercise(Exercise newExercise) {
+		public void onNextExercise(ExerciseData newExercise) {
 		}
 
 		@Override
@@ -103,9 +125,9 @@ public class ProgramRunService extends RoboIntentService {
 
 			} else {
 				startForeground(1, notification);
-				programCountDown = new ExerciseCountDown(program.getDuration(),
-						programCountDownObs);
-				program.start();
+				programCountDown = new ExerciseCountDown(program
+						.getAssociatedNode().getDuration(), programCountDownObs);
+				programNode.start();
 
 				newCountDown();
 				programCountDown.start();
@@ -142,47 +164,46 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		public ProgramNode getCurrentSuperset() {
-			return program.getCurrentNode();
+			return programNode.getCurrentNode();
 		}
 
-		public Exercise getCurrentExercise() {
-			return program.getCurrentExercise();
+		public ExerciseData getCurrentExercise() {
+			return programNode.getCurrentExercise();
 		}
 	}
 
-	// TODO: These are basically the same class with one line's difference...
-	// combine them.
-	private CountDownObserver exerciseCountDownObs = new CountDownObserver() {
-		@Override
-		public void onTick(long msecondsRemaining) {
-			for (CountDownObserver observer : exerciseObservers) {
-				observer.onTick(msecondsRemaining);
-			}
-		}
-
+	private final CountDownObserver exerciseCountDownObs = new ObserverProxy(
+			exerciseObservers) {
 		@Override
 		public void onFinish() {
-			for (CountDownObserver observer : exerciseObservers) {
-				observer.onFinish();
-			}
+			super.onFinish();
 
 			next();
 		}
 	};
 
-	private CountDownObserver programCountDownObs = new CountDownObserver() {
+	private final CountDownObserver programCountDownObs = new ObserverProxy(
+			programObservers);
+
+	private class ObserverProxy implements CountDownObserver {
+		private final List<CountDownObserver> observers;
+
+		public ObserverProxy(List<CountDownObserver> observers) {
+			this.observers = observers;
+		}
+
 		@Override
 		public void onTick(long msecondsRemaining) {
-			for (CountDownObserver observer : programObservers) {
+			for (CountDownObserver observer : observers) {
 				observer.onTick(msecondsRemaining);
 			}
 		}
 
 		@Override
 		public void onFinish() {
-			for (CountDownObserver observer : programObservers) {
+			for (CountDownObserver observer : observers) {
 				observer.onFinish();
 			}
 		}
-	};
+	}
 }

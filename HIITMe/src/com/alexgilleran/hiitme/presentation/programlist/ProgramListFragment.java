@@ -1,5 +1,6 @@
 package com.alexgilleran.hiitme.presentation.programlist;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import roboguice.fragment.RoboListFragment;
@@ -82,8 +83,11 @@ public class ProgramListFragment extends RoboListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO: replace with a real list adapter.
-		setListAdapter(new Adapter(programDao.getAllPrograms()));
+		try {
+			setListAdapter(new ProgramAdapter(programDao.getAllPrograms()));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -160,12 +164,12 @@ public class ProgramListFragment extends RoboListFragment {
 		mActivatedPosition = position;
 	}
 
-	private class Adapter extends BaseAdapter {
-		private LayoutInflater inflater = (LayoutInflater) getActivity()
+	private class ProgramAdapter extends BaseAdapter {
+		private final LayoutInflater inflater = (LayoutInflater) getActivity()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		private List<Program> programList;
+		private final List<Program> programList;
 
-		private Adapter(List<Program> programList) {
+		private ProgramAdapter(List<Program> programList) {
 			this.programList = programList;
 		}
 

@@ -1,46 +1,210 @@
 package com.alexgilleran.hiitme.model;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * A group of one or more sets, used to encapsulate reps.
- * 
- * @author Alex Gilleran
- * 
- */
-public interface ProgramNode {
 
-	/** Get how many times this {@link ProgramNode} is to be repeated */
-	int getTotalReps();
+public class ProgramNode extends ProgramNodeData {
+	private int completedReps;
+	private int currentChildIndex;
+	private final Set<ProgramNodeObserver> observers = new HashSet<ProgramNodeObserver>();
 
-	int getCompletedReps();
+	public ProgramNode() {
+		reset();
+	}
 
-	List<ProgramNode> getChildren();
+	public ProgramNode(int repCount) {
+		this();
 
-	boolean isFinished();
+		setTotalReps(repCount);
+	}
 
-	void reset();
+	public int getCompletedReps() {
+		return completedReps;
+	}
 
-	void next();
+	public ProgramNode addChildNode(int repCount) {
+		checkCanHaveChildren();
 
-	ProgramNode getCurrentNode();
+		ProgramNode newNode = new ProgramNode(repCount);
+		getChildren().add(newNode);
 
-	Exercise getCurrentExercise();
+		return newNode;
+	}
 
-	Exercise getAttachedExercise();
+	public ExerciseData addChildExercise(String name, int duration,
+			Exercise.EffortLevel effortLevel, int repCount) {
+		checkCanHaveChildren();
 
-	boolean hasChildren();
+		ProgramNode containerNode = new ProgramNode(repCount);
+		Exercise newExercise = new Exercise(name, duration, effortLevel,
+				containerNode);
+		containerNode.setAttachedExercise(newExercise);
 
-	ProgramNode addChildNode(int repCount);
+		getChildren().add(containerNode);
 
-	void registerObserver(ProgramNodeObserver observer);
+		return newExercise;
+	}
 
-	Exercise addChildExercise(String name, int duration,
-			Exercise.EffortLevel effortLevel, int repCount);
+	private void checkCanHaveChildren() {
+		if (getAttachedExercise() != null) {
+			throw new RuntimeException(
+					"This ProgramNode was created with an attached exercise - it cannot have getChildren().");
+		}
+	}
 
-	void triggerExerciseBroadcast();
+	public void next() {
+		if (isFinished()) {
+			throw new RuntimeException(
+					"next() called on finished node - node must be reset before next() is called again");
+		}
 
-	void start();
+		if (this.hasChildren()) {
+			// the next node.
+			ProgramNode currentNode = getCurrentNode();
+			currentNode.next();
 
-	int getDuration();
+			if (currentNode.isFinished()) {
+				// Current node finished, go to the next one
+				nextNode();
+
+				if (!this.isFinished()) {
+					getCurrentExercise().getParentNode()
+							.triggerExerciseBroadcast();
+				}
+			}
+		} else {
+			nextNode();
+		}
+	}
+
+	public boolean hasChildren() {
+		return !getChildren().isEmpty();
+	}
+
+	private void nextNode() {
+		currentChildIndex++;
+
+		if (currentChildIndex >= getChildren().size()) {
+			nextRep();
+		}
+	}
+
+	private void nextRep() {
+		completedReps++;
+		broadcastRepFinish();
+
+		currentChildIndex = 0;
+
+		if (isFinished()) {
+			broadcastFinish();
+		} else {
+			resetChildren();
+		}
+	}
+
+	public boolean isFinished() {
+		return completedReps >= getTotalReps();
+	}
+
+	public void reset() {
+		completedReps = 0;
+		currentChildIndex = 0;
+
+		resetChildren();
+
+		broadcastReset();
+	}
+
+	private void resetChildren() {
+		for (ProgramNode node : getChildren()) {
+			node.reset();
+		}
+	}
+
+	public ProgramNode getCurrentNode() {
+		if (isFinished()) {
+			throw new RuntimeException(
+					"getCurrentNode() called on finished ProgramNode");
+		}
+
+		if (this.hasChildren()) {
+			return this.getChildren().get(currentChildIndex);
+		} else {
+			return this;
+		}
+	}
+
+	public ExerciseData getCurrentExercise() {
+		if (getAttachedExercise() != null) {
+			return getAttachedExercise();
+		}
+
+		ProgramNode currentNode = getCurrentNode();
+		if (currentNode != this) {
+			return getCurrentNode().getCurrentExercise();
+		} else {
+			return null;
+		}
+	}
+
+	private Set<ProgramNodeObserver> getObservers() {
+		return observers;
+	}
+
+	private void broadcastFinish() {
+		for (ProgramNodeObserver observer : observers) {
+			observer.onFinish(this);
+		}
+	}
+
+	private void broadcastRepFinish() {
+		for (ProgramNodeObserver observer : observers) {
+			observer.onRepFinish(this, completedReps);
+		}
+	}
+
+	protected void broadcastNextExercise() {
+		for (ProgramNodeObserver observer : getObservers()) {
+			observer.onNextExercise(getCurrentExercise());
+		}
+	}
+
+	private void broadcastReset() {
+		for (ProgramNodeObserver observer : getObservers()) {
+			observer.onReset(this);
+		}
+	}
+
+	public void registerObserver(ProgramNodeObserver observer) {
+		observers.add(observer);
+	}
+
+	public void triggerExerciseBroadcast() {
+		this.broadcastNextExercise();
+	}
+
+	public void start() {
+		ProgramNode node = getCurrentNode();
+
+		if (this == node) {
+			broadcastNextExercise();
+		} else {
+			node.start();
+		}
+	}
+
+	public int getDuration() {
+		if (this.getAttachedExercise() != null) {
+			return getAttachedExercise().getDuration() * getTotalReps();
+		} else {
+			int total = 0;
+
+			for (ProgramNode child : getChildren()) {
+				total += child.getDuration();
+			}
+
+			return total * getTotalReps();
+		}
+	}
 }

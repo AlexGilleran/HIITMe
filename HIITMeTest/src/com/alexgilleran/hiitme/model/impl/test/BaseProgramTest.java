@@ -4,16 +4,16 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 
 import com.alexgilleran.hiitme.data.ProgramDao;
-import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
+import com.alexgilleran.hiitme.model.ExerciseData;
 import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.ExerciseData.EffortLevel;
 
 public class BaseProgramTest {
 	protected ProgramDao dao;
-	protected Exercise step1;
-	protected Exercise step2;
-	protected Exercise step3;
-	protected Exercise step4;
+	protected ExerciseData step1;
+	protected ExerciseData step2;
+	protected ExerciseData step3;
+	protected ExerciseData step4;
 	protected ProgramNode subNode1;
 	protected ProgramNode sub2Node1;
 	protected ProgramNode sub3Node1;

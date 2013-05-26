@@ -7,10 +7,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
+import com.alexgilleran.hiitme.model.ExerciseData;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.impl.ProgramNodeImpl;
+import com.alexgilleran.hiitme.model.ExerciseData.EffortLevel;
 
 public class ProgramNodeImplTest extends BaseProgramTest {
 	ProgramNode simpleNode;
@@ -18,8 +17,8 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 
 	@Before
 	public void setUp() {
-		simpleNode = new ProgramNodeImpl(dao, 1);
-		nestedNode = new ProgramNodeImpl(dao, 2);
+		simpleNode = new ProgramNode(1);
+		nestedNode = new ProgramNode(2);
 
 		setupSimpleNode(simpleNode);
 		setupNestedNode(nestedNode);
@@ -175,16 +174,16 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 		assertFalse(step2.hasChildren());
 		assertFalse(step3.hasChildren());
 
-		Exercise exercise1 = step1.getAttachedExercise();
-		Exercise exercise2 = step2.getAttachedExercise();
-		Exercise exercise3 = step3.getAttachedExercise();
+		ExerciseData exercise1 = step1.getAttachedExercise();
+		ExerciseData exercise2 = step2.getAttachedExercise();
+		ExerciseData exercise3 = step3.getAttachedExercise();
 
 		assertExercise(exercise1, "Step 1", 100, EffortLevel.HARD);
 		assertExercise(exercise2, "Step 2", 200, EffortLevel.EASY);
 		assertExercise(exercise3, "Step 3", 300, EffortLevel.REST);
 	}
 
-	private static void assertExercise(Exercise exercise, String name,
+	private static void assertExercise(ExerciseData exercise, String name,
 			int duration, EffortLevel effortLevel) {
 		assertEquals(name, exercise.getName());
 		assertEquals(duration, exercise.getDuration());

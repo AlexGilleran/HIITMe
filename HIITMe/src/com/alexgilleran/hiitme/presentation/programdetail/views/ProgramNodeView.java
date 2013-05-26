@@ -16,14 +16,15 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.ExerciseData;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
 public class ProgramNodeView extends LinearLayout implements
 		ProgramNodeObserver {
-	private Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
-	private Map<ProgramNode, TextView> repViews = new HashMap<ProgramNode, TextView>();
-	private List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
+	private final Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
+	private final Map<ProgramNode, TextView> repViews = new HashMap<ProgramNode, TextView>();
+	private final List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
 	private ProgramNode programNode;
 	private TableRow currentRow;
 
@@ -80,7 +81,7 @@ public class ProgramNodeView extends LinearLayout implements
 	 * @param exercise
 	 *            The {@link Exercise} to source data from.
 	 */
-	private void populateExerciseRow(TableRow row, Exercise exercise) {
+	private void populateExerciseRow(TableRow row, ExerciseData exercise) {
 		TextView repCountView = new TextView(this.getContext());
 		repCountView.setText(exercise.getParentNode().getTotalReps() + "x");
 		row.addView(repCountView);
@@ -123,11 +124,11 @@ public class ProgramNodeView extends LinearLayout implements
 	}
 
 	@Override
-	public void onNextExercise(Exercise newExercise) {
+	public void onNextExercise(ExerciseData newExercise) {
 		highlightExercise(newExercise);
 	}
 
-	public void highlightExercise(Exercise exercise) {
+	public void highlightExercise(ExerciseData exercise) {
 		if (currentRow != null) {
 			currentRow.setBackgroundColor(Color.TRANSPARENT);
 		}

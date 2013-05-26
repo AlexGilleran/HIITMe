@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.ExerciseData;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
@@ -94,16 +94,18 @@ public class ProgramRunFragment extends RoboFragment {
 				/ ((int) duration / 100);
 	}
 
-	private ServiceConnection connection = new ServiceConnection() {
+	private final ServiceConnection connection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
-			programBinder.getProgram().registerObserver(observer);
+			programBinder.getProgram().getAssociatedNode()
+					.registerObserver(observer);
 			programBinder.regExerciseCountDownObs(exCountDownObs);
 			programBinder.regProgCountDownObs(progCountDownObs);
 			exerciseProgressBar.setProgress(0);
 
-			duration = programBinder.getProgram().getDuration();
+			duration = programBinder.getProgram().getAssociatedNode()
+					.getDuration();
 		}
 
 		@Override
@@ -112,12 +114,12 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 	};
 
-	private CountDownObserver exCountDownObs = new CountDownObserver() {
+	private final CountDownObserver exCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
 			timeRemainingView.setText(formatTime(msecondsRemaining));
 			int currentExerciseDuration = programBinder.getProgram()
-					.getCurrentExercise().getDuration();
+					.getAssociatedNode().getCurrentExercise().getDuration();
 			programProgressBar.setProgress(getPercentage(msecondsRemaining,
 					currentExerciseDuration));
 		}
@@ -128,7 +130,7 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 	};
 
-	private CountDownObserver progCountDownObs = new CountDownObserver() {
+	private final CountDownObserver progCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
 			exerciseProgressBar.setProgress(getPercentage(msecondsRemaining,
@@ -141,9 +143,9 @@ public class ProgramRunFragment extends RoboFragment {
 		}
 	};
 
-	private ProgramNodeObserver observer = new ProgramNodeObserver() {
+	private final ProgramNodeObserver observer = new ProgramNodeObserver() {
 		@Override
-		public void onNextExercise(Exercise newExercise) {
+		public void onNextExercise(ExerciseData newExercise) {
 			exerciseProgressBar.setProgress(0);
 		}
 

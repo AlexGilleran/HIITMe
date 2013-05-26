@@ -1,25 +1,18 @@
 package com.alexgilleran.hiitme.model;
 
-/**
- * A single part of activity - e.g. "work for 20 seconds" or
- * "rest for 10 seconds"
- * 
- * @author Alex Gilleran
- */
-public interface Exercise {
-	ProgramNode getParentNode();
+public class Exercise extends ExerciseData {
 
-	/** Get the displayable name of the rep */
-	String getName();
+	public Exercise() {
+		super();
+	}
 
-	/** Get the duration of the rep, in milliseconds */
-	int getDuration();
+	public Exercise(String name, int duration, EffortLevel effortLevel,
+			ProgramNode node) {
+		super(name, duration, effortLevel, node);
+	}
 
-	/** Get the type of the rep */
-	EffortLevel getEffortLevel();
-
-	/** A simple representation of the effort level of the set */
-	enum EffortLevel {
-		HARD, EASY, REST
+	@Override
+	public String toString() {
+		return getName();
 	}
 }

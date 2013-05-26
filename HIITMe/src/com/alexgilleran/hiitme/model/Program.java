@@ -1,23 +1,23 @@
 package com.alexgilleran.hiitme.model;
 
-/**
- * Represents an entire HIIT program... e.g. the Tabata protocol is an instance
- * of {@link Program}.
- * 
- * @author Alex Gilleran
- * 
- */
-public interface Program extends ProgramNode {
-	public static final String PROGRAM_ID_NAME = "programid";
 
-	/** The id of this program */
-	long getId();
+public class Program extends ProgramData {
 
-	/** Gets the name of the program */
-	String getName();
+	public static final String PROGRAM_ID_NAME = "PROGRAM_ID";
 
-	/** Gets a description of the program */
-	String getDescription();
+	public Program() {
 
-	int getTotalReps();
+	}
+
+	public Program(String name, String description, int reps) {
+		super(name, description);
+
+		getAssociatedNode().setTotalReps(reps);
+	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 }

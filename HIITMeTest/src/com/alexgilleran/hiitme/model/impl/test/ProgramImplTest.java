@@ -1,7 +1,9 @@
 package com.alexgilleran.hiitme.model.impl.test;
 
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
-import static org.easymock.EasyMock.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,15 +16,14 @@ import org.junit.Test;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
-import com.alexgilleran.hiitme.model.impl.ProgramImpl;
 
 public class ProgramImplTest extends BaseProgramTest {
-	private List<ProgramNodeObserver> observers = new ArrayList<ProgramNodeObserver>();
+	private final List<ProgramNodeObserver> observers = new ArrayList<ProgramNodeObserver>();
 
 	@Test
 	public void testGetDuration() {
-		Program nestedProgram = new ProgramImpl(dao, "Hello", "Hello", 1);
-		setupNestedNode(nestedProgram);
+		Program nestedProgram = new Program("Hello", "Hello", 1);
+		setupNestedNode(nestedProgram.getAssociatedNode());
 
 		assertEquals(900, step3.getParentNode().getDuration());
 		assertEquals(200, step2.getParentNode().getDuration());
@@ -30,14 +31,13 @@ public class ProgramImplTest extends BaseProgramTest {
 		assertEquals(400, step4.getParentNode().getDuration());
 		assertEquals(7400, sub2Node1.getDuration());
 		assertEquals(200, step2.getParentNode().getDuration());
-		assertEquals(7600, nestedProgram.getDuration());
+		assertEquals(7600, nestedProgram.getAssociatedNode().getDuration());
 	}
 
 	@Test
 	public void testNestedRunThrough() {
-		Program nestedProgram = new ProgramImpl(dao, "Test",
-				"Test description", 2);
-		setupNestedNode(nestedProgram);
+		Program nestedProgram = new Program("Test", "Test description", 2);
+		setupNestedNode(nestedProgram.getAssociatedNode());
 
 		ProgramNodeObserver step1Observer = addObserver(step1.getParentNode());
 		ProgramNodeObserver step2Observer = addObserver(step2.getParentNode());
@@ -46,7 +46,8 @@ public class ProgramImplTest extends BaseProgramTest {
 		ProgramNodeObserver sub3Node1Observer = addObserver(sub3Node1);
 		ProgramNodeObserver sub2Node1Observer = addObserver(sub2Node1);
 		ProgramNodeObserver subNode1Observer = addObserver(subNode1);
-		ProgramNodeObserver programObserver = addObserver(nestedProgram);
+		ProgramNodeObserver programObserver = addObserver(nestedProgram
+				.getAssociatedNode());
 
 		int callCount = 0;
 		for (int i = 0; i < 2; i++) {
@@ -141,22 +142,20 @@ public class ProgramImplTest extends BaseProgramTest {
 				expectLastCall();
 			}
 
-			// Can't compare the actual Program here because it'll return the
-			// underlying ProgramNode.
-			programObserver
-					.onRepFinish(anyObject(ProgramNode.class), eq(i + 1));
+			programObserver.onRepFinish(nestedProgram.getAssociatedNode(),
+					i + 1);
 			expectLastCall();
 		}
-		programObserver.onFinish(anyObject(ProgramNode.class));
+		programObserver.onFinish(nestedProgram.getAssociatedNode());
 		expectLastCall();
 
 		for (ProgramNodeObserver observer : observers) {
 			replay(observer);
 		}
 
-		nestedProgram.start();
+		nestedProgram.getAssociatedNode().start();
 		for (int i = 0; i < callCount; i++) {
-			nestedProgram.next();
+			nestedProgram.getAssociatedNode().next();
 		}
 
 		for (ProgramNodeObserver observer : observers) {
@@ -164,7 +163,7 @@ public class ProgramImplTest extends BaseProgramTest {
 		}
 
 		try {
-			nestedProgram.next();
+			nestedProgram.getAssociatedNode().next();
 			Assert.fail();
 		} catch (RuntimeException e) {
 			// yay
