@@ -10,7 +10,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.data.ProgramDao;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
-	private ProgramDAO programDao;
+	private ProgramDao programDao;
 
 	private Program program;
 
@@ -103,8 +103,8 @@ public class ProgramRunService extends RoboIntentService {
 
 			} else {
 				startForeground(1, notification);
-				programCountDown = new ExerciseCountDown(
-						program.getTotalDuration(), programCountDownObs);
+				programCountDown = new ExerciseCountDown(program.getDuration(),
+						programCountDownObs);
 				program.start();
 
 				newCountDown();
@@ -150,6 +150,8 @@ public class ProgramRunService extends RoboIntentService {
 		}
 	}
 
+	// TODO: These are basically the same class with one line's difference...
+	// combine them.
 	private CountDownObserver exerciseCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
@@ -160,6 +162,10 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onFinish() {
+			for (CountDownObserver observer : exerciseObservers) {
+				observer.onFinish();
+			}
+
 			next();
 		}
 	};
@@ -174,7 +180,9 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onFinish() {
-
+			for (CountDownObserver observer : programObservers) {
+				observer.onFinish();
+			}
 		}
 	};
 }

@@ -1,10 +1,15 @@
 package com.alexgilleran.hiitme.model.impl.test;
 
+import org.easymock.EasyMock;
+import org.junit.Before;
+
+import com.alexgilleran.hiitme.data.ProgramDao;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
 import com.alexgilleran.hiitme.model.ProgramNode;
 
 public class BaseProgramTest {
+	protected ProgramDao dao;
 	protected Exercise step1;
 	protected Exercise step2;
 	protected Exercise step3;
@@ -12,6 +17,11 @@ public class BaseProgramTest {
 	protected ProgramNode subNode1;
 	protected ProgramNode sub2Node1;
 	protected ProgramNode sub3Node1;
+
+	@Before
+	public void mockDao() {
+		dao = EasyMock.createMock(ProgramDao.class);
+	}
 
 	protected void setupNestedNode(ProgramNode nestedNode) {
 		step1 = nestedNode.addChildExercise("Step 1", 100, EffortLevel.HARD, 2);

@@ -13,7 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.data.ProgramDao;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 import com.google.inject.Inject;
@@ -47,7 +47,7 @@ public class ProgramListFragment extends RoboListFragment {
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 
 	@Inject
-	private ProgramDAO programDao;
+	private ProgramDao programDao;
 
 	/**
 	 * A callback interface that all activities containing this fragment must

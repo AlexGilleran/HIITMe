@@ -18,8 +18,8 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 
 	@Before
 	public void setUp() {
-		simpleNode = new ProgramNodeImpl(1);
-		nestedNode = new ProgramNodeImpl(2);
+		simpleNode = new ProgramNodeImpl(dao, 1);
+		nestedNode = new ProgramNodeImpl(dao, 2);
 
 		setupSimpleNode(simpleNode);
 		setupNestedNode(nestedNode);

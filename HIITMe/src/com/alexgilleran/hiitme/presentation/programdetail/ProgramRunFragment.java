@@ -103,7 +103,7 @@ public class ProgramRunFragment extends RoboFragment {
 			programBinder.regProgCountDownObs(progCountDownObs);
 			exerciseProgressBar.setProgress(0);
 
-			duration = programBinder.getProgram().getTotalDuration();
+			duration = programBinder.getProgram().getDuration();
 		}
 
 		@Override
@@ -124,6 +124,7 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onFinish() {
+			programProgressBar.setProgress(programProgressBar.getMax());
 		}
 	};
 
@@ -136,6 +137,7 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onFinish() {
+			exerciseProgressBar.setProgress(exerciseProgressBar.getMax());
 		}
 	};
 
@@ -149,7 +151,6 @@ public class ProgramRunFragment extends RoboFragment {
 		public void onFinish(ProgramNode node) {
 			timeRemainingView.setText(formatTime(0));
 			refreshPlayButtonIcon();
-			exerciseProgressBar.setProgress(exerciseProgressBar.getMax());
 		}
 
 		@Override
