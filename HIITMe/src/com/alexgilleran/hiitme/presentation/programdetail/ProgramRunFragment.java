@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.ExerciseData;
+import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
@@ -145,7 +145,7 @@ public class ProgramRunFragment extends RoboFragment {
 
 	private final ProgramNodeObserver observer = new ProgramNodeObserver() {
 		@Override
-		public void onNextExercise(ExerciseData newExercise) {
+		public void onNextExercise(Exercise newExercise) {
 			exerciseProgressBar.setProgress(0);
 		}
 

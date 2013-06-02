@@ -1,6 +1,5 @@
 package com.alexgilleran.hiitme.presentation.programlist;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import roboguice.fragment.RoboListFragment;
@@ -83,11 +82,7 @@ public class ProgramListFragment extends RoboListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		try {
-			setListAdapter(new ProgramAdapter(programDao.getAllPrograms()));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		setListAdapter(new ProgramAdapter(programDao.getAllPrograms()));
 	}
 
 	@Override

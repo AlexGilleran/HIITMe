@@ -1,15 +1,31 @@
 package com.alexgilleran.hiitme.model;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 
-public class ProgramNode extends ProgramNodeData {
+@Table(name = "program_node")
+public class ProgramNode extends Model {
+	@Column(name = "total_reps")
+	private int totalReps;
+	@Column(name = "attached_exercise")
+	private Exercise attachedExercise;
+	@Column(name = "parent")
+	private ProgramNode parent;
+
+	List<ProgramNode> children;
+
 	private int completedReps;
 	private int currentChildIndex;
 	private final Set<ProgramNodeObserver> observers = new HashSet<ProgramNodeObserver>();
 
 	public ProgramNode() {
+		super();
 		reset();
 	}
 
@@ -17,6 +33,10 @@ public class ProgramNode extends ProgramNodeData {
 		this();
 
 		setTotalReps(repCount);
+	}
+
+	public void prepareForSave() {
+
 	}
 
 	public int getCompletedReps() {
@@ -28,20 +48,19 @@ public class ProgramNode extends ProgramNodeData {
 
 		ProgramNode newNode = new ProgramNode(repCount);
 		getChildren().add(newNode);
+		newNode.setParent(this);
 
 		return newNode;
 	}
 
-	public ExerciseData addChildExercise(String name, int duration,
+	public Exercise addChildExercise(String name, int duration,
 			Exercise.EffortLevel effortLevel, int repCount) {
 		checkCanHaveChildren();
 
-		ProgramNode containerNode = new ProgramNode(repCount);
+		ProgramNode containerNode = addChildNode(repCount);
 		Exercise newExercise = new Exercise(name, duration, effortLevel,
 				containerNode);
 		containerNode.setAttachedExercise(newExercise);
-
-		getChildren().add(containerNode);
 
 		return newExercise;
 	}
@@ -135,7 +154,7 @@ public class ProgramNode extends ProgramNodeData {
 		}
 	}
 
-	public ExerciseData getCurrentExercise() {
+	public Exercise getCurrentExercise() {
 		if (getAttachedExercise() != null) {
 			return getAttachedExercise();
 		}
@@ -205,6 +224,71 @@ public class ProgramNode extends ProgramNodeData {
 			}
 
 			return total * getTotalReps();
+		}
+	}
+
+	public int getTotalReps() {
+		return totalReps;
+	}
+
+	public Exercise getAttachedExercise() {
+		return attachedExercise;
+	}
+
+	public void setTotalReps(int totalReps) {
+		this.totalReps = totalReps;
+	}
+
+	public List<ProgramNode> getChildren() {
+		if (children == null) {
+			children = getMany(ProgramNode.class, "parent");
+		}
+
+		return children;
+	}
+
+	public void setAttachedExercise(Exercise attachedExercise) {
+		this.attachedExercise = attachedExercise;
+	}
+
+	public ProgramNode getParent() {
+		return parent;
+	}
+
+	public void setParent(ProgramNode parent) {
+		this.parent = parent;
+	}
+
+	@Override
+	public void save() {
+		ActiveAndroid.beginTransaction();
+		try {
+			// Hack to get around ActiveAndroid's non-handling of circular
+			// dependencies.
+
+			for (ProgramNode child : getChildren()) {
+				child.setParent(null);
+				child.save();
+			}
+			Exercise attachedExercise = getAttachedExercise();
+			this.setAttachedExercise(null);
+
+			super.save();
+
+			for (ProgramNode child : getChildren()) {
+				child.setParent(this);
+				child.save();
+			}
+
+			if (attachedExercise != null) {
+				attachedExercise.save();
+				this.setAttachedExercise(attachedExercise);
+				super.save();
+			}
+
+			ActiveAndroid.setTransactionSuccessful();
+		} finally {
+			ActiveAndroid.endTransaction();
 		}
 	}
 }

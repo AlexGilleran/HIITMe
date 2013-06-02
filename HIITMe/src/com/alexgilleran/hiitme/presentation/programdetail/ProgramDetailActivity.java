@@ -29,6 +29,7 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_program_detail);
 
 		// Show the Up button in the action bar.
@@ -52,6 +53,11 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 
 			transaction.commit();
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 	}
 
 	@Override

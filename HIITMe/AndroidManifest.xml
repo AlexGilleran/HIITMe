@@ -9,10 +9,17 @@
         android:targetSdkVersion="17" />
 
     <application
+        android:name="HIITMeApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:name="HIITMeApplication">
+        android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="hiitme.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="20" />
         <activity
             android:name=".presentation.programlist.ProgramListActivity"
             android:label="@string/app_name" >
@@ -23,9 +30,11 @@
         </activity>
         <activity
             android:name=".presentation.programdetail.ProgramDetailActivity"
-            android:label="@string/title_program_detail">
+            android:label="@string/title_program_detail" >
         </activity>
-        <service android:name="com.alexgilleran.hiitme.programrunner.ProgramRunService"></service>
+
+        <service android:name="com.alexgilleran.hiitme.programrunner.ProgramRunService" >
+        </service>
     </application>
 
 </manifest>

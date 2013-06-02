@@ -2,7 +2,7 @@ package com.alexgilleran.hiitme.model;
 
 
 public interface ProgramNodeObserver {
-	void onNextExercise(ExerciseData newExercise);
+	void onNextExercise(Exercise newExercise);
 
 	void onRepFinish(ProgramNode node, int completedReps);
 

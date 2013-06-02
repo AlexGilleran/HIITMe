@@ -1,6 +1,5 @@
 package com.alexgilleran.hiitme.programrunner;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +11,7 @@ import android.os.IBinder;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDao;
-import com.alexgilleran.hiitme.data.ProgramDaoProvider;
-import com.alexgilleran.hiitme.model.ExerciseData;
+import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
@@ -23,8 +21,6 @@ import com.google.inject.Inject;
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
-	private ProgramDaoProvider daoProvider;
-
 	private ProgramDao programDao;
 	private Program program;
 	private ProgramNode programNode;
@@ -46,8 +42,6 @@ public class ProgramRunService extends RoboIntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		programDao = daoProvider.get();
 	}
 
 	@Override
@@ -58,20 +52,10 @@ public class ProgramRunService extends RoboIntentService {
 		builder.setSmallIcon(R.drawable.ic_launcher);
 		notification = builder.getNotification();
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
-		try {
-			program = programDao.getProgram(programId);
-			programNode = program.getAssociatedNode();
-			programNode.registerObserver(programObserver);
-		} catch (SQLException e) {
-			throw new RuntimeException();
-		}
-	}
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		daoProvider.release();
+		program = programDao.getProgram(programId);
+		programNode = program.getAssociatedNode();
+		programNode.registerObserver(programObserver);
 	}
 
 	@Override
@@ -94,7 +78,7 @@ public class ProgramRunService extends RoboIntentService {
 
 	private final ProgramNodeObserver programObserver = new ProgramNodeObserver() {
 		@Override
-		public void onNextExercise(ExerciseData newExercise) {
+		public void onNextExercise(Exercise newExercise) {
 		}
 
 		@Override
@@ -167,7 +151,7 @@ public class ProgramRunService extends RoboIntentService {
 			return programNode.getCurrentNode();
 		}
 
-		public ExerciseData getCurrentExercise() {
+		public Exercise getCurrentExercise() {
 			return programNode.getCurrentExercise();
 		}
 	}

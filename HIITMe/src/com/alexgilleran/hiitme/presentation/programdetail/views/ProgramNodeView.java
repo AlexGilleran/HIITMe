@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ExerciseData;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
@@ -81,7 +80,7 @@ public class ProgramNodeView extends LinearLayout implements
 	 * @param exercise
 	 *            The {@link Exercise} to source data from.
 	 */
-	private void populateExerciseRow(TableRow row, ExerciseData exercise) {
+	private void populateExerciseRow(TableRow row, Exercise exercise) {
 		TextView repCountView = new TextView(this.getContext());
 		repCountView.setText(exercise.getParentNode().getTotalReps() + "x");
 		row.addView(repCountView);
@@ -124,11 +123,11 @@ public class ProgramNodeView extends LinearLayout implements
 	}
 
 	@Override
-	public void onNextExercise(ExerciseData newExercise) {
+	public void onNextExercise(Exercise newExercise) {
 		highlightExercise(newExercise);
 	}
 
-	public void highlightExercise(ExerciseData exercise) {
+	public void highlightExercise(Exercise exercise) {
 		if (currentRow != null) {
 			currentRow.setBackgroundColor(Color.TRANSPARENT);
 		}
