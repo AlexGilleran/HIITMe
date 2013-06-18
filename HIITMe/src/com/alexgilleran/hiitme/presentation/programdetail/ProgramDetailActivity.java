@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.alexgilleran.hiitme.R;
@@ -26,6 +28,8 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	@Inject
 	private ProgramDao programDao;
 
+	private Intent serviceIntent;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,10 +40,10 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Bind to LocalService
-		Intent intent = new Intent(this, ProgramRunService.class);
-		intent.putExtra(Program.PROGRAM_ID_NAME,
-				this.getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
-		this.getApplicationContext().startService(intent);
+		serviceIntent = new Intent(this, ProgramRunService.class);
+		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, this.getIntent()
+				.getLongExtra(Program.PROGRAM_ID_NAME, -1));
+		startService(serviceIntent);
 
 		if (savedInstanceState == null) {
 			FragmentTransaction transaction = getSupportFragmentManager()
@@ -56,8 +60,10 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onStop() {
+		super.onStop();
+
+		stopService(serviceIntent);
 	}
 
 	@Override
@@ -70,5 +76,12 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.run_menu, menu);
+		return true;
 	}
 }

@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
+import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
@@ -23,7 +26,8 @@ import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
  * either contained in a {@link ProgramListActivity} in two-pane mode (on
  * tablets) or a {@link ProgramDetailActivity} on handsets.
  */
-public class ProgramDetailFragment extends RoboFragment {
+public class ProgramDetailFragment extends RoboFragment implements
+		EditExerciseListener {
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -31,7 +35,6 @@ public class ProgramDetailFragment extends RoboFragment {
 	public static final String ARG_ITEM_ID = "item_id";
 
 	private ProgramBinder programBinder;
-
 	private LayoutInflater inflater;
 
 	/** Mandatory empty constructor */
@@ -58,6 +61,20 @@ public class ProgramDetailFragment extends RoboFragment {
 		return rootView;
 	}
 
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		getActivity().getApplicationContext().unbindService(connection);
+	}
+
+	@Override
+	public void onEditExercise(Exercise exerciseToEdit) {
+		EditExerciseFragment editExercise = new EditExerciseFragment(
+				exerciseToEdit);
+		editExercise.show(getFragmentManager(), "editexercise");
+	}
+
 	private final ServiceConnection connection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -71,6 +88,7 @@ public class ProgramDetailFragment extends RoboFragment {
 
 				ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
 						R.layout.view_program_node, null);
+				nodeView.setEditExerciseListener(ProgramDetailFragment.this);
 				nodeView.setProgramNode(programBinder.getProgram()
 						.getAssociatedNode());
 

@@ -75,6 +75,13 @@ public class ProgramRunFragment extends RoboFragment {
 		return view;
 	}
 
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		getActivity().getApplicationContext().unbindService(connection);
+	}
+
 	private void refreshPlayButtonIcon() {
 		int iconResId = programBinder.isRunning() ? android.R.drawable.ic_media_pause
 				: android.R.drawable.ic_media_play;
@@ -163,6 +170,11 @@ public class ProgramRunFragment extends RoboFragment {
 		@Override
 		public void onReset(ProgramNode node) {
 
+		}
+
+		@Override
+		public void onChange(ProgramNode node) {
+			
 		}
 	};
 }

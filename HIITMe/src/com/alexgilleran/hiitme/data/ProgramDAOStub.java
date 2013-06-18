@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
+import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.google.inject.Singleton;
@@ -20,9 +19,9 @@ public class ProgramDaoStub implements ProgramDao {
 	public ProgramDaoStub() {
 		Program tabata = new Program("Tabata", "The tabata protocol", 8);
 		tabata.getAssociatedNode().addChildExercise("Hard", 2000,
-				Exercise.EffortLevel.HARD, 1);
+				EffortLevel.HARD, 1);
 		tabata.getAssociatedNode().addChildExercise("Rest", 1000,
-				Exercise.EffortLevel.REST, 1);
+				EffortLevel.REST, 1);
 
 		programMap.put(tabata.getId(), tabata);
 		programList.add(tabata);

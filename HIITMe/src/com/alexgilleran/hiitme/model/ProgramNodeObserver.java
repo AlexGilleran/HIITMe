@@ -1,6 +1,5 @@
 package com.alexgilleran.hiitme.model;
 
-
 public interface ProgramNodeObserver {
 	void onNextExercise(Exercise newExercise);
 
@@ -9,4 +8,6 @@ public interface ProgramNodeObserver {
 	void onFinish(ProgramNode node);
 
 	void onReset(ProgramNode node);
+
+	void onChange(ProgramNode node);
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reps:" />
+
+    <NumberPicker
+        android:id="@+id/exercise_edit_rep_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: " />
+
+    <NumberPicker
+        android:id="@+id/exercise_edit_duration_minutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":" />
+
+    <NumberPicker
+        android:id="@+id/exercise_edit_duration_seconds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Effort: " />
+
+    <Spinner
+        android:id="@+id/exercise_edit_effort_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+</com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView>

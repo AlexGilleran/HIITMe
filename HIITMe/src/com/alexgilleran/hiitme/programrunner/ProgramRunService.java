@@ -45,6 +45,19 @@ public class ProgramRunService extends RoboIntentService {
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		if (programCountDown != null) {
+			programCountDown.cancel();
+		}
+
+		if (exerciseCountDown != null) {
+			exerciseCountDown.cancel();
+		}
+	}
+
+	@Override
 	protected void onHandleIntent(Intent intent) {
 		Notification.Builder builder = new Notification.Builder(
 				this.getBaseContext());
@@ -55,6 +68,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		program = programDao.getProgram(programId);
 		programNode = program.getAssociatedNode();
+		programNode.reset();
 		programNode.registerObserver(programObserver);
 	}
 
@@ -94,6 +108,11 @@ public class ProgramRunService extends RoboIntentService {
 		@Override
 		public void onReset(ProgramNode node) {
 
+		}
+
+		@Override
+		public void onChange(ProgramNode node) {
+			
 		}
 	};
 

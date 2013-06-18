@@ -7,8 +7,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
 import com.alexgilleran.hiitme.model.ProgramNode;
 
 public class ProgramNodeImplTest extends BaseProgramTest {

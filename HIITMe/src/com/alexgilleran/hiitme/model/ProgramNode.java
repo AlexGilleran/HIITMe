@@ -54,7 +54,7 @@ public class ProgramNode extends Model {
 	}
 
 	public Exercise addChildExercise(String name, int duration,
-			Exercise.EffortLevel effortLevel, int repCount) {
+			EffortLevel effortLevel, int repCount) {
 		checkCanHaveChildren();
 
 		ProgramNode containerNode = addChildNode(repCount);
@@ -195,6 +195,12 @@ public class ProgramNode extends Model {
 		}
 	}
 
+	protected void broadcastChanged() {
+		for (ProgramNodeObserver observer : getObservers()) {
+			observer.onChange(this);
+		}
+	}
+
 	public void registerObserver(ProgramNodeObserver observer) {
 		observers.add(observer);
 	}
@@ -287,6 +293,8 @@ public class ProgramNode extends Model {
 			}
 
 			ActiveAndroid.setTransactionSuccessful();
+
+			this.broadcastChanged();
 		} finally {
 			ActiveAndroid.endTransaction();
 		}

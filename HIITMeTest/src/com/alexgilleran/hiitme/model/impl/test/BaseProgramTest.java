@@ -4,8 +4,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 
 import com.alexgilleran.hiitme.data.ProgramDao;
+import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
 import com.alexgilleran.hiitme.model.ProgramNode;
 
 public class BaseProgramTest {

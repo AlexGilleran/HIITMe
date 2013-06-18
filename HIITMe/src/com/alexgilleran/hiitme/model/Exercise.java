@@ -6,8 +6,6 @@ import com.activeandroid.annotation.Table;
 
 @Table(name = "exercise")
 public class Exercise extends Model {
-	@Column(name = "name")
-	private String name;
 	@Column(name = "duration")
 	private int duration;
 	@Column(name = "effort_level")
@@ -21,14 +19,9 @@ public class Exercise extends Model {
 
 	public Exercise(String name, int duration, EffortLevel effortLevel,
 			ProgramNode node) {
-		this.name = name;
 		this.duration = duration;
 		this.effortLevel = effortLevel;
 		this.exerciseGroup = node;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public int getDuration() {
@@ -43,13 +36,26 @@ public class Exercise extends Model {
 		return exerciseGroup;
 	}
 
-	/** A simple representation of the effort level of the set */
-	public enum EffortLevel {
-		HARD, EASY, REST
+	public ProgramNode getExerciseGroup() {
+		return exerciseGroup;
+	}
+
+	public void setExerciseGroup(ProgramNode exerciseGroup) {
+		this.exerciseGroup = exerciseGroup;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+
+	public void setEffortLevel(EffortLevel effortLevel) {
+		this.effortLevel = effortLevel;
 	}
 
 	@Override
-	public String toString() {
-		return getName();
+	public void save() {
+		super.save();
+
+		getParentNode().broadcastChanged();
 	}
 }

@@ -6,8 +6,8 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.app.Application;
 import com.activeandroid.query.Delete;
 import com.alexgilleran.hiitme.guice.StubModule;
+import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Exercise.EffortLevel;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 
@@ -27,9 +27,9 @@ public class HIITMeApplication extends Application {
 
 			Program tabata = new Program("Tabata", "The tabata protocol", 8);
 			tabata.getAssociatedNode().addChildExercise("Hard", 2000,
-					Exercise.EffortLevel.HARD, 1);
+					EffortLevel.HARD, 1);
 			tabata.getAssociatedNode().addChildExercise("Rest", 1000,
-					Exercise.EffortLevel.REST, 1);
+					EffortLevel.REST, 1);
 			tabata.save();
 
 			Program nestTest = new Program("NestTest", "A nested test program",

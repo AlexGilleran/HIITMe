@@ -3,5 +3,9 @@
 
     <string name="app_name">HIIT Me</string>
     <string name="title_program_detail">Program Detail</string>
+    <string name="caption_edit">Edit</string>
+    <string name="effort_hard">Hard</string>
+    <string name="effort_easy">Easy</string>
+    <string name="effort_rest">Rest</string>
 
 </resources>
