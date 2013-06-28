@@ -64,8 +64,6 @@ public class ProgramDetailFragment extends RoboFragment implements
 	@Override
 	public void onStop() {
 		super.onStop();
-
-		getActivity().getApplicationContext().unbindService(connection);
 	}
 
 	@Override

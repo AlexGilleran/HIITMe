@@ -185,7 +185,6 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 
 	private static void assertExercise(Exercise exercise, String name,
 			int duration, EffortLevel effortLevel) {
-		assertEquals(name, exercise.getName());
 		assertEquals(duration, exercise.getDuration());
 		assertEquals(effortLevel, exercise.getEffortLevel());
 	}

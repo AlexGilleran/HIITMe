@@ -5,9 +5,12 @@ import java.util.List;
 
 import roboguice.service.RoboIntentService;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDao;
@@ -35,6 +38,8 @@ public class ProgramRunService extends RoboIntentService {
 	private final List<CountDownObserver> exerciseObservers = new ArrayList<CountDownObserver>();
 	private final List<CountDownObserver> programObservers = new ArrayList<CountDownObserver>();
 
+	private WakeLock wakeLock;
+
 	public ProgramRunService() {
 		super("HIIT Me");
 	}
@@ -42,6 +47,10 @@ public class ProgramRunService extends RoboIntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+				"MyWakeLock");
 	}
 
 	@Override
@@ -112,7 +121,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onChange(ProgramNode node) {
-			
+
 		}
 	};
 
@@ -120,6 +129,8 @@ public class ProgramRunService extends RoboIntentService {
 		boolean isPaused = false;
 
 		public void start() {
+			wakeLock.acquire();
+
 			isRunning = true;
 
 			if (isPaused) {
@@ -141,6 +152,8 @@ public class ProgramRunService extends RoboIntentService {
 			isRunning = false;
 			exerciseCountDown.cancel();
 			programCountDown.cancel();
+
+			wakeLock.release();
 		}
 
 		public void pause() {
@@ -148,6 +161,8 @@ public class ProgramRunService extends RoboIntentService {
 			isRunning = false;
 			exerciseCountDown = exerciseCountDown.pause();
 			programCountDown = programCountDown.pause();
+
+			wakeLock.release();
 		}
 
 		public Program getProgram() {

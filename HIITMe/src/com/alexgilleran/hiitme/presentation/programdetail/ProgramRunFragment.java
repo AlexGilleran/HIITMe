@@ -78,8 +78,6 @@ public class ProgramRunFragment extends RoboFragment {
 	@Override
 	public void onStop() {
 		super.onStop();
-
-		getActivity().getApplicationContext().unbindService(connection);
 	}
 
 	private void refreshPlayButtonIcon() {
@@ -174,7 +172,7 @@ public class ProgramRunFragment extends RoboFragment {
 
 		@Override
 		public void onChange(ProgramNode node) {
-			
+
 		}
 	};
 }
