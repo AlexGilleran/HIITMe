@@ -2,21 +2,62 @@
 <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:layout_margin="5dp"
+    android:orientation="horizontal"
+    android:padding="5dp" >
 
-    <TextView
-        android:id="@+id/textview_repcount"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="5dp"
+        android:background="@drawable/border_exercise"
+        android:padding="5dp" >
 
-    <View
-        android:layout_width="2dip"
-        android:layout_height="fill_parent"
-        android:background="#FF0000" />
+        <EditText
+            android:id="@+id/textview_repcount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
-    <TableLayout
-        android:id="@+id/layout_reps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="x" />
+
+        <TableLayout
+            android:id="@+id/layout_reps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" >
+
+                    <ImageButton
+                        android:id="@+id/button_add_exercise"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_exercise_add" />
+
+                    <ImageButton
+                        android:id="@+id/button_add_group"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_folder_add" />
+                </LinearLayout>
+            </RelativeLayout>
+        </TableLayout>
+    </LinearLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>

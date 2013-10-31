@@ -3,8 +3,10 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TableRow;
-import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
@@ -13,9 +15,8 @@ import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
 public class ExerciseView extends TableRow implements ProgramNodeObserver {
 
-	private TextView repCount;
-	private TextView effortLevel;
-	private TextView duration;
+	private Spinner effortLevel;
+	private EditText duration;
 
 	private Exercise exercise;
 
@@ -31,9 +32,16 @@ public class ExerciseView extends TableRow implements ProgramNodeObserver {
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 
-		repCount = (TextView) findViewById(R.id.exercise_rep_count);
-		effortLevel = (TextView) findViewById(R.id.exercise_effort_level);
-		duration = (TextView) findViewById(R.id.exercise_duration);
+		effortLevel = (Spinner) findViewById(R.id.exercise_effort_level);
+		duration = (EditText) findViewById(R.id.exercise_duration);
+
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+				getContext(), android.R.layout.simple_spinner_item,
+				new String[] { "Hard", "Easy", "Rest" });
+		arrayAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		effortLevel.setAdapter(arrayAdapter);
 	}
 
 	public void setExercise(Exercise exercise) {
@@ -50,8 +58,7 @@ public class ExerciseView extends TableRow implements ProgramNodeObserver {
 
 	@Override
 	public void onRepFinish(ProgramNode node, int completedReps) {
-		repCount.setText(completedReps + "/"
-				+ exercise.getParentNode().getTotalReps());
+
 	}
 
 	@Override
@@ -61,9 +68,8 @@ public class ExerciseView extends TableRow implements ProgramNodeObserver {
 
 	@Override
 	public void onReset(ProgramNode node) {
-		repCount.setText(exercise.getParentNode().getTotalReps() + "x");
-		effortLevel.setText(exercise.getEffortLevel().name());
-		duration.setText(exercise.getDuration() + "secs");
+
+		duration.setText(Integer.toString(exercise.getDuration() / 1000));
 	}
 
 	@Override

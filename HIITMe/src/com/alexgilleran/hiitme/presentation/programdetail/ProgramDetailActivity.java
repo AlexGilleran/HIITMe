@@ -53,7 +53,7 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 			transaction.add(R.id.program_detail_container, detailFragment);
 
 			ProgramRunFragment runFragment = new ProgramRunFragment();
-			transaction.add(R.id.program_run_container, runFragment);
+			// transaction.add(R.id.program_run_container, runFragment);
 
 			transaction.commit();
 		}
