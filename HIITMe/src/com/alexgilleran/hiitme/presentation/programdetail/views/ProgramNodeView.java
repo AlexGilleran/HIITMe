@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -93,7 +92,8 @@ public class ProgramNodeView extends LinearLayout implements
 			TableRow newRow;
 
 			if (child.getAttachedExercise() != null) {
-				newRow = buildExerciseView(child.getAttachedExercise());
+				newRow = new TableRow(getContext());
+				newRow.addView(buildExerciseView(child.getAttachedExercise()));
 				exerciseRows.put(child.getAttachedExercise(), newRow);
 			} else {
 				newRow = buildProgramNodeView(child);
@@ -196,7 +196,7 @@ public class ProgramNodeView extends LinearLayout implements
 		render();
 	}
 
-	private OnClickListener addExerciseListener = new OnClickListener() {
+	private final OnClickListener addExerciseListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
 			programNode.addChildExercise("", 0, EffortLevel.HARD, 5);
@@ -204,7 +204,7 @@ public class ProgramNodeView extends LinearLayout implements
 		}
 	};
 
-	private OnClickListener addGroupListener = new OnClickListener() {
+	private final OnClickListener addGroupListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
 			programNode.addChildNode(1);

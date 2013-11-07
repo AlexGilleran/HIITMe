@@ -5,15 +5,15 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TableRow;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
-public class ExerciseView extends TableRow implements ProgramNodeObserver {
+public class ExerciseView extends LinearLayout implements ProgramNodeObserver {
 
 	private Spinner effortLevel;
 	private EditText duration;
