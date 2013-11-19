@@ -24,7 +24,8 @@ import com.google.inject.Inject;
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
-	private ProgramDAO programDao;
+	private ProgramDAO ProgramDAO;
+	
 	private Program program;
 	private ProgramNode programNode;
 
@@ -75,7 +76,7 @@ public class ProgramRunService extends RoboIntentService {
 		notification = builder.getNotification();
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 
-		program = programDao.getProgram(programId);
+		program = ProgramDAO.getProgram(programId);
 		programNode = program.getAssociatedNode();
 		programNode.reset();
 		programNode.registerObserver(programObserver);

@@ -1,8 +1,11 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import android.app.Fragment;
+import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -42,7 +45,20 @@ public class ExerciseView extends LinearLayout implements ProgramNodeObserver {
 				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		effortLevel.setAdapter(arrayAdapter);
+		effortLevel.setOnLongClickListener(new OnLongClickListener() {
+
+			@Override
+			public boolean onLongClick(View view) {
+				ClipData data = ClipData.newPlainText("", "");
+				DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
+						ExerciseView.this);
+				ExerciseView.this.startDrag(data, shadowBuilder, ExerciseView.this, 0);
+				// view.setVisibility(View.INVISIBLE);
+				return true;
+			}
+		});
 	}
+	
 
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;

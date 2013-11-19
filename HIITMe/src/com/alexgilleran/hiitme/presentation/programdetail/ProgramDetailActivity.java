@@ -8,6 +8,7 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
@@ -24,11 +25,13 @@ import com.google.inject.Inject;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link ProgramDetailFragment}.
  */
-public class ProgramDetailActivity extends RoboFragmentActivity {
+public class ProgramDetailActivity extends RoboFragmentActivity implements DragPlaceholderProvider {
 	@Inject
-	private ProgramDAO programDao;
+	private ProgramDAO ProgramDAO;
 
 	private Intent serviceIntent;
+
+	private View dragPlaceholder;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,9 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 
 			transaction.commit();
 		}
+
+		dragPlaceholder = getLayoutInflater().inflate(
+				R.layout.view_move_placeholder, null);
 	}
 
 	@Override
@@ -83,5 +89,10 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.run_menu, menu);
 		return true;
+	}
+
+	@Override
+	public View getDragPlaceholder() {
+		return dragPlaceholder;
 	}
 }

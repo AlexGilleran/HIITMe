@@ -6,7 +6,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.alexgilleran.hiitme.model.Program;
 
-public class ProgramDaoActiveAndroid implements ProgramDAO {
+public class ProgramDAOActiveAndroid implements ProgramDAO {
 
 	@Override
 	public List<Program> getAllPrograms() {

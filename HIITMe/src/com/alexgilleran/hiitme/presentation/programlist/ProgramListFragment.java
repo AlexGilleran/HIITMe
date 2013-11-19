@@ -47,7 +47,7 @@ public class ProgramListFragment extends RoboListFragment {
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 
 	@Inject
-	private ProgramDAO programDao;
+	private ProgramDAO ProgramDAO;
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -82,7 +82,7 @@ public class ProgramListFragment extends RoboListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setListAdapter(new ProgramAdapter(programDao.getAllPrograms()));
+		setListAdapter(new ProgramAdapter(ProgramDAO.getAllPrograms()));
 	}
 
 	@Override
