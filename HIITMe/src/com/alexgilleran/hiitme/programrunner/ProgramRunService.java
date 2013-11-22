@@ -13,7 +13,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDao;
+import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
@@ -24,7 +24,7 @@ import com.google.inject.Inject;
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
-	private ProgramDao programDao;
+	private ProgramDAO programDao;
 	private Program program;
 	private ProgramNode programNode;
 

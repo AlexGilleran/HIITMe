@@ -10,7 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDao;
+import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
@@ -26,7 +26,7 @@ import com.google.inject.Inject;
  */
 public class ProgramDetailActivity extends RoboFragmentActivity {
 	@Inject
-	private ProgramDao programDao;
+	private ProgramDAO programDao;
 
 	private Intent serviceIntent;
 

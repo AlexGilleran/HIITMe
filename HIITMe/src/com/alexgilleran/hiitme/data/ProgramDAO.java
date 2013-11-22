@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.alexgilleran.hiitme.model.Program;
 
-public interface ProgramDao {
+public interface ProgramDAO {
 	List<Program> getAllPrograms();
 
 	Program getProgram(long programId);

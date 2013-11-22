@@ -41,34 +41,28 @@
 				<plugin>
 					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 					<artifactId>android-maven-plugin</artifactId>
-					<version>3.5.0</version>
-
+					<version>3.7.0</version>
 					<extensions>true</extensions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
-
 		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+					<sdk>
+						<path>${env.ANDROID_HOME}</path>
+						<platform>14</platform>
+					</sdk>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-				<artifactId>android-maven-plugin</artifactId>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
-				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-				<artifactId>android-maven-plugin</artifactId>
-				<configuration>
-					<sdk>
-						<platform>14</platform>
-					</sdk>
 				</configuration>
 			</plugin>
 		</plugins>

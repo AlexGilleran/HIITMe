@@ -12,11 +12,11 @@ import com.alexgilleran.hiitme.model.ProgramNode;
 import com.google.inject.Singleton;
 
 @Singleton
-public class ProgramDaoStub implements ProgramDao {
+public class ProgramDAOStub implements ProgramDAO {
 	private final List<Program> programList = new ArrayList<Program>();
 	private final Map<Long, Program> programMap = new HashMap<Long, Program>();
 
-	public ProgramDaoStub() {
+	public ProgramDAOStub() {
 		Program tabata = new Program("Tabata", "The tabata protocol", 8);
 		tabata.getAssociatedNode().addChildExercise("Hard", 2000,
 				EffortLevel.HARD, 1);
