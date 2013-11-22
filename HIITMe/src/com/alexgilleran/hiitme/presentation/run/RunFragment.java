@@ -1,4 +1,4 @@
-package com.alexgilleran.hiitme.presentation.programdetail;
+package com.alexgilleran.hiitme.presentation.run;
 
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
@@ -25,7 +25,7 @@ import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
 
-public class ProgramRunFragment extends RoboFragment {
+public class RunFragment extends RoboFragment {
 	@InjectView(R.id.textview_time_remaining)
 	private TextView timeRemainingView;
 
@@ -40,23 +40,26 @@ public class ProgramRunFragment extends RoboFragment {
 	private ProgramBinder programBinder;
 
 	private int duration;
+	private Intent serviceIntent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Intent intent = new Intent(getActivity(), ProgramRunService.class);
-		intent.putExtra(Program.PROGRAM_ID_NAME, 1l);
+	}
 
-		getActivity().getApplicationContext().bindService(intent, connection,
-				Context.BIND_AUTO_CREATE);
+	public void setProgram(Program program) {
+		// Bind to LocalService
+		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
+		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, program.getId());
+		getActivity().getApplicationContext().bindService(serviceIntent,
+				connection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_program_run, container,
-				false);
+		View view = inflater.inflate(R.layout.fragment_run, container, false);
 
 		view.findViewById(R.id.rep_button_play_pause).setOnClickListener(
 				new OnClickListener() {

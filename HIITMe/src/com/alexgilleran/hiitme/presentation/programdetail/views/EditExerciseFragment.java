@@ -17,7 +17,7 @@ public class EditExerciseFragment extends RoboDialogFragment {
 
 	}
 
-	public EditExerciseFragment(Exercise exercise) {
+	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;
 	}
 

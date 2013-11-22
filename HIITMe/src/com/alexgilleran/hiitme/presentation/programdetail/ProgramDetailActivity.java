@@ -1,6 +1,9 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
+import javax.annotation.Nullable;
+
 import roboguice.activity.RoboFragmentActivity;
+import roboguice.inject.InjectFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -13,7 +16,8 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
-import com.alexgilleran.hiitme.programrunner.ProgramRunService;
+import com.alexgilleran.hiitme.presentation.run.RunActivity;
+import com.alexgilleran.hiitme.presentation.run.RunFragment;
 import com.google.inject.Inject;
 
 /**
@@ -28,7 +32,11 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	@Inject
 	private ProgramDAO programDao;
 
-	private Intent serviceIntent;
+	@InjectFragment(R.id.run_fragment_run)
+	@Nullable
+	private RunFragment runFragment;
+
+	private Program program;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,21 +47,16 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		// Bind to LocalService
-		serviceIntent = new Intent(this, ProgramRunService.class);
-		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, this.getIntent()
-				.getLongExtra(Program.PROGRAM_ID_NAME, -1));
-		startService(serviceIntent);
-
 		if (savedInstanceState == null) {
 			FragmentTransaction transaction = getSupportFragmentManager()
 					.beginTransaction();
 
-			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
-			transaction.add(R.id.program_detail_container, detailFragment);
+			program = programDao.getProgram(getIntent().getLongExtra(
+					Program.PROGRAM_ID_NAME, -1));
 
-			ProgramRunFragment runFragment = new ProgramRunFragment();
-			// transaction.add(R.id.program_run_container, runFragment);
+			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
+			detailFragment.setProgram(program);
+			transaction.add(R.id.program_detail_container, detailFragment);
 
 			transaction.commit();
 		}
@@ -62,8 +65,6 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	@Override
 	public void onStop() {
 		super.onStop();
-
-		stopService(serviceIntent);
 	}
 
 	@Override
@@ -73,9 +74,23 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 			NavUtils.navigateUpTo(this, new Intent(this,
 					ProgramListActivity.class));
 			return true;
+		case R.id.actionbar_icon_run:
+			if (runFragment == null) {
+				startActivity(buildRunIntent(program.getId()));
+			} else {
+				// TODO: Make the run fragment run?
+
+			}
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	private Intent buildRunIntent(long programId) {
+		Intent intent = new Intent(this, RunActivity.class);
+		intent.putExtra(Program.PROGRAM_ID_NAME, programId);
+		return intent;
 	}
 
 	@Override
