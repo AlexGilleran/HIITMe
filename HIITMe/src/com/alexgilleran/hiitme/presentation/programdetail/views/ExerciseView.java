@@ -1,27 +1,29 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import android.app.Fragment;
 import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.View.DragShadowBuilder;
+import android.view.View.OnLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TableRow;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 
-public class ExerciseView extends LinearLayout implements ProgramNodeObserver {
+public class ExerciseView extends TableRow implements ProgramNodeObserver {
 
 	private Spinner effortLevel;
 	private EditText duration;
 
 	private Exercise exercise;
+	private ProgramNodeView nodeView;
 
 	public ExerciseView(Context context) {
 		super(context);
@@ -58,7 +60,15 @@ public class ExerciseView extends LinearLayout implements ProgramNodeObserver {
 			}
 		});
 	}
-	
+		
+
+	public ProgramNodeView getNodeView() {
+		return nodeView;
+	}
+
+	public void setNodeView(ProgramNodeView nodeView) {
+		this.nodeView = nodeView;
+	}
 
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;

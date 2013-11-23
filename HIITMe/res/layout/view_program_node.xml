@@ -2,17 +2,25 @@
 <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginTop="5dp"
     android:orientation="horizontal"
-    android:padding="5dp" >
+    android:paddingBottom="5dp"
+    android:paddingLeft="5dp"
+    android:paddingTop="5dp" >
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_margin="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:background="@drawable/border_exercise"
-        android:padding="5dp" >
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp" >
 
         <EditText
             android:id="@+id/textview_repcount"
@@ -26,13 +34,19 @@
             android:layout_gravity="center"
             android:text="x" />
 
-        <TableLayout
-            android:id="@+id/layout_reps"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:id="@+id/layout_reps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+            </TableLayout>
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
 
                 <LinearLayout
@@ -57,7 +71,7 @@
                         android:src="@drawable/ic_folder_add" />
                 </LinearLayout>
             </RelativeLayout>
-        </TableLayout>
+        </LinearLayout>
     </LinearLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>
