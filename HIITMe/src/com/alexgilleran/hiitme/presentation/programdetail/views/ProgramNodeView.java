@@ -31,7 +31,6 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFrag
 
 public class ProgramNodeView extends LinearLayout implements
 		ProgramNodeObserver {
-	private final List<TableRow> tableRows = new LinkedList<TableRow>();
 	private final Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
 	private final Map<ProgramNode, TextView> repViews = new HashMap<ProgramNode, TextView>();
 	private final List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
@@ -97,23 +96,19 @@ public class ProgramNodeView extends LinearLayout implements
 	}
 
 	private void render() {
-		for (TableRow row : tableRows) {
-			repLayout.removeView(row);
-		}
+		repLayout.removeAllViews();
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
 			ProgramNode child = programNode.getChildren().get(i);
 			TableRow newRow;
 
 			if (child.getAttachedExercise() != null) {
-				newRow = new TableRow(getContext());
-				newRow.addView(buildExerciseView(child.getAttachedExercise()));
+				newRow = buildExerciseView(child.getAttachedExercise());
 				exerciseRows.put(child.getAttachedExercise(), newRow);
 			} else {
 				newRow = buildProgramNodeView(child);
 			}
 
-			tableRows.add(newRow);
 			repLayout.addView(newRow, i);
 		}
 
@@ -134,6 +129,7 @@ public class ProgramNodeView extends LinearLayout implements
 		ExerciseView exerciseView = (ExerciseView) inflater.inflate(
 				R.layout.view_exercise, null);
 
+		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
 		exerciseView.setOnClickListener(new OnClickListener() {
 			@Override
@@ -227,21 +223,23 @@ public class ProgramNodeView extends LinearLayout implements
 	};
 
 	private void insertAfter(float y, View view) {
-		y = y - tableRows.get(0).getHeight() / 2;
-		if (y < (tableRows.get(0).getY() + tableRows.get(0).getHeight() / 2)) {
+		// TODO: This is a mess but it feels roughly right... improve it.
+		y = y - view.getHeight() / 2;
+		if (repLayout.getChildCount() == 0
+				|| y < (repLayout.getChildAt(0).getY() + repLayout
+						.getChildAt(0).getHeight() / 2)) {
 			repLayout.addView(view, 0);
 			return;
 		}
-		y = y + tableRows.get(0).getHeight() / 2;
-		for (int i = 0; i < tableRows.size(); i++) {
-			TableRow row = tableRows.get(i);
+		for (int i = 0; i < repLayout.getChildCount(); i++) {
+			TableRow row = (TableRow) repLayout.getChildAt(i);
 			if (y > row.getY() - row.getHeight() / 2
 					&& y < row.getY() + row.getHeight() / 2) {
 				repLayout.addView(view, i);
 				return;
 			}
 		}
-		repLayout.addView(view, tableRows.size());
+		repLayout.addView(view, repLayout.getChildCount());
 	}
 
 	private void movePlaceholder(float y) {
@@ -266,8 +264,8 @@ public class ProgramNodeView extends LinearLayout implements
 		public boolean onDrag(View v, DragEvent event) {
 			int action = event.getAction();
 			float y = event.getY();
-			View view;
-			ViewGroup owner;
+			ExerciseView view;
+
 			switch (action) {
 			case DragEvent.ACTION_DRAG_STARTED:
 				// do nothing
@@ -281,9 +279,9 @@ public class ProgramNodeView extends LinearLayout implements
 				break;
 			case DragEvent.ACTION_DROP:
 				clearPlaceholder();
-				view = (View) event.getLocalState();
+				view = (ExerciseView) event.getLocalState();
 				// Dropped, reassign View to ViewGroup
-				owner = (ViewGroup) view.getParent();
+				ViewGroup owner = (ViewGroup) view.getParent();
 				owner.removeView(view);
 
 				insertAfter(y, view);
