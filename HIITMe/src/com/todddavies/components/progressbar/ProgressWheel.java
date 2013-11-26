@@ -18,7 +18,11 @@ import com.alexgilleran.hiitme.R;
  * An indicator of progress, similar to Android's ProgressBar. Can be used in
  * 'spin mode' or 'increment mode'
  * 
+ * This has been modified to allow for two independently-styled lines of text in
+ * the middle.
+ * 
  * @author Todd Davies
+ * @author Alex Gilleran
  * 
  *         Licensed under the Creative Commons Attribution 3.0 license see:
  *         http://creativecommons.org/licenses/by/3.0/
@@ -35,7 +39,8 @@ public class ProgressWheel extends View {
 	private int barLength = 60;
 	private int barWidth = 20;
 	private int rimWidth = 20;
-	private int textSize = 20;
+	private int textSizeLine1 = 20;
+	private int textSizeLine2 = 20;
 
 	// Padding (with defaults)
 	private int paddingTop = 5;
@@ -47,13 +52,15 @@ public class ProgressWheel extends View {
 	private int barColor = 0xAA000000;
 	private int circleColor = 0x00000000;
 	private int rimColor = 0xAADDDDDD;
-	private int textColor = 0xFF000000;
+	private int textColorLine1 = 0xFF000000;
+	private int textColorLine2 = 0xFF000000;
 
 	// Paints
 	private Paint barPaint = new Paint();
 	private Paint circlePaint = new Paint();
 	private Paint rimPaint = new Paint();
-	private Paint textPaint = new Paint();
+	private Paint textLine1Paint = new Paint();
+	private Paint textLine2Paint = new Paint();
 
 	// Rectangles
 	@SuppressWarnings("unused")
@@ -87,8 +94,8 @@ public class ProgressWheel extends View {
 	boolean isSpinning = false;
 
 	// Other
-	private String text = "";
-	private String[] splitText = {};
+	private String textLine1 = "";
+	private String textLine2 = "";
 
 	/**
 	 * The constructor for the ProgressWheel
@@ -143,10 +150,15 @@ public class ProgressWheel extends View {
 		circlePaint.setAntiAlias(true);
 		circlePaint.setStyle(Style.FILL);
 
-		textPaint.setColor(textColor);
-		textPaint.setStyle(Style.FILL);
-		textPaint.setAntiAlias(true);
-		textPaint.setTextSize(textSize);
+		textLine1Paint.setColor(textColorLine1);
+		textLine1Paint.setStyle(Style.FILL);
+		textLine1Paint.setAntiAlias(true);
+		textLine1Paint.setTextSize(textSizeLine1);
+
+		textLine2Paint.setColor(textColorLine2);
+		textLine2Paint.setStyle(Style.FILL);
+		textLine2Paint.setAntiAlias(true);
+		textLine2Paint.setTextSize(textSizeLine2);
 	}
 
 	/**
@@ -198,13 +210,18 @@ public class ProgressWheel extends View {
 
 		barLength = (int) a.getDimension(R.styleable.ProgressWheel_barLength, barLength);
 
-		textSize = (int) a.getDimension(R.styleable.ProgressWheel_textSize, textSize);
+		textSizeLine1 = (int) a.getDimension(R.styleable.ProgressWheel_textSizeLine1, textSizeLine1);
+		textSizeLine2 = (int) a.getDimension(R.styleable.ProgressWheel_textSizeLine2, textSizeLine2);
 
-		textColor = (int) a.getColor(R.styleable.ProgressWheel_textColor, textColor);
+		textColorLine1 = (int) a.getColor(R.styleable.ProgressWheel_textColorLine1, textColorLine1);
+		textColorLine2 = (int) a.getColor(R.styleable.ProgressWheel_textColorLine1, textColorLine2);
 
 		// if the text is empty , so ignore it
-		if (a.hasValue(R.styleable.ProgressWheel_text)) {
-			setText(a.getString(R.styleable.ProgressWheel_text));
+		if (a.hasValue(R.styleable.ProgressWheel_textLine1)) {
+			setTextLine1(a.getString(R.styleable.ProgressWheel_textColorLine1));
+		}
+		if (a.hasValue(R.styleable.ProgressWheel_textLine2)) {
+			setTextLine2(a.getString(R.styleable.ProgressWheel_textColorLine2));
 		}
 
 		rimColor = (int) a.getColor(R.styleable.ProgressWheel_rimColor, rimColor);
@@ -233,13 +250,15 @@ public class ProgressWheel extends View {
 		canvas.drawCircle((circleBounds.width() / 2) + rimWidth + paddingLeft, (circleBounds.height() / 2) + rimWidth
 				+ paddingTop, circleRadius, circlePaint);
 		// Draw the text (attempts to center it horizontally and vertically)
-		int offsetNum = 0;
-		for (String s : splitText) {
-			float offset = textPaint.measureText(s) / 2;
-			canvas.drawText(s, this.getWidth() / 2 - offset, this.getHeight() / 2 + (textSize * (offsetNum))
-					- ((splitText.length - 1) * (textSize / 2)), textPaint);
-			offsetNum++;
-		}
+		int heightOffset = (this.getHeight() / 2) ;
+
+		paintText(canvas, heightOffset, textLine1Paint, textLine1, textSizeLine1);
+		paintText(canvas, heightOffset + textSizeLine1, textLine2Paint, textLine2, textSizeLine2);
+	}
+
+	private void paintText(Canvas canvas, int heightOffset, Paint textPaint, String text, int textSize) {
+		float offset = textPaint.measureText(text) / 2;
+		canvas.drawText(text, this.getWidth() / 2 - offset, heightOffset, textPaint);
 	}
 
 	/**
@@ -247,7 +266,7 @@ public class ProgressWheel extends View {
 	 */
 	public void resetCount() {
 		progress = 0;
-		setText("0%");
+		setTextLine1("0%");
 		invalidate();
 	}
 
@@ -274,7 +293,7 @@ public class ProgressWheel extends View {
 	public void incrementProgress() {
 		isSpinning = false;
 		progress++;
-		setText(Math.round(((float) progress / 360) * 100) + "%");
+		setTextLine1(Math.round(((float) progress / 360) * 100) + "%");
 		spinHandler.sendEmptyMessage(0);
 	}
 
@@ -297,9 +316,12 @@ public class ProgressWheel extends View {
 	 * @param text
 	 *            the text to show ('\n' constitutes a new line)
 	 */
-	public void setText(String text) {
-		this.text = text;
-		splitText = this.text.split("\n");
+	public void setTextLine1(String text) {
+		this.textLine1 = text;
+	}
+
+	public void setTextLine2(String text) {
+		this.textLine2 = text;
 	}
 
 	public int getCircleRadius() {
@@ -326,12 +348,20 @@ public class ProgressWheel extends View {
 		this.barWidth = barWidth;
 	}
 
-	public int getTextSize() {
-		return textSize;
+	public int getTextSizeLine1() {
+		return textSizeLine1;
 	}
 
-	public void setTextSize(int textSize) {
-		this.textSize = textSize;
+	public void setTextSizeLine1(int textSize) {
+		this.textSizeLine1 = textSize;
+	}
+
+	public int getTextSizeLine2() {
+		return textSizeLine2;
+	}
+
+	public void setTextSizeLine2(int textSize) {
+		this.textSizeLine1 = textSize;
 	}
 
 	public int getPaddingTop() {
@@ -398,12 +428,20 @@ public class ProgressWheel extends View {
 		this.rimPaint.setShader(shader);
 	}
 
-	public int getTextColor() {
-		return textColor;
+	public int getTextColorLine1() {
+		return textColorLine1;
 	}
 
-	public void setTextColor(int textColor) {
-		this.textColor = textColor;
+	public void getTextColorLine1(int textColor) {
+		this.textColorLine1 = textColor;
+	}
+
+	public int getTextColorLine2() {
+		return textColorLine2;
+	}
+
+	public void getTextColorLine2(int textColor) {
+		this.textColorLine2 = textColor;
 	}
 
 	public int getSpinSpeed() {

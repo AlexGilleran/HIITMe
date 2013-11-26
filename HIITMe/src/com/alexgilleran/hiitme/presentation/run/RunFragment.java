@@ -32,14 +32,11 @@ public class RunFragment extends RoboFragment {
 	@InjectView(R.id.textview_run_title)
 	private TextView titleText;
 
-	@InjectView(R.id.textview_time_remaining)
-	private TextView timeRemainingView;
+	@InjectView(R.id.progressbar_program)
+	private ProgressWheel programProgressBar;
 
 	@InjectView(R.id.progressbar_exercise)
 	private ProgressWheel exerciseProgressBar;
-
-	@InjectView(R.id.progressbar_program)
-	private ProgressWheel programProgressBar;
 
 	@InjectView(R.id.rep_button_play_pause)
 	private ImageButton playButton;
@@ -119,7 +116,7 @@ public class RunFragment extends RoboFragment {
 					program.getAssociatedNode().registerObserver(observer);
 					programBinder.regExerciseCountDownObs(exCountDownObs);
 					programBinder.regProgCountDownObs(progCountDownObs);
-					exerciseProgressBar.setProgress(0);
+					programProgressBar.setProgress(0);
 
 					duration = program.getAssociatedNode().getDuration();
 
@@ -138,21 +135,9 @@ public class RunFragment extends RoboFragment {
 	private final CountDownObserver exCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
-			timeRemainingView.setText(formatTime(msecondsRemaining));
+			exerciseProgressBar.setTextLine1(formatTime(msecondsRemaining));
 			int currentExerciseDuration = program.getAssociatedNode().getCurrentExercise().getDuration();
-			programProgressBar.setProgress(getDegrees(msecondsRemaining, currentExerciseDuration));
-		}
-
-		@Override
-		public void onFinish() {
-			programProgressBar.setProgress(ProgressWheel.getMax());
-		}
-	};
-
-	private final CountDownObserver progCountDownObs = new CountDownObserver() {
-		@Override
-		public void onTick(long msecondsRemaining) {
-			exerciseProgressBar.setProgress(getDegrees(msecondsRemaining, duration));
+			exerciseProgressBar.setProgress(getDegrees(msecondsRemaining, currentExerciseDuration));
 		}
 
 		@Override
@@ -161,15 +146,29 @@ public class RunFragment extends RoboFragment {
 		}
 	};
 
+	private final CountDownObserver progCountDownObs = new CountDownObserver() {
+		@Override
+		public void onTick(long msecondsRemaining) {
+			programProgressBar.setProgress(getDegrees(msecondsRemaining, duration));
+			exerciseProgressBar.setTextLine2(formatTime(msecondsRemaining));
+		}
+
+		@Override
+		public void onFinish() {
+			programProgressBar.setProgress(ProgressWheel.getMax());
+		}
+	};
+
 	private final ProgramNodeObserver observer = new ProgramNodeObserver() {
 		@Override
 		public void onNextExercise(Exercise newExercise) {
-			exerciseProgressBar.setProgress(0);
+			programProgressBar.setProgress(0);
 		}
 
 		@Override
 		public void onFinish(ProgramNode node) {
-			timeRemainingView.setText(formatTime(0));
+			exerciseProgressBar.setTextLine1(formatTime(0));
+			exerciseProgressBar.setTextLine2(formatTime(0));
 			refreshPlayButtonIcon();
 		}
 

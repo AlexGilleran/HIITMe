@@ -13,9 +13,10 @@ public class ExerciseCountDown extends CountDownTimer {
 
 		this.observer = observer;
 	}
-
+	
 	@Override
 	public void onFinish() {
+		onTick(0);
 		observer.onFinish();
 	}
 
