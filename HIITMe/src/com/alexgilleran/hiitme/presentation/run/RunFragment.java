@@ -22,8 +22,9 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramBinder;
+import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
-import com.alexgilleran.hiitme.programrunner.ProgramRunService.ProgramBinder;
 
 public class RunFragment extends RoboFragment {
 	@InjectView(R.id.textview_time_remaining)
@@ -38,6 +39,7 @@ public class RunFragment extends RoboFragment {
 	private ImageButton playButton;
 
 	private ProgramBinder programBinder;
+	private Program program;
 
 	private int duration;
 	private Intent serviceIntent;
@@ -48,32 +50,30 @@ public class RunFragment extends RoboFragment {
 
 	}
 
-	public void setProgram(Program program) {
+	public void setProgramId(long programId) {
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
-		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, program.getId());
-		getActivity().getApplicationContext().bindService(serviceIntent,
-				connection, Context.BIND_AUTO_CREATE);
+		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, programId);
+		getActivity().getApplicationContext().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+		getActivity().startService(serviceIntent);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_run, container, false);
 
-		view.findViewById(R.id.rep_button_play_pause).setOnClickListener(
-				new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						if (programBinder.isRunning()) {
-							programBinder.pause();
-						} else {
-							programBinder.start();
-						}
+		view.findViewById(R.id.rep_button_play_pause).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (programBinder.isRunning()) {
+					programBinder.pause();
+				} else {
+					programBinder.start();
+				}
 
-						refreshPlayButtonIcon();
-					}
-				});
+				refreshPlayButtonIcon();
+			}
+		});
 
 		return view;
 	}
@@ -98,22 +98,26 @@ public class RunFragment extends RoboFragment {
 	}
 
 	private int getPercentage(long msecondsRemaining, long duration) {
-		return ((int) duration - (int) msecondsRemaining)
-				/ ((int) duration / 100);
+		return ((int) duration - (int) msecondsRemaining) / ((int) duration / 100);
 	}
 
 	private final ServiceConnection connection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
-			programBinder.getProgram().getAssociatedNode()
-					.registerObserver(observer);
-			programBinder.regExerciseCountDownObs(exCountDownObs);
-			programBinder.regProgCountDownObs(progCountDownObs);
-			exerciseProgressBar.setProgress(0);
+			programBinder.getProgram(new ProgramCallback() {
 
-			duration = programBinder.getProgram().getAssociatedNode()
-					.getDuration();
+				@Override
+				public void onProgramReady(Program program) {
+					program.getAssociatedNode().registerObserver(observer);
+					programBinder.regExerciseCountDownObs(exCountDownObs);
+					programBinder.regProgCountDownObs(progCountDownObs);
+					exerciseProgressBar.setProgress(0);
+
+					duration = program.getAssociatedNode().getDuration();
+				}
+			});
+
 		}
 
 		@Override
@@ -126,10 +130,8 @@ public class RunFragment extends RoboFragment {
 		@Override
 		public void onTick(long msecondsRemaining) {
 			timeRemainingView.setText(formatTime(msecondsRemaining));
-			int currentExerciseDuration = programBinder.getProgram()
-					.getAssociatedNode().getCurrentExercise().getDuration();
-			programProgressBar.setProgress(getPercentage(msecondsRemaining,
-					currentExerciseDuration));
+			int currentExerciseDuration = program.getAssociatedNode().getCurrentExercise().getDuration();
+			programProgressBar.setProgress(getPercentage(msecondsRemaining, currentExerciseDuration));
 		}
 
 		@Override
@@ -141,8 +143,7 @@ public class RunFragment extends RoboFragment {
 	private final CountDownObserver progCountDownObs = new CountDownObserver() {
 		@Override
 		public void onTick(long msecondsRemaining) {
-			exerciseProgressBar.setProgress(getPercentage(msecondsRemaining,
-					duration));
+			exerciseProgressBar.setProgress(getPercentage(msecondsRemaining, duration));
 		}
 
 		@Override
