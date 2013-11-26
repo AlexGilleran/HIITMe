@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -21,9 +20,9 @@ import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
-import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
+import com.alexgilleran.hiitme.programrunner.ProgramCountDown.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.todddavies.components.progressbar.ProgressWheel;
 
@@ -114,8 +113,7 @@ public class RunFragment extends RoboFragment {
 					RunFragment.this.program = program;
 
 					program.getAssociatedNode().registerObserver(observer);
-					programBinder.regExerciseCountDownObs(exCountDownObs);
-					programBinder.regProgCountDownObs(progCountDownObs);
+					programBinder.registerCountDownObserver(countDownObserver);
 					programProgressBar.setProgress(0);
 
 					duration = program.getAssociatedNode().getDuration();
@@ -132,30 +130,29 @@ public class RunFragment extends RoboFragment {
 		}
 	};
 
-	private final CountDownObserver exCountDownObs = new CountDownObserver() {
+	private final CountDownObserver countDownObserver = new CountDownObserver() {
 		@Override
-		public void onTick(long msecondsRemaining) {
-			exerciseProgressBar.setTextLine1(formatTime(msecondsRemaining));
-			int currentExerciseDuration = program.getAssociatedNode().getCurrentExercise().getDuration();
-			exerciseProgressBar.setProgress(getDegrees(msecondsRemaining, currentExerciseDuration));
+		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
+			exerciseProgressBar.setTextLine1(formatTime(exerciseMsRemaining));
+			exerciseProgressBar.setTextLine2(formatTime(programMsRemaining));
+
+			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, program.getAssociatedNode()
+					.getCurrentExercise().getDuration()));
+			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
 		}
 
 		@Override
-		public void onFinish() {
+		public void onExerciseFinish() {
 			exerciseProgressBar.setProgress(ProgressWheel.getMax());
-		}
-	};
-
-	private final CountDownObserver progCountDownObs = new CountDownObserver() {
-		@Override
-		public void onTick(long msecondsRemaining) {
-			programProgressBar.setProgress(getDegrees(msecondsRemaining, duration));
-			exerciseProgressBar.setTextLine2(formatTime(msecondsRemaining));
+			exerciseProgressBar.setTextLine1(formatTime(0));
 		}
 
 		@Override
-		public void onFinish() {
+		public void onProgramFinish() {
 			programProgressBar.setProgress(ProgressWheel.getMax());
+			exerciseProgressBar.setTextLine1(formatTime(0));
+			exerciseProgressBar.setTextLine2(formatTime(0));
+			exerciseProgressBar.invalidate();
 		}
 	};
 

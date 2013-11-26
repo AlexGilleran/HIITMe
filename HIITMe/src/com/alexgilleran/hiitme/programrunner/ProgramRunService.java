@@ -20,8 +20,8 @@ import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
-import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
+import com.alexgilleran.hiitme.programrunner.ProgramCountDown.CountDownObserver;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
@@ -32,15 +32,13 @@ public class ProgramRunService extends RoboIntentService {
 	private Program program;
 	private ProgramNode programNode;
 
-	private ExerciseCountDown exerciseCountDown;
-	private ExerciseCountDown programCountDown;
+	private ProgramCountDown programCountDown;
 
 	boolean isRunning = false;
 
 	private Notification notification;
 
-	private final List<CountDownObserver> exerciseObservers = new ArrayList<CountDownObserver>();
-	private final List<CountDownObserver> programObservers = new ArrayList<CountDownObserver>();
+	private final List<CountDownObserver> observers = new ArrayList<CountDownObserver>();
 
 	private WakeLock wakeLock;
 
@@ -65,10 +63,6 @@ public class ProgramRunService extends RoboIntentService {
 		if (programCountDown != null) {
 			programCountDown.cancel();
 		}
-
-		if (exerciseCountDown != null) {
-			exerciseCountDown.cancel();
-		}
 	}
 
 	@Override
@@ -92,18 +86,6 @@ public class ProgramRunService extends RoboIntentService {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return new ProgramBinderImpl();
-	}
-
-	private void next() {
-		programNode.next();
-		if (!programNode.isFinished()) {
-			newCountDown();
-		}
-	}
-
-	private void newCountDown() {
-		exerciseCountDown = new ExerciseCountDown(programNode.getCurrentExercise().getDuration(), exerciseCountDownObs);
-		exerciseCountDown.start();
 	}
 
 	private final ProgramNodeObserver programObserver = new ProgramNodeObserver() {
@@ -142,15 +124,13 @@ public class ProgramRunService extends RoboIntentService {
 			isRunning = true;
 
 			if (isPaused) {
-				exerciseCountDown.start();
 				programCountDown.start();
 
 			} else {
 				startForeground(1, notification);
-				programCountDown = new ExerciseCountDown(program.getAssociatedNode().getDuration(), programCountDownObs);
-				programNode.start();
+				programCountDown = new ProgramCountDown(program, observerProxy);
 
-				newCountDown();
+				programNode.start();
 				programCountDown.start();
 			}
 		}
@@ -158,7 +138,6 @@ public class ProgramRunService extends RoboIntentService {
 		@Override
 		public void stop() {
 			isRunning = false;
-			exerciseCountDown.cancel();
 			programCountDown.cancel();
 
 			wakeLock.release();
@@ -168,7 +147,6 @@ public class ProgramRunService extends RoboIntentService {
 		public void pause() {
 			isPaused = true;
 			isRunning = false;
-			exerciseCountDown = exerciseCountDown.pause();
 			programCountDown = programCountDown.pause();
 
 			wakeLock.release();
@@ -189,13 +167,8 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		@Override
-		public void regExerciseCountDownObs(CountDownObserver observer) {
-			exerciseObservers.add(observer);
-		}
-
-		@Override
-		public void regProgCountDownObs(CountDownObserver observer) {
-			programObservers.add(observer);
+		public void registerCountDownObserver(CountDownObserver observer) {
+			observers.add(observer);
 		}
 
 		@Override
@@ -209,16 +182,7 @@ public class ProgramRunService extends RoboIntentService {
 		}
 	}
 
-	private final CountDownObserver exerciseCountDownObs = new ObserverProxy(exerciseObservers) {
-		@Override
-		public void onFinish() {
-			super.onFinish();
-
-			next();
-		}
-	};
-
-	private final CountDownObserver programCountDownObs = new ObserverProxy(programObservers);
+	private final CountDownObserver observerProxy = new ObserverProxy(observers);
 
 	private class ObserverProxy implements CountDownObserver {
 		private final List<CountDownObserver> observers;
@@ -228,16 +192,23 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		@Override
-		public void onTick(long msecondsRemaining) {
+		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
 			for (CountDownObserver observer : observers) {
-				observer.onTick(msecondsRemaining);
+				observer.onTick(exerciseMsRemaining, programMsRemaining);
 			}
 		}
 
 		@Override
-		public void onFinish() {
+		public void onExerciseFinish() {
 			for (CountDownObserver observer : observers) {
-				observer.onFinish();
+				observer.onExerciseFinish();
+			}
+		}
+
+		@Override
+		public void onProgramFinish() {
+			for (CountDownObserver observer : observers) {
+				observer.onProgramFinish();
 			}
 		}
 	}
