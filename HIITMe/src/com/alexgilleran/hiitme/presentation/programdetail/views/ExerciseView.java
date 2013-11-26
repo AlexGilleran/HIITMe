@@ -48,5 +48,6 @@ public class ExerciseView extends LinearLayout {
 
 	private void render() {
 		effortLevel.setSelection(exercise.getEffortLevel().ordinal());
+		duration.setText(Integer.toString(exercise.getDuration() / 1000));
 	}
 }

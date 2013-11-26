@@ -27,11 +27,16 @@ import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 
 public class RunFragment extends RoboFragment {
+
+	@InjectView(R.id.textview_run_title)
+	private TextView titleText;
+
 	@InjectView(R.id.textview_time_remaining)
 	private TextView timeRemainingView;
 
 	@InjectView(R.id.progressbar_exercise)
 	private ProgressBar exerciseProgressBar;
+
 	@InjectView(R.id.progressbar_program)
 	private ProgressBar programProgressBar;
 
@@ -106,15 +111,18 @@ public class RunFragment extends RoboFragment {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
 			programBinder.getProgram(new ProgramCallback() {
-
 				@Override
 				public void onProgramReady(Program program) {
+					RunFragment.this.program = program;
+					
 					program.getAssociatedNode().registerObserver(observer);
 					programBinder.regExerciseCountDownObs(exCountDownObs);
 					programBinder.regProgCountDownObs(progCountDownObs);
 					exerciseProgressBar.setProgress(0);
 
 					duration = program.getAssociatedNode().getDuration();
+
+					titleText.setText(program.getName());
 				}
 			});
 
