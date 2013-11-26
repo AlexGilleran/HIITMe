@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ProgressWheel="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
@@ -9,17 +10,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <ProgressBar
+    <com.todddavies.components.progressbar.ProgressWheel
         android:id="@+id/progressbar_exercise"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        ProgressWheel:barColor="#0097D6"
+        ProgressWheel:barLength="60dp"
+        ProgressWheel:barWidth="5dp"
+        ProgressWheel:rimColor="#330097D6"
+        ProgressWheel:rimWidth="2dp"
+        ProgressWheel:text="Authenticating..."
+        ProgressWheel:textColor="#222"
+        ProgressWheel:textSize="14sp" />
 
-    <ProgressBar
+    <com.todddavies.components.progressbar.ProgressWheel
         android:id="@+id/progressbar_program"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        ProgressWheel:barColor="#0097D6"
+        ProgressWheel:barLength="60dp"
+        ProgressWheel:barWidth="5dp"
+        ProgressWheel:rimColor="#330097D6"
+        ProgressWheel:rimWidth="2dp"
+        ProgressWheel:text="Authenticating..."
+        ProgressWheel:textColor="#222"
+        ProgressWheel:textSize="14sp" />
 
     <TextView
         android:id="@+id/textview_time_remaining"
