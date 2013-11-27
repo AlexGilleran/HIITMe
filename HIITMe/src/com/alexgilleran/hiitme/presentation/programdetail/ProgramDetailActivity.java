@@ -31,7 +31,7 @@ import com.google.inject.Inject;
  */
 public class ProgramDetailActivity extends RoboFragmentActivity implements DragPlaceholderProvider {
 	@Inject
-	private ProgramDAO ProgramDAO;
+	private ProgramDAO programDao;
 
 	@InjectFragment(R.id.run_fragment_run)
 	@Nullable
