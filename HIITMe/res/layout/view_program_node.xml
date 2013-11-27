@@ -5,12 +5,11 @@
     android:layout_marginBottom="5dp"
     android:layout_marginLeft="5dp"
     android:layout_marginTop="5dp"
-    android:orientation="horizontal"
     android:paddingBottom="5dp"
     android:paddingLeft="5dp"
     android:paddingTop="5dp" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -26,22 +25,25 @@
             android:id="@+id/textview_repcount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_alignParentLeft="true" />
 
         <TextView
+            android:id="@+id/textview_x"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_toRightOf="@id/textview_repcount"
             android:text="x" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_toRightOf="@id/textview_x"
+            android:layout_alignParentRight="true"
             android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:orientation="vertical" >
 
             <TableLayout
                 android:id="@+id/layout_reps"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
             </TableLayout>
 
@@ -59,6 +61,7 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:adjustViewBounds="true"
+                        android:background="?android:attr/selectableItemBackground"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_exercise_add" />
 
@@ -67,11 +70,21 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:adjustViewBounds="true"
+                        android:background="?android:attr/selectableItemBackground"
                         android:scaleType="centerInside"
-                        android:src="@drawable/ic_folder_add" />
+                        android:src="@drawable/ic_program_node_add" />
+
+                    <ImageButton
+                        android:id="@+id/button_move_program_group"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:adjustViewBounds="true"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_move" />
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>

@@ -45,7 +45,7 @@ public class ExerciseView extends TableRow {
 				ClipData data = ClipData.newPlainText("", "");
 				DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(ExerciseView.this);
 				ExerciseView.this.startDrag(data, shadowBuilder, ExerciseView.this, 0);
-				// view.setVisibility(View.INVISIBLE);
+				ExerciseView.this.setVisibility(View.INVISIBLE);
 				return true;
 			}
 		});

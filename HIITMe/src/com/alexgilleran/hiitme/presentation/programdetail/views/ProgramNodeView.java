@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -24,7 +25,7 @@ import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvider;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
 
-public class ProgramNodeView extends LinearLayout {
+public class ProgramNodeView extends TableRow {
 	private final Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
 	private final List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
 
@@ -34,6 +35,7 @@ public class ProgramNodeView extends LinearLayout {
 	private EditExerciseListener editListener;
 	private ImageButton addExerciseButton;
 	private ImageButton addGroupButton;
+	private ImageButton moveButton;
 	private TableLayout repLayout;
 
 	private DragPlaceholderProvider placeholderProvider;
@@ -51,11 +53,6 @@ public class ProgramNodeView extends LinearLayout {
 		inflater = LayoutInflater.from(context);
 	}
 
-	public ProgramNodeView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		inflater = LayoutInflater.from(context);
-	}
-
 	@Override
 	public void onFinishInflate() {
 		if (getContext() instanceof DragPlaceholderProvider) {
@@ -63,13 +60,18 @@ public class ProgramNodeView extends LinearLayout {
 		}
 
 		this.repView = (TextView) this.findViewById(R.id.textview_repcount);
-		this.addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
-		this.addGroupButton = (ImageButton) this.findViewById(R.id.button_add_group);
 
+		this.addExerciseButton = (ImageButton) this
+				.findViewById(R.id.button_add_exercise);
+		this.addGroupButton = (ImageButton) this
+				.findViewById(R.id.button_add_group);
+		this.moveButton = (ImageButton) this
+				.findViewById(R.id.button_move_program_group);
 		this.repLayout = (TableLayout) this.findViewById(R.id.layout_reps);
 
 		addGroupButton.setOnClickListener(addGroupListener);
 		addExerciseButton.setOnClickListener(addExerciseListener);
+		moveButton.setOnTouchListener(moveListener);
 
 		this.setOnDragListener(dragListener);
 	}
@@ -103,7 +105,8 @@ public class ProgramNodeView extends LinearLayout {
 			repLayout.addView(newRow, i);
 		}
 
-		TextView repCountView = (TextView) this.findViewById(R.id.textview_repcount);
+		TextView repCountView = (TextView) this
+				.findViewById(R.id.textview_repcount);
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
 	}
 
@@ -116,7 +119,8 @@ public class ProgramNodeView extends LinearLayout {
 	 *            The {@link Exercise} to source data from.
 	 */
 	private ExerciseView buildExerciseView(final Exercise exercise) {
-		ExerciseView exerciseView = (ExerciseView) inflater.inflate(R.layout.view_exercise, null);
+		ExerciseView exerciseView = (ExerciseView) inflater.inflate(
+				R.layout.view_exercise, null);
 
 		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
@@ -139,20 +143,91 @@ public class ProgramNodeView extends LinearLayout {
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
 	private TableRow buildProgramNodeView(ProgramNode node) {
-		TableRow row = new TableRow(this.getContext());
-
-		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(R.layout.view_program_node, null);
+		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
+				R.layout.view_program_node, null);
 		nodeView.setProgramNode(node);
 		subViews.add(nodeView);
 
-		row.addView(nodeView);
-
-		return row;
+		return nodeView;
 	}
 
 	public void setEditExerciseListener(EditExerciseListener listener) {
 		this.editListener = listener;
 	}
+
+	private void insertAfter(float y, View view) {
+		// TODO: This is a mess but it feels roughly right... improve it.
+		y = y - view.getHeight() / 2;
+		if (repLayout.getChildCount() == 0
+				|| y < (repLayout.getChildAt(0).getY() + repLayout
+						.getChildAt(0).getHeight() / 2)) {
+			repLayout.addView(view, 0);
+			return;
+		}
+		for (int i = 0; i < repLayout.getChildCount(); i++) {
+			TableRow row = (TableRow) repLayout.getChildAt(i);
+			if (y > row.getY() - row.getHeight() / 2
+					&& y < row.getY() + row.getHeight() / 2) {
+				repLayout.addView(view, i);
+				return;
+			}
+		}
+		repLayout.addView(view, repLayout.getChildCount());
+		view.requestLayout();
+	}
+
+	private void movePlaceholder(float y) {
+		clearPlaceholder();
+
+		insertAfter(y, placeholderProvider.getDragPlaceholder());
+	}
+
+	private void clearPlaceholder() {
+		if (placeholderProvider.getDragPlaceholder().getParent() != null) {
+			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent())
+					.removeView(placeholderProvider.getDragPlaceholder());
+		}
+	}
+
+	private OnDragListener dragListener = new OnDragListener() {
+		@Override
+		public boolean onDrag(View v, DragEvent event) {
+			int action = event.getAction();
+			float y = event.getY();
+			View view;
+
+			switch (action) {
+			case DragEvent.ACTION_DRAG_STARTED:
+				// do nothing
+				break;
+			case DragEvent.ACTION_DRAG_ENTERED:
+				movePlaceholder(event.getY());
+				break;
+			case DragEvent.ACTION_DRAG_EXITED:
+				// ProgramNodeView.this.setOnTouchListener(null);
+				clearPlaceholder();
+				break;
+			case DragEvent.ACTION_DROP:
+				clearPlaceholder();
+				view = (View) event.getLocalState();
+				// Dropped, reassign View to ViewGroup
+				ViewGroup owner = (ViewGroup) view.getParent();
+				owner.removeView(view);
+				insertAfter(y, view);
+				view.setVisibility(View.VISIBLE);
+				break;
+			case DragEvent.ACTION_DRAG_ENDED:
+				clearPlaceholder();
+				break;
+			case DragEvent.ACTION_DRAG_LOCATION:
+				movePlaceholder(event.getY());
+				break;
+			default:
+				break;
+			}
+			return true;
+		}
+	};
 
 	private final OnClickListener addExerciseListener = new OnClickListener() {
 		@Override
@@ -170,80 +245,15 @@ public class ProgramNodeView extends LinearLayout {
 		}
 	};
 
-	private void insertAfter(float y, View view) {
-		// TODO: This is a mess but it feels roughly right... improve it.
-		y = y - view.getHeight() / 2;
-		if (repLayout.getChildCount() == 0
-				|| y < (repLayout.getChildAt(0).getY() + repLayout.getChildAt(0).getHeight() / 2)) {
-			repLayout.addView(view, 0);
-			return;
-		}
-		for (int i = 0; i < repLayout.getChildCount(); i++) {
-			TableRow row = (TableRow) repLayout.getChildAt(i);
-			if (y > row.getY() - row.getHeight() / 2 && y < row.getY() + row.getHeight() / 2) {
-				repLayout.addView(view, i);
-				return;
-			}
-		}
-		repLayout.addView(view, repLayout.getChildCount());
-	}
-
-	private void movePlaceholder(float y) {
-		clearPlaceholder();
-
-		insertAfter(y, placeholderProvider.getDragPlaceholder());
-	}
-
-	private void clearPlaceholder() {
-		if (placeholderProvider.getDragPlaceholder().getParent() != null) {
-			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent()).removeView(placeholderProvider
-					.getDragPlaceholder());
-		}
-	}
-
-	OnDragListener dragListener = new OnDragListener() {
-		// Drawable enterShape = getResources().getDrawable(
-		// R.drawable.shape_droptarget);
-		// Drawable normalShape = getResources().getDrawable(R.drawable.shape);
+	private final OnTouchListener moveListener = new OnTouchListener() {
 
 		@Override
-		public boolean onDrag(View v, DragEvent event) {
-			int action = event.getAction();
-			float y = event.getY();
-			ExerciseView view;
-
-			switch (action) {
-			case DragEvent.ACTION_DRAG_STARTED:
-				// do nothing
-				break;
-			case DragEvent.ACTION_DRAG_ENTERED:
-				movePlaceholder(event.getY());
-				break;
-			case DragEvent.ACTION_DRAG_EXITED:
-				// ProgramNodeView.this.setOnTouchListener(null);
-				clearPlaceholder();
-				break;
-			case DragEvent.ACTION_DROP:
-				clearPlaceholder();
-				view = (ExerciseView) event.getLocalState();
-				// Dropped, reassign View to ViewGroup
-				ViewGroup owner = (ViewGroup) view.getParent();
-				owner.removeView(view);
-
-				insertAfter(y, view);
-				// LinearLayout container = (LinearLayout) v;
-				// container.addView(view);
-				view.setVisibility(View.VISIBLE);
-				break;
-			case DragEvent.ACTION_DRAG_ENDED:
-				clearPlaceholder();
-				break;
-			case DragEvent.ACTION_DRAG_LOCATION:
-				movePlaceholder(event.getY());
-				break;
-			default:
-				break;
-			}
+		public boolean onTouch(View v, MotionEvent event) {
+			ClipData data = ClipData.newPlainText("", "");
+			DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
+					ProgramNodeView.this);
+			startDrag(data, shadowBuilder, ProgramNodeView.this, 0);
+			ProgramNodeView.this.setVisibility(GONE);
 			return true;
 		}
 	};
