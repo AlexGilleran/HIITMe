@@ -92,12 +92,22 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 		@Override
 		public void onTick(long millisUntilFinished) {
+			// onTick doesn't execute exactly on intervals of the tickRate, it
+			// executes roughly close to the tickRate... so the interval within
+			// ticks needs to be calculated.
+			int msSinceLastTick = (int) (programMsRemaining - millisUntilFinished);
 			programMsRemaining = (int) millisUntilFinished;
-			exerciseMsRemaining -= tickRate;
+
+			// Remove the ms since last tick from the exercise ms remaining.
+			exerciseMsRemaining -= msSinceLastTick;
 			if (exerciseMsRemaining <= 0) {
 				observer.onExerciseFinish();
 				program.getAssociatedNode().next();
-				exerciseMsRemaining = program.getAssociatedNode().getCurrentExercise().getDuration();
+
+				// Adding rather than assigning the next exercise duration means
+				// that any time leftover from the first exercise is subtracted
+				// from the next one.
+				exerciseMsRemaining += program.getAssociatedNode().getCurrentExercise().getDuration();
 			}
 			observer.onTick(exerciseMsRemaining, millisUntilFinished);
 		}
