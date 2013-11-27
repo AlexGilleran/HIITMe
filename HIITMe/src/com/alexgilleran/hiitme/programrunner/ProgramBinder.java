@@ -16,6 +16,8 @@ public interface ProgramBinder {
 	void getProgram(ProgramCallback callback);
 
 	boolean isRunning();
+	
+	boolean isActive();
 
 	void registerCountDownObserver(CountDownObserver observer);
 

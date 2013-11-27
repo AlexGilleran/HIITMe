@@ -53,7 +53,7 @@ public class RunFragment extends RoboFragment {
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
 		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, programId);
-		getActivity().getApplicationContext().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+		getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 		getActivity().startService(serviceIntent);
 	}
 
@@ -78,6 +78,11 @@ public class RunFragment extends RoboFragment {
 	@Override
 	public void onStop() {
 		super.onStop();
+
+		if (!programBinder.isActive()) {
+			getActivity().stopService(serviceIntent);
+			getActivity().unbindService(connection);
+		}
 	}
 
 	private void refreshPlayButtonIcon() {

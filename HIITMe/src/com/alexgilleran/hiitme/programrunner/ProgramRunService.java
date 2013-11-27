@@ -81,7 +81,7 @@ public class ProgramRunService extends RoboIntentService {
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 
 		program = programDao.getProgram(programId);
-		
+
 		while (!programCallbacks.isEmpty()) {
 			programCallbacks.poll().onProgramReady(program);
 		}
@@ -151,6 +151,11 @@ public class ProgramRunService extends RoboIntentService {
 		@Override
 		public Exercise getCurrentExercise() {
 			return program.getAssociatedNode().getCurrentExercise();
+		}
+
+		@Override
+		public boolean isActive() {
+			return programCountDown != null && programCountDown.isRunning() || programCountDown.isPaused();
 		}
 	}
 
