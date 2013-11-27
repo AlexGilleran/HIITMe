@@ -152,6 +152,7 @@ public class RunFragment extends RoboFragment {
 			exerciseProgressBar.setTextLine1(formatTime(0));
 			exerciseProgressBar.setTextLine2(formatTime(0));
 			exerciseProgressBar.invalidate();
+			refreshPlayButtonIcon();
 		}
 
 		@Override
