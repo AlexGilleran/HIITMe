@@ -13,15 +13,15 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
-import com.alexgilleran.hiitme.programrunner.ProgramCountDown.CountDownObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
@@ -32,9 +32,7 @@ public class ProgramRunService extends RoboIntentService {
 	private Program program;
 	private ProgramNode programNode;
 
-	private ProgramCountDown programCountDown;
-
-	boolean isRunning = false;
+	private ProgramRunner programCountDown;
 
 	private Notification notification;
 
@@ -60,8 +58,18 @@ public class ProgramRunService extends RoboIntentService {
 	public void onDestroy() {
 		super.onDestroy();
 
-		if (programCountDown != null) {
-			programCountDown.cancel();
+		stopRun();
+	}
+
+	private void stopRun() {
+		if (programCountDown != null && !programCountDown.isStopped()) {
+			programCountDown.stop();
+		}
+
+		stopForeground(true);
+
+		if (wakeLock != null && wakeLock.isHeld()) {
+			wakeLock.release();
 		}
 	}
 
@@ -76,7 +84,6 @@ public class ProgramRunService extends RoboIntentService {
 		program = programDao.getProgram(programId);
 		programNode = program.getAssociatedNode();
 		programNode.reset();
-		programNode.registerObserver(programObserver);
 
 		while (!programCallbacks.isEmpty()) {
 			programCallbacks.poll().onProgramReady(program);
@@ -88,66 +95,34 @@ public class ProgramRunService extends RoboIntentService {
 		return new ProgramBinderImpl();
 	}
 
-	private final ProgramNodeObserver programObserver = new ProgramNodeObserver() {
-		@Override
-		public void onNextExercise(Exercise newExercise) {
-		}
-
-		@Override
-		public void onRepFinish(ProgramNode superset, int remainingReps) {
-		}
-
-		@Override
-		public void onFinish(ProgramNode node) {
-			stopForeground(true);
-			isRunning = false;
-		}
-
-		@Override
-		public void onReset(ProgramNode node) {
-
-		}
-
-		@Override
-		public void onChange(ProgramNode node) {
-
-		}
-	};
-
 	public class ProgramBinderImpl extends Binder implements ProgramBinder {
-		private boolean isPaused = false;
-
 		@Override
 		public void start() {
 			wakeLock.acquire();
 
-			isRunning = true;
-
-			if (isPaused) {
-				programCountDown.start();
-
-			} else {
+			if (programCountDown == null || programCountDown.isStopped()) {
 				startForeground(1, notification);
-				programCountDown = new ProgramCountDown(program, observerProxy);
+				programCountDown = new ProgramRunnerImpl(program, observerProxy);
 
+				programNode.reset();
 				programNode.start();
 				programCountDown.start();
+			} else if (programCountDown.isPaused()) {
+				programCountDown.start();
+			} else if (programCountDown.isRunning()) {
+				Log.wtf(getPackageName(),
+						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
 			}
 		}
 
 		@Override
 		public void stop() {
-			isRunning = false;
-			programCountDown.cancel();
-
-			wakeLock.release();
+			stopRun();
 		}
 
 		@Override
 		public void pause() {
-			isPaused = true;
-			isRunning = false;
-			programCountDown = programCountDown.pause();
+			programCountDown.pause();
 
 			wakeLock.release();
 		}
@@ -163,7 +138,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public boolean isRunning() {
-			return isRunning;
+			return programCountDown != null ? programCountDown.isRunning() : false;
 		}
 
 		@Override
@@ -182,12 +157,16 @@ public class ProgramRunService extends RoboIntentService {
 		}
 	}
 
-	private final CountDownObserver observerProxy = new ObserverProxy(observers);
+	private final CountDownObserver observerProxy = new MasterCountDownObserver(observers);
 
-	private class ObserverProxy implements CountDownObserver {
+	/**
+	 * Listens for count down events and proxies them to a number of other
+	 * {@link CountDownObserver}s.
+	 */
+	private class MasterCountDownObserver implements CountDownObserver {
 		private final List<CountDownObserver> observers;
 
-		public ObserverProxy(List<CountDownObserver> observers) {
+		public MasterCountDownObserver(List<CountDownObserver> observers) {
 			this.observers = observers;
 		}
 
@@ -209,6 +188,14 @@ public class ProgramRunService extends RoboIntentService {
 		public void onProgramFinish() {
 			for (CountDownObserver observer : observers) {
 				observer.onProgramFinish();
+			}
+			stopRun();
+		}
+
+		@Override
+		public void onStart() {
+			for (CountDownObserver observer : observers) {
+				observer.onStart();
 			}
 		}
 	}

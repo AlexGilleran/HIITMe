@@ -22,7 +22,7 @@ import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
-import com.alexgilleran.hiitme.programrunner.ProgramCountDown.CountDownObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.todddavies.components.progressbar.ProgressWheel;
 
@@ -72,8 +72,6 @@ public class RunFragment extends RoboFragment {
 				} else {
 					programBinder.start();
 				}
-
-				refreshPlayButtonIcon();
 			}
 		});
 
@@ -112,7 +110,6 @@ public class RunFragment extends RoboFragment {
 				public void onProgramReady(Program program) {
 					RunFragment.this.program = program;
 
-					program.getAssociatedNode().registerObserver(observer);
 					programBinder.registerCountDownObserver(countDownObserver);
 					programProgressBar.setProgress(0);
 
@@ -143,7 +140,7 @@ public class RunFragment extends RoboFragment {
 
 		@Override
 		public void onExerciseFinish() {
-			exerciseProgressBar.setProgress(ProgressWheel.getMax());
+			exerciseProgressBar.setProgress(0);
 			exerciseProgressBar.setTextLine1(formatTime(0));
 		}
 
@@ -154,34 +151,10 @@ public class RunFragment extends RoboFragment {
 			exerciseProgressBar.setTextLine2(formatTime(0));
 			exerciseProgressBar.invalidate();
 		}
-	};
-
-	private final ProgramNodeObserver observer = new ProgramNodeObserver() {
-		@Override
-		public void onNextExercise(Exercise newExercise) {
-			programProgressBar.setProgress(0);
-		}
 
 		@Override
-		public void onFinish(ProgramNode node) {
-			exerciseProgressBar.setTextLine1(formatTime(0));
-			exerciseProgressBar.setTextLine2(formatTime(0));
+		public void onStart() {
 			refreshPlayButtonIcon();
-		}
-
-		@Override
-		public void onRepFinish(ProgramNode superset, int remainingReps) {
-
-		}
-
-		@Override
-		public void onReset(ProgramNode node) {
-
-		}
-
-		@Override
-		public void onChange(ProgramNode node) {
-
 		}
 	};
 }
