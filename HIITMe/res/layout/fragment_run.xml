@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:progresswheel="http://schemas.android.com/apk/res/com.alexgilleran.hiitme"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" >
+
+        <com.todddavies.components.progressbar.ProgressWheel
+            android:id="@+id/progressbar_exercise"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_centerInParent="true"
+            progresswheel:barColor="#0097D6"
+            progresswheel:barLength="60dp"
+            progresswheel:barWidth="5dp"
+            progresswheel:rimColor="#330097D6"
+            progresswheel:rimWidth="2dp"
+            progresswheel:textColorLine1="#222"
+            progresswheel:textColorLine2="#AFA"
+            progresswheel:textSizeLine1="40sp"
+            progresswheel:textSizeLine2="28sp" />
+
+        <com.todddavies.components.progressbar.ProgressWheel
+            android:id="@+id/progressbar_program"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true"
+            progresswheel:barColor="#0097D6"
+            progresswheel:barLength="60dp"
+            progresswheel:barWidth="5dp"
+            progresswheel:rimColor="#330097D6"
+            progresswheel:rimWidth="2dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/rep_button_play_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:src="@drawable/ic_action_play_dark" />
+
+        <ImageButton
+            android:id="@+id/rep_button_play_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:src="@drawable/ic_action_stop" />
+    </LinearLayout>
+
+</LinearLayout>

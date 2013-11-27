@@ -1,7 +1,9 @@
 package com.alexgilleran.hiitme.programrunner;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import roboguice.service.RoboIntentService;
 import android.app.Notification;
@@ -11,35 +13,33 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.ProgramNodeObserver;
-import com.alexgilleran.hiitme.programrunner.ExerciseCountDown.CountDownObserver;
+import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
+import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
-	private ProgramDAO ProgramDAO;
-	
+	private ProgramDAO programDao;
+
 	private Program program;
-	private ProgramNode programNode;
 
-	private ExerciseCountDown exerciseCountDown;
-	private ExerciseCountDown programCountDown;
-
-	boolean isRunning = false;
+	private ProgramRunner programCountDown;
 
 	private Notification notification;
 
-	private final List<CountDownObserver> exerciseObservers = new ArrayList<CountDownObserver>();
-	private final List<CountDownObserver> programObservers = new ArrayList<CountDownObserver>();
+	private final List<CountDownObserver> observers = new ArrayList<CountDownObserver>();
 
 	private WakeLock wakeLock;
+
+	private Queue<ProgramCallback> programCallbacks = new LinkedList<ProgramCallback>();
 
 	public ProgramRunService() {
 		super("HIIT Me");
@@ -50,178 +50,159 @@ public class ProgramRunService extends RoboIntentService {
 		super.onCreate();
 
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-				"MyWakeLock");
+		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 
-		if (programCountDown != null) {
-			programCountDown.cancel();
+		stopRun();
+	}
+
+	private void stopRun() {
+		if (programCountDown != null && !programCountDown.isStopped()) {
+			programCountDown.stop();
 		}
 
-		if (exerciseCountDown != null) {
-			exerciseCountDown.cancel();
+		stopForeground(true);
+
+		if (wakeLock != null && wakeLock.isHeld()) {
+			wakeLock.release();
 		}
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Notification.Builder builder = new Notification.Builder(
-				this.getBaseContext());
+		Notification.Builder builder = new Notification.Builder(this.getBaseContext());
 		builder.setContentTitle("HIIT Me");
 		builder.setSmallIcon(R.drawable.ic_launcher);
 		notification = builder.getNotification();
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 
-		program = ProgramDAO.getProgram(programId);
-		programNode = program.getAssociatedNode();
-		programNode.reset();
-		programNode.registerObserver(programObserver);
+		program = programDao.getProgram(programId);
+
+		while (!programCallbacks.isEmpty()) {
+			programCallbacks.poll().onProgramReady(program);
+		}
 	}
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return new ProgramBinder();
+		return new ProgramBinderImpl();
 	}
 
-	private void next() {
-		programNode.next();
-		if (!programNode.isFinished()) {
-			newCountDown();
-		}
-	}
-
-	private void newCountDown() {
-		exerciseCountDown = new ExerciseCountDown(programNode
-				.getCurrentExercise().getDuration(), exerciseCountDownObs);
-		exerciseCountDown.start();
-	}
-
-	private final ProgramNodeObserver programObserver = new ProgramNodeObserver() {
+	public class ProgramBinderImpl extends Binder implements ProgramBinder {
 		@Override
-		public void onNextExercise(Exercise newExercise) {
-		}
-
-		@Override
-		public void onRepFinish(ProgramNode superset, int remainingReps) {
-		}
-
-		@Override
-		public void onFinish(ProgramNode node) {
-			stopForeground(true);
-			isRunning = false;
-		}
-
-		@Override
-		public void onReset(ProgramNode node) {
-
-		}
-
-		@Override
-		public void onChange(ProgramNode node) {
-
-		}
-	};
-
-	public class ProgramBinder extends Binder {
-		boolean isPaused = false;
-
 		public void start() {
 			wakeLock.acquire();
 
-			isRunning = true;
-
-			if (isPaused) {
-				exerciseCountDown.start();
-				programCountDown.start();
-
-			} else {
+			if (programCountDown == null || programCountDown.isStopped()) {
 				startForeground(1, notification);
-				programCountDown = new ExerciseCountDown(program
-						.getAssociatedNode().getDuration(), programCountDownObs);
-				programNode.start();
 
-				newCountDown();
+				program.getAssociatedNode().reset();
+				programCountDown = new ProgramRunnerImpl(program, observerProxy);
+
 				programCountDown.start();
+			} else if (programCountDown.isPaused()) {
+				programCountDown.start();
+			} else if (programCountDown.isRunning()) {
+				Log.wtf(getPackageName(),
+						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
 			}
 		}
 
+		@Override
 		public void stop() {
-			isRunning = false;
-			exerciseCountDown.cancel();
-			programCountDown.cancel();
-
-			wakeLock.release();
+			stopRun();
 		}
 
+		@Override
 		public void pause() {
-			isPaused = true;
-			isRunning = false;
-			exerciseCountDown = exerciseCountDown.pause();
-			programCountDown = programCountDown.pause();
+			programCountDown.pause();
 
 			wakeLock.release();
 		}
 
-		public Program getProgram() {
-			return program;
+		@Override
+		public void getProgram(ProgramCallback callback) {
+			if (program != null) {
+				callback.onProgramReady(program);
+			} else {
+				programCallbacks.add(callback);
+			}
 		}
 
+		@Override
 		public boolean isRunning() {
-			return isRunning;
+			return programCountDown != null ? programCountDown.isRunning() : false;
 		}
 
-		public void regExerciseCountDownObs(CountDownObserver observer) {
-			exerciseObservers.add(observer);
+		@Override
+		public void registerCountDownObserver(CountDownObserver observer) {
+			observers.add(observer);
 		}
 
-		public void regProgCountDownObs(CountDownObserver observer) {
-			programObservers.add(observer);
+		@Override
+		public ProgramNode getCurrentNode() {
+			return program.getAssociatedNode().getCurrentNode();
 		}
 
-		public ProgramNode getCurrentSuperset() {
-			return programNode.getCurrentNode();
-		}
-
+		@Override
 		public Exercise getCurrentExercise() {
-			return programNode.getCurrentExercise();
+			return program.getAssociatedNode().getCurrentExercise();
+		}
+
+		@Override
+		public boolean isActive() {
+			return programCountDown != null && (programCountDown.isRunning() || programCountDown.isPaused());
+		}
+
+		@Override
+		public boolean isStopped() {
+			return programCountDown.isStopped();
 		}
 	}
 
-	private final CountDownObserver exerciseCountDownObs = new ObserverProxy(
-			exerciseObservers) {
-		@Override
-		public void onFinish() {
-			super.onFinish();
+	private final CountDownObserver observerProxy = new MasterCountDownObserver(observers);
 
-			next();
-		}
-	};
-
-	private final CountDownObserver programCountDownObs = new ObserverProxy(
-			programObservers);
-
-	private class ObserverProxy implements CountDownObserver {
+	/**
+	 * Listens for count down events and proxies them to a number of other
+	 * {@link CountDownObserver}s.
+	 */
+	private class MasterCountDownObserver implements CountDownObserver {
 		private final List<CountDownObserver> observers;
 
-		public ObserverProxy(List<CountDownObserver> observers) {
+		public MasterCountDownObserver(List<CountDownObserver> observers) {
 			this.observers = observers;
 		}
 
 		@Override
-		public void onTick(long msecondsRemaining) {
+		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
 			for (CountDownObserver observer : observers) {
-				observer.onTick(msecondsRemaining);
+				observer.onTick(exerciseMsRemaining, programMsRemaining);
 			}
 		}
 
 		@Override
-		public void onFinish() {
+		public void onExerciseFinish() {
 			for (CountDownObserver observer : observers) {
-				observer.onFinish();
+				observer.onExerciseFinish();
+			}
+		}
+
+		@Override
+		public void onProgramFinish() {
+			for (CountDownObserver observer : observers) {
+				observer.onProgramFinish();
+			}
+			stopRun();
+		}
+
+		@Override
+		public void onStart() {
+			for (CountDownObserver observer : observers) {
+				observer.onStart();
 			}
 		}
 	}

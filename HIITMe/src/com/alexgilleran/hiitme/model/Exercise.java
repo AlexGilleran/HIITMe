@@ -17,8 +17,7 @@ public class Exercise extends Model {
 		super();
 	}
 
-	public Exercise(String name, int duration, EffortLevel effortLevel,
-			ProgramNode node) {
+	public Exercise(String name, int duration, EffortLevel effortLevel, ProgramNode node) {
 		this.duration = duration;
 		this.effortLevel = effortLevel;
 		this.exerciseGroup = node;
@@ -55,7 +54,5 @@ public class Exercise extends Model {
 	@Override
 	public void save() {
 		super.save();
-
-		getParentNode().broadcastChanged();
 	}
 }

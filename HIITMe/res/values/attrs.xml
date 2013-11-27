@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <declare-styleable name="RepGroupView">
-   </declare-styleable>
+
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!-- Default style for ImageButtons -->
+        <item name="android:imageButtonStyle">?android:borderlessButtonStyle</item>
+        <!-- Default style for Buttons -->
+        <item name="android:buttonStyle">?android:borderlessButtonStyle</item>
+    </style>
+
+    <declare-styleable name="ProgressWheel">
+        <attr name="delayMillis" format="integer" />
+        <attr name="textLine1" format="string" />
+        <attr name="textLine2" format="string" />
+        <attr name="textColorLine1" format="color" />
+        <attr name="textColorLine2" format="color" />
+        <attr name="textSizeLine1" format="dimension" />
+        <attr name="textSizeLine2" format="dimension" />
+        <attr name="barColor" format="color" />
+        <attr name="rimColor" format="color" />
+        <attr name="rimWidth" format="dimension" />
+        <attr name="spinSpeed" format="integer" />
+        <attr name="circleColor" format="color" />
+        <attr name="radius" format="dimension" />
+        <attr name="barWidth" format="dimension" />
+        <attr name="barLength" format="dimension" />
+    </declare-styleable>
+
 </resources>

@@ -38,6 +38,7 @@
         <service android:name="com.alexgilleran.hiitme.programrunner.ProgramRunService" >
             
         </service>
+        <activity android:name=".presentation.run.RunActivity"></activity>
     </application>
 
 </manifest>

@@ -1,8 +1,6 @@
 package com.alexgilleran.hiitme.model;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
@@ -18,11 +16,10 @@ public class ProgramNode extends Model {
 	@Column(name = "parent")
 	private ProgramNode parent;
 
-	List<ProgramNode> children;
+	private List<ProgramNode> children;
 
 	private int completedReps;
 	private int currentChildIndex;
-	private final Set<ProgramNodeObserver> observers = new HashSet<ProgramNodeObserver>();
 
 	public ProgramNode() {
 		super();
@@ -53,13 +50,11 @@ public class ProgramNode extends Model {
 		return newNode;
 	}
 
-	public Exercise addChildExercise(String name, int duration,
-			EffortLevel effortLevel, int repCount) {
+	public Exercise addChildExercise(String name, int duration, EffortLevel effortLevel, int repCount) {
 		checkCanHaveChildren();
 
 		ProgramNode containerNode = addChildNode(repCount);
-		Exercise newExercise = new Exercise(name, duration, effortLevel,
-				containerNode);
+		Exercise newExercise = new Exercise(name, duration, effortLevel, containerNode);
 		containerNode.setAttachedExercise(newExercise);
 
 		return newExercise;
@@ -86,11 +81,6 @@ public class ProgramNode extends Model {
 			if (currentNode.isFinished()) {
 				// Current node finished, go to the next one
 				nextNode();
-
-				if (!this.isFinished()) {
-					getCurrentExercise().getParentNode()
-							.triggerExerciseBroadcast();
-				}
 			}
 		} else {
 			nextNode();
@@ -111,13 +101,10 @@ public class ProgramNode extends Model {
 
 	private void nextRep() {
 		completedReps++;
-		broadcastRepFinish();
 
 		currentChildIndex = 0;
 
-		if (isFinished()) {
-			broadcastFinish();
-		} else {
+		if (!isFinished()) {
 			resetChildren();
 		}
 	}
@@ -131,8 +118,6 @@ public class ProgramNode extends Model {
 		currentChildIndex = 0;
 
 		resetChildren();
-
-		broadcastReset();
 	}
 
 	private void resetChildren() {
@@ -143,8 +128,7 @@ public class ProgramNode extends Model {
 
 	public ProgramNode getCurrentNode() {
 		if (isFinished()) {
-			throw new RuntimeException(
-					"getCurrentNode() called on finished ProgramNode");
+			throw new RuntimeException("getCurrentNode() called on finished ProgramNode");
 		}
 
 		if (this.hasChildren()) {
@@ -164,58 +148,6 @@ public class ProgramNode extends Model {
 			return getCurrentNode().getCurrentExercise();
 		} else {
 			return null;
-		}
-	}
-
-	private Set<ProgramNodeObserver> getObservers() {
-		return observers;
-	}
-
-	private void broadcastFinish() {
-		for (ProgramNodeObserver observer : observers) {
-			observer.onFinish(this);
-		}
-	}
-
-	private void broadcastRepFinish() {
-		for (ProgramNodeObserver observer : observers) {
-			observer.onRepFinish(this, completedReps);
-		}
-	}
-
-	protected void broadcastNextExercise() {
-		for (ProgramNodeObserver observer : getObservers()) {
-			observer.onNextExercise(getCurrentExercise());
-		}
-	}
-
-	private void broadcastReset() {
-		for (ProgramNodeObserver observer : getObservers()) {
-			observer.onReset(this);
-		}
-	}
-
-	protected void broadcastChanged() {
-		for (ProgramNodeObserver observer : getObservers()) {
-			observer.onChange(this);
-		}
-	}
-
-	public void registerObserver(ProgramNodeObserver observer) {
-		observers.add(observer);
-	}
-
-	public void triggerExerciseBroadcast() {
-		this.broadcastNextExercise();
-	}
-
-	public void start() {
-		ProgramNode node = getCurrentNode();
-
-		if (this == node) {
-			broadcastNextExercise();
-		} else {
-			node.start();
 		}
 	}
 
@@ -293,8 +225,6 @@ public class ProgramNode extends Model {
 			}
 
 			ActiveAndroid.setTransactionSuccessful();
-
-			this.broadcastChanged();
 		} finally {
 			ActiveAndroid.endTransaction();
 		}

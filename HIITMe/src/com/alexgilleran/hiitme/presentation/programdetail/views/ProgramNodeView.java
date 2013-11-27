@@ -2,16 +2,13 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -19,26 +16,22 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvider;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
 
-public class ProgramNodeView extends LinearLayout implements
-		ProgramNodeObserver {
+public class ProgramNodeView extends LinearLayout {
 	private final Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
-	private final Map<ProgramNode, TextView> repViews = new HashMap<ProgramNode, TextView>();
 	private final List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
 
 	private ProgramNode programNode;
 
-	private EditExerciseListener editListener;
 	private TextView repView;
+	private EditExerciseListener editListener;
 	private ImageButton addExerciseButton;
 	private ImageButton addGroupButton;
 	private TableLayout repLayout;
@@ -70,10 +63,9 @@ public class ProgramNodeView extends LinearLayout implements
 		}
 
 		this.repView = (TextView) this.findViewById(R.id.textview_repcount);
-		this.addExerciseButton = (ImageButton) this
-				.findViewById(R.id.button_add_exercise);
-		this.addGroupButton = (ImageButton) this
-				.findViewById(R.id.button_add_group);
+		this.addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
+		this.addGroupButton = (ImageButton) this.findViewById(R.id.button_add_group);
+
 		this.repLayout = (TableLayout) this.findViewById(R.id.layout_reps);
 
 		addGroupButton.setOnClickListener(addGroupListener);
@@ -90,7 +82,6 @@ public class ProgramNodeView extends LinearLayout implements
 
 	public void setProgramNode(ProgramNode programNode) {
 		this.programNode = programNode;
-		programNode.registerObserver(this);
 
 		render();
 	}
@@ -112,8 +103,7 @@ public class ProgramNodeView extends LinearLayout implements
 			repLayout.addView(newRow, i);
 		}
 
-		TextView repCountView = (TextView) this
-				.findViewById(R.id.textview_repcount);
+		TextView repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
 	}
 
@@ -126,8 +116,7 @@ public class ProgramNodeView extends LinearLayout implements
 	 *            The {@link Exercise} to source data from.
 	 */
 	private ExerciseView buildExerciseView(final Exercise exercise) {
-		ExerciseView exerciseView = (ExerciseView) inflater.inflate(
-				R.layout.view_exercise, null);
+		ExerciseView exerciseView = (ExerciseView) inflater.inflate(R.layout.view_exercise, null);
 
 		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
@@ -152,8 +141,7 @@ public class ProgramNodeView extends LinearLayout implements
 	private TableRow buildProgramNodeView(ProgramNode node) {
 		TableRow row = new TableRow(this.getContext());
 
-		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
-				R.layout.view_program_node, null);
+		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(R.layout.view_program_node, null);
 		nodeView.setProgramNode(node);
 		subViews.add(nodeView);
 
@@ -162,48 +150,8 @@ public class ProgramNodeView extends LinearLayout implements
 		return row;
 	}
 
-	public void setRemainingReps(ProgramNode node, int repsLeft) {
-		repView.setText(repsLeft + "/" + node.getTotalReps());
-	}
-
-	@Override
-	public void onNextExercise(Exercise newExercise) {
-		// highlightExercise(newExercise);
-	}
-
-	public void resetRepCounts() {
-		for (ProgramNodeView view : subViews) {
-			view.resetRepCounts();
-		}
-
-		for (ProgramNode node : repViews.keySet()) {
-			setRemainingReps(node, 0);
-		}
-	}
-
-	@Override
-	public void onRepFinish(ProgramNode node, int completedReps) {
-		setRemainingReps(node, completedReps);
-	}
-
-	@Override
-	public void onFinish(ProgramNode node) {
-	}
-
-	@Override
-	public void onReset(ProgramNode node) {
-		if (node == this.programNode) {
-			this.resetRepCounts();
-		}
-	}
-
 	public void setEditExerciseListener(EditExerciseListener listener) {
 		this.editListener = listener;
-	}
-
-	@Override
-	public void onChange(ProgramNode node) {
-		render();
 	}
 
 	private final OnClickListener addExerciseListener = new OnClickListener() {
@@ -226,15 +174,13 @@ public class ProgramNodeView extends LinearLayout implements
 		// TODO: This is a mess but it feels roughly right... improve it.
 		y = y - view.getHeight() / 2;
 		if (repLayout.getChildCount() == 0
-				|| y < (repLayout.getChildAt(0).getY() + repLayout
-						.getChildAt(0).getHeight() / 2)) {
+				|| y < (repLayout.getChildAt(0).getY() + repLayout.getChildAt(0).getHeight() / 2)) {
 			repLayout.addView(view, 0);
 			return;
 		}
 		for (int i = 0; i < repLayout.getChildCount(); i++) {
 			TableRow row = (TableRow) repLayout.getChildAt(i);
-			if (y > row.getY() - row.getHeight() / 2
-					&& y < row.getY() + row.getHeight() / 2) {
+			if (y > row.getY() - row.getHeight() / 2 && y < row.getY() + row.getHeight() / 2) {
 				repLayout.addView(view, i);
 				return;
 			}
@@ -250,8 +196,8 @@ public class ProgramNodeView extends LinearLayout implements
 
 	private void clearPlaceholder() {
 		if (placeholderProvider.getDragPlaceholder().getParent() != null) {
-			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent())
-					.removeView(placeholderProvider.getDragPlaceholder());
+			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent()).removeView(placeholderProvider
+					.getDragPlaceholder());
 		}
 	}
 
