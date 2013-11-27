@@ -105,7 +105,6 @@ public class ProgramRunService extends RoboIntentService {
 				programCountDown = new ProgramRunnerImpl(program, observerProxy);
 
 				programNode.reset();
-				programNode.start();
 				programCountDown.start();
 			} else if (programCountDown.isPaused()) {
 				programCountDown.start();

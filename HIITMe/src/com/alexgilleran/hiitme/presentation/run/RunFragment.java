@@ -16,14 +16,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.model.ProgramNodeObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
-import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
+import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.todddavies.components.progressbar.ProgressWheel;
 
 public class RunFragment extends RoboFragment {
