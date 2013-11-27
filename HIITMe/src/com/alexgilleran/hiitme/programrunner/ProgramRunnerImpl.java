@@ -45,6 +45,9 @@ public class ProgramRunnerImpl implements ProgramRunner {
 		running = false;
 		stopped = true;
 
+		observer.onExerciseFinish();
+		observer.onProgramFinish();
+
 		countDown.cancel();
 	}
 

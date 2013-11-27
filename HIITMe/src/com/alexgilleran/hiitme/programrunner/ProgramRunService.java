@@ -155,7 +155,12 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public boolean isActive() {
-			return programCountDown != null && programCountDown.isRunning() || programCountDown.isPaused();
+			return programCountDown != null && (programCountDown.isRunning() || programCountDown.isPaused());
+		}
+
+		@Override
+		public boolean isStopped() {
+			return programCountDown.isStopped();
 		}
 	}
 

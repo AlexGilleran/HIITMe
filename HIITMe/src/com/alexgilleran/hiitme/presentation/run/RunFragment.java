@@ -13,9 +13,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.R.drawable;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
@@ -24,10 +24,6 @@ import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver
 import com.todddavies.components.progressbar.ProgressWheel;
 
 public class RunFragment extends RoboFragment {
-
-	@InjectView(R.id.textview_run_title)
-	private TextView titleText;
-
 	@InjectView(R.id.progressbar_program)
 	private ProgressWheel programProgressBar;
 
@@ -36,6 +32,9 @@ public class RunFragment extends RoboFragment {
 
 	@InjectView(R.id.rep_button_play_pause)
 	private ImageButton playButton;
+
+	@InjectView(R.id.rep_button_play_stop)
+	private ImageButton stopButton;
 
 	private ProgramBinder programBinder;
 	private Program program;
@@ -46,7 +45,6 @@ public class RunFragment extends RoboFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 	}
 
 	public void setProgramId(long programId) {
@@ -59,20 +57,17 @@ public class RunFragment extends RoboFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_run, container, false);
+		return inflater.inflate(R.layout.fragment_run, container, false);
+	}
 
-		view.findViewById(R.id.rep_button_play_pause).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (programBinder.isRunning()) {
-					programBinder.pause();
-				} else {
-					programBinder.start();
-				}
-			}
-		});
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
-		return view;
+		playButton.setOnClickListener(playButtonListener);
+		stopButton.setOnClickListener(stopButtonListener);
+
+		refreshButtons();
 	}
 
 	@Override
@@ -85,11 +80,24 @@ public class RunFragment extends RoboFragment {
 		}
 	}
 
-	private void refreshPlayButtonIcon() {
-		int iconResId = programBinder.isRunning() ? android.R.drawable.ic_media_pause
-				: android.R.drawable.ic_media_play;
+	private void refreshButtons() {
+		boolean isRunning = programBinder != null ? programBinder.isRunning() : false;
+		stopButton.setEnabled(isRunning);
+		stopButton.setImageResource(isRunning ? R.drawable.ic_action_stop : R.drawable.ic_action_stop_light);
 
-		playButton.setImageResource(iconResId);
+		playButton.setImageResource(getPlayButtonResource());
+	}
+
+	private int getPlayButtonResource() {
+		if (programBinder != null) {
+			if (programBinder.isRunning()) {
+				return R.drawable.ic_action_pause;
+			} else if (programBinder.isStopped()) {
+				return R.drawable.ic_action_repeat;
+			}
+		}
+
+		return R.drawable.ic_action_play_dark;
 	}
 
 	private String formatTime(long mseconds) {
@@ -102,6 +110,26 @@ public class RunFragment extends RoboFragment {
 	private int getDegrees(long msecondsRemaining, long duration) {
 		return ((int) duration - (int) msecondsRemaining) / ((int) duration / ProgressWheel.getMax());
 	}
+
+	private OnClickListener stopButtonListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			programBinder.stop();
+		}
+	};
+
+	private OnClickListener playButtonListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if (programBinder.isRunning()) {
+				programBinder.pause();
+			} else {
+				programBinder.start();
+			}
+
+			refreshButtons();
+		}
+	};
 
 	private final ServiceConnection connection = new ServiceConnection() {
 		@Override
@@ -116,8 +144,6 @@ public class RunFragment extends RoboFragment {
 					programProgressBar.setProgress(0);
 
 					duration = program.getAssociatedNode().getDuration();
-
-					titleText.setText(program.getName());
 				}
 			});
 
@@ -149,15 +175,16 @@ public class RunFragment extends RoboFragment {
 		@Override
 		public void onProgramFinish() {
 			programProgressBar.setProgress(ProgressWheel.getMax());
+			exerciseProgressBar.setProgress(ProgressWheel.getMax());
 			exerciseProgressBar.setTextLine1(formatTime(0));
 			exerciseProgressBar.setTextLine2(formatTime(0));
 			exerciseProgressBar.invalidate();
-			refreshPlayButtonIcon();
+			refreshButtons();
 		}
 
 		@Override
 		public void onStart() {
-			refreshPlayButtonIcon();
+			refreshButtons();
 		}
 	};
 }

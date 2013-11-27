@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!-- Default style for ImageButtons -->
+        <item name="android:imageButtonStyle">?android:borderlessButtonStyle</item>
+        <!-- Default style for Buttons -->
+        <item name="android:buttonStyle">?android:borderlessButtonStyle</item>
+    </style>
+
     <declare-styleable name="ProgressWheel">
         <attr name="delayMillis" format="integer" />
         <attr name="textLine1" format="string" />

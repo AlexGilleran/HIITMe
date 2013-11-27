@@ -5,14 +5,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textview_run_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" >
 
         <com.todddavies.components.progressbar.ProgressWheel
             android:id="@+id/progressbar_exercise"
@@ -41,10 +37,25 @@
             progresswheel:rimWidth="2dp" />
     </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/rep_button_play_pause"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_media_play" />
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/rep_button_play_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:src="@drawable/ic_action_play_dark" />
+
+        <ImageButton
+            android:id="@+id/rep_button_play_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:src="@drawable/ic_action_stop" />
+    </LinearLayout>
 
 </LinearLayout>
