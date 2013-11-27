@@ -30,7 +30,6 @@ public class ProgramRunService extends RoboIntentService {
 	private ProgramDAO programDao;
 
 	private Program program;
-	private ProgramNode programNode;
 
 	private ProgramRunner programCountDown;
 
@@ -82,9 +81,7 @@ public class ProgramRunService extends RoboIntentService {
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 
 		program = programDao.getProgram(programId);
-		programNode = program.getAssociatedNode();
-		programNode.reset();
-
+		
 		while (!programCallbacks.isEmpty()) {
 			programCallbacks.poll().onProgramReady(program);
 		}
@@ -102,9 +99,10 @@ public class ProgramRunService extends RoboIntentService {
 
 			if (programCountDown == null || programCountDown.isStopped()) {
 				startForeground(1, notification);
+
+				program.getAssociatedNode().reset();
 				programCountDown = new ProgramRunnerImpl(program, observerProxy);
 
-				programNode.reset();
 				programCountDown.start();
 			} else if (programCountDown.isPaused()) {
 				programCountDown.start();
@@ -147,12 +145,12 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public ProgramNode getCurrentNode() {
-			return programNode.getCurrentNode();
+			return program.getAssociatedNode().getCurrentNode();
 		}
 
 		@Override
 		public Exercise getCurrentExercise() {
-			return programNode.getCurrentExercise();
+			return program.getAssociatedNode().getCurrentExercise();
 		}
 	}
 
