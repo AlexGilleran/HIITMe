@@ -34,6 +34,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	@Override
 	public void start() {
 		running = true;
+		paused = false;
 
 		observer.onStart();
 
@@ -44,6 +45,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	public void stop() {
 		running = false;
 		stopped = true;
+		paused = false;
 
 		observer.onExerciseFinish();
 		observer.onProgramFinish();

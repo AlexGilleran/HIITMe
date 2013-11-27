@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.R.drawable;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
@@ -81,11 +80,18 @@ public class RunFragment extends RoboFragment {
 	}
 
 	private void refreshButtons() {
-		boolean isRunning = programBinder != null ? programBinder.isRunning() : false;
-		stopButton.setEnabled(isRunning);
-		stopButton.setImageResource(isRunning ? R.drawable.ic_action_stop : R.drawable.ic_action_stop_light);
+		boolean enableStopButton = programBinder != null && programBinder.isActive();
+		stopButton.setEnabled(enableStopButton);
+		stopButton.setImageResource(enableStopButton ? R.drawable.ic_action_stop : R.drawable.ic_action_stop_light);
 
 		playButton.setImageResource(getPlayButtonResource());
+
+		if (programBinder != null && programBinder.isPaused()) {
+			exerciseProgressBar.setBarLength(5);
+			exerciseProgressBar.spin();
+		} else {
+			exerciseProgressBar.stopSpinning();
+		}
 	}
 
 	private int getPlayButtonResource() {

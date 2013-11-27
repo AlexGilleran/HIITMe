@@ -20,6 +20,8 @@ public interface ProgramBinder {
 	boolean isActive();
 	
 	boolean isStopped();
+	
+	boolean isPaused();
 
 	void registerCountDownObserver(CountDownObserver observer);
 

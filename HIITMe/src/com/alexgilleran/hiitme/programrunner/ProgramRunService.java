@@ -162,6 +162,11 @@ public class ProgramRunService extends RoboIntentService {
 		public boolean isStopped() {
 			return programCountDown.isStopped();
 		}
+
+		@Override
+		public boolean isPaused() {
+			return programCountDown.isPaused();
+		}
 	}
 
 	private final CountDownObserver observerProxy = new MasterCountDownObserver(observers);
