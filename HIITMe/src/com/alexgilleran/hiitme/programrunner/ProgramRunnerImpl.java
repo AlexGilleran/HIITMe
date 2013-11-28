@@ -1,5 +1,7 @@
 package com.alexgilleran.hiitme.programrunner;
 
+import java.util.Queue;
+
 import android.os.CountDownTimer;
 
 import com.alexgilleran.hiitme.model.Exercise;
@@ -12,7 +14,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 	private CountDownTimer countDown;
 
-	private ProgramNodeState programState;
+	private Queue<ProgramNode> nodeQueue;
 	private CountDownObserver observer;
 	private int exerciseMsRemaining;
 	private int programMsRemaining;
@@ -25,9 +27,9 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	}
 
 	public ProgramRunnerImpl(Program program, CountDownObserver observer, int tickRate) {
-		this.programState = new ProgramNodeState(program.getAssociatedNode());
+		this.nodeQueue = program.asQueue();
 		this.observer = observer;
-		this.exerciseMsRemaining = programState.getCurrentExercise().getDuration();
+		this.exerciseMsRemaining = getCurrentExercise().getDuration();
 		this.programMsRemaining = program.getAssociatedNode().getDuration();
 
 		countDown = new ProgramCountDown(programMsRemaining, tickRate);
@@ -73,12 +75,12 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 	@Override
 	public Exercise getCurrentExercise() {
-		return programState.getCurrentExercise();
+		return nodeQueue.peek().getAttachedExercise();
 	}
 
 	@Override
 	public ProgramNode getCurrentNode() {
-		return programState.getCurrentNode();
+		return nodeQueue.peek();
 	}
 
 	@Override
@@ -126,12 +128,12 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 			if (exerciseMsRemaining <= 0) {
 				observer.onExerciseFinish();
-				programState.next();
+				nodeQueue.remove();
 
 				// Adding rather than assigning the next exercise duration means
 				// that any time leftover from the first exercise is subtracted
 				// from the next one.
-				exerciseMsRemaining += programState.getCurrentExercise().getDuration();
+				exerciseMsRemaining += getCurrentExercise().getDuration();
 			}
 
 			observer.onTick(exerciseMsRemaining, millisUntilFinished);

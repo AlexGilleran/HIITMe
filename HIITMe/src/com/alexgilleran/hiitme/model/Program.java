@@ -1,9 +1,14 @@
 package com.alexgilleran.hiitme.model;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.alexgilleran.hiitme.programrunner.ProgramNodeState;
 
 @Table(name = "program")
 public class Program extends Model {
@@ -68,4 +73,16 @@ public class Program extends Model {
 		return getName();
 	}
 
+	public Queue<ProgramNode> asQueue() {
+		Queue<ProgramNode> result = new LinkedList<ProgramNode>();
+
+		ProgramNodeState state = new ProgramNodeState(getAssociatedNode());
+
+		while (!state.isFinished()) {
+			result.add(state.getCurrentNode());
+			state.next();
+		}
+
+		return result;
+	}
 }
