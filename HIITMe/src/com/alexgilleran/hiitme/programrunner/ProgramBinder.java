@@ -29,6 +29,8 @@ public interface ProgramBinder {
 
 	Exercise getCurrentExercise();
 
+	Exercise getNextExercise();
+
 	int getProgramMsRemaining();
 
 	int getExerciseMsRemaining();

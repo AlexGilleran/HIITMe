@@ -31,7 +31,7 @@ public class ProgramRunService extends RoboIntentService {
 
 	private Program program;
 
-	private ProgramRunner programCountDown;
+	private ProgramRunner programRunner;
 
 	private Notification notification;
 
@@ -61,8 +61,8 @@ public class ProgramRunService extends RoboIntentService {
 	}
 
 	private void stopRun() {
-		if (programCountDown != null && !programCountDown.isStopped()) {
-			programCountDown.stop();
+		if (programRunner != null && !programRunner.isStopped()) {
+			programRunner.stop();
 		}
 
 		stopForeground(true);
@@ -97,16 +97,16 @@ public class ProgramRunService extends RoboIntentService {
 		public void start() {
 			wakeLock.acquire();
 
-			if (programCountDown == null || programCountDown.isStopped()) {
+			if (programRunner == null || programRunner.isStopped()) {
 				startForeground(1, notification);
 
 				program.getAssociatedNode().reset();
-				programCountDown = new ProgramRunnerImpl(program, observerProxy);
+				programRunner = new ProgramRunnerImpl(program, observerProxy);
 
-				programCountDown.start();
-			} else if (programCountDown.isPaused()) {
-				programCountDown.start();
-			} else if (programCountDown.isRunning()) {
+				programRunner.start();
+			} else if (programRunner.isPaused()) {
+				programRunner.start();
+			} else if (programRunner.isRunning()) {
 				Log.wtf(getPackageName(),
 						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
 			}
@@ -119,7 +119,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void pause() {
-			programCountDown.pause();
+			programRunner.pause();
 
 			wakeLock.release();
 		}
@@ -135,7 +135,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public boolean isRunning() {
-			return programCountDown != null ? programCountDown.isRunning() : false;
+			return programRunner != null ? programRunner.isRunning() : false;
 		}
 
 		@Override
@@ -155,27 +155,32 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public boolean isActive() {
-			return programCountDown != null && (programCountDown.isRunning() || programCountDown.isPaused());
+			return programRunner != null && (programRunner.isRunning() || programRunner.isPaused());
 		}
 
 		@Override
 		public boolean isStopped() {
-			return programCountDown.isStopped();
+			return programRunner.isStopped();
 		}
 
 		@Override
 		public boolean isPaused() {
-			return programCountDown.isPaused();
+			return programRunner.isPaused();
 		}
 
 		@Override
 		public int getProgramMsRemaining() {
-			return programCountDown.getProgramMsRemaining();
+			return programRunner.getProgramMsRemaining();
 		}
 
 		@Override
 		public int getExerciseMsRemaining() {
-			return programCountDown.getExerciseMsRemaining();
+			return programRunner.getExerciseMsRemaining();
+		}
+
+		@Override
+		public Exercise getNextExercise() {
+			return null;
 		}
 	}
 

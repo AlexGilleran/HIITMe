@@ -110,6 +110,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 			// Remove the ms since last tick from the exercise ms remaining.
 			exerciseMsRemaining -= msSinceLastTick;
+
 			if (exerciseMsRemaining <= 0) {
 				observer.onExerciseFinish();
 				program.getAssociatedNode().next();
@@ -119,6 +120,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 				// from the next one.
 				exerciseMsRemaining += program.getAssociatedNode().getCurrentExercise().getDuration();
 			}
+
 			observer.onTick(exerciseMsRemaining, millisUntilFinished);
 		}
 	}

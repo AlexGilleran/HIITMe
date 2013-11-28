@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Program;
@@ -23,6 +24,13 @@ import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver
 import com.todddavies.components.progressbar.ProgressWheel;
 
 public class RunFragment extends RoboFragment {
+	/**
+	 * The number of degrees at which the exercise wheel starts - leaving this
+	 * above 0 gives the illusion that the wheel is turning from one exercise to
+	 * the next instead of stopping and starting
+	 */
+	private static final int EXERCISE_WHEEL_START_DEGREES = 5;
+
 	@InjectView(R.id.progressbar_program)
 	private ProgressWheel programProgressBar;
 
@@ -34,6 +42,12 @@ public class RunFragment extends RoboFragment {
 
 	@InjectView(R.id.rep_button_play_stop)
 	private ImageButton stopButton;
+
+	@InjectView(R.id.textview_current_exercise)
+	private TextView currentExerciseName;
+
+	@InjectView(R.id.textview_next_exercise)
+	private TextView nextExerciseName;
 
 	private ProgramBinder programBinder;
 	private Program program;
@@ -121,8 +135,21 @@ public class RunFragment extends RoboFragment {
 		return minutes + ":" + seconds / 1000 + "." + (seconds % 1000 / 100);
 	}
 
-	private int getDegrees(long msecondsRemaining, long duration) {
-		return ((int) duration - (int) msecondsRemaining) / ((int) duration / ProgressWheel.getMax());
+	private int getDegrees(long msecondsRemaining, int duration) {
+		return getDegrees(msecondsRemaining, duration, 0);
+	}
+
+	private int getDegrees(long msecondsRemaining, int duration, int minDegrees) {
+		float degreesFraction = ((float) duration - (float) msecondsRemaining)
+				/ ((float) duration / (float) ProgressWheel.getMax());
+
+		// This is a bit of a tweak to make the bar appear at 100% for a tiny
+		// bit longer while revolving.
+		if (degreesFraction < minDegrees) {
+			return ProgressWheel.getMax();
+		} else {
+			return Math.round(degreesFraction);
+		}
 	}
 
 	private OnClickListener stopButtonListener = new OnClickListener() {
@@ -176,14 +203,13 @@ public class RunFragment extends RoboFragment {
 			exerciseProgressBar.setTextLine2(formatTime(programMsRemaining));
 
 			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, program.getAssociatedNode()
-					.getCurrentExercise().getDuration()));
+					.getCurrentExercise().getDuration(), EXERCISE_WHEEL_START_DEGREES));
 			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
 		}
 
 		@Override
 		public void onExerciseFinish() {
-			exerciseProgressBar.setProgress(0);
-			exerciseProgressBar.setTextLine1(formatTime(0));
+			currentExerciseName.setText(programBinder.getCurrentExercise().getEffortLevel().toString());
 		}
 
 		@Override
