@@ -179,7 +179,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public Exercise getNextExercise() {
-			return null;
+			return programRunner.getNextExercise();
 		}
 	}
 

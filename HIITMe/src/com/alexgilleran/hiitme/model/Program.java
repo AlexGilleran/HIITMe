@@ -1,14 +1,12 @@
 package com.alexgilleran.hiitme.model;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.alexgilleran.hiitme.programrunner.ProgramNodeState;
+import com.alexgilleran.hiitme.util.PeekaheadQueue;
+import com.alexgilleran.hiitme.util.PeekaheadLinkedList;
 
 @Table(name = "program")
 public class Program extends Model {
@@ -73,8 +71,8 @@ public class Program extends Model {
 		return getName();
 	}
 
-	public Queue<ProgramNode> asQueue() {
-		Queue<ProgramNode> result = new LinkedList<ProgramNode>();
+	public PeekaheadQueue<ProgramNode> asQueue() {
+		PeekaheadQueue<ProgramNode> result = new PeekaheadLinkedList<ProgramNode>();
 
 		ProgramNodeState state = new ProgramNodeState(getAssociatedNode());
 

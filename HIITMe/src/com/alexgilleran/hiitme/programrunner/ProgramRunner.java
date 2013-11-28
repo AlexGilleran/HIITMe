@@ -22,5 +22,7 @@ public interface ProgramRunner {
 
 	Exercise getCurrentExercise();
 
+	Exercise getNextExercise();
+
 	ProgramNode getCurrentNode();
 }

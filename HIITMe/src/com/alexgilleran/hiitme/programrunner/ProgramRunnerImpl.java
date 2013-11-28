@@ -1,12 +1,11 @@
 package com.alexgilleran.hiitme.programrunner;
 
-import java.util.Queue;
-
 import android.os.CountDownTimer;
 
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.util.PeekaheadQueue;
 
 public class ProgramRunnerImpl implements ProgramRunner {
 	private static final int DEFAULT_TICK_RATE = 25;
@@ -14,7 +13,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 	private CountDownTimer countDown;
 
-	private Queue<ProgramNode> nodeQueue;
+	private PeekaheadQueue<ProgramNode> nodeQueue;
 	private CountDownObserver observer;
 	private int exerciseMsRemaining;
 	private int programMsRemaining;
@@ -31,9 +30,9 @@ public class ProgramRunnerImpl implements ProgramRunner {
 		this.observer = observer;
 		this.exerciseMsRemaining = getCurrentExercise().getDuration();
 		this.programMsRemaining = program.getAssociatedNode().getDuration();
+		this.tickRate = tickRate;
 
 		countDown = new ProgramCountDown(programMsRemaining, tickRate);
-		this.tickRate = tickRate;
 	}
 
 	@Override
@@ -75,12 +74,18 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 	@Override
 	public Exercise getCurrentExercise() {
-		return nodeQueue.peek().getAttachedExercise();
+		return getCurrentNode().getAttachedExercise();
 	}
 
 	@Override
 	public ProgramNode getCurrentNode() {
 		return nodeQueue.peek();
+	}
+
+	@Override
+	public Exercise getNextExercise() {
+		ProgramNode next = nodeQueue.peek(1);
+		return next != null ? next.getAttachedExercise() : null;
 	}
 
 	@Override

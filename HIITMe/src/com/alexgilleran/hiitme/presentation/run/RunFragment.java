@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
@@ -50,7 +51,6 @@ public class RunFragment extends RoboFragment {
 	private TextView nextExerciseName;
 
 	private ProgramBinder programBinder;
-	private Program program;
 
 	private int duration;
 	private Intent serviceIntent;
@@ -179,8 +179,6 @@ public class RunFragment extends RoboFragment {
 			programBinder.getProgram(new ProgramCallback() {
 				@Override
 				public void onProgramReady(Program program) {
-					RunFragment.this.program = program;
-
 					programBinder.registerCountDownObserver(countDownObserver);
 					programProgressBar.setProgress(0);
 
@@ -210,6 +208,11 @@ public class RunFragment extends RoboFragment {
 		@Override
 		public void onExerciseFinish() {
 			currentExerciseName.setText(programBinder.getCurrentExercise().getEffortLevel().toString());
+
+			Exercise nextExercise = programBinder.getNextExercise();
+			if (nextExercise != null) {
+				nextExerciseName.setText(nextExercise.getEffortLevel().toString());
+			}
 		}
 
 		@Override
