@@ -66,7 +66,7 @@ public class RunFragment extends RoboFragment {
 		playButton.setOnClickListener(playButtonListener);
 		stopButton.setOnClickListener(stopButtonListener);
 
-		refreshButtons();
+		refreshPauseState();
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class RunFragment extends RoboFragment {
 		}
 	}
 
-	private void refreshButtons() {
+	private void refreshPauseState() {
 		boolean enableStopButton = programBinder != null && programBinder.isActive();
 		stopButton.setEnabled(enableStopButton);
 		stopButton.setImageResource(enableStopButton ? R.drawable.ic_action_stop : R.drawable.ic_action_stop_light);
@@ -87,10 +87,18 @@ public class RunFragment extends RoboFragment {
 		playButton.setImageResource(getPlayButtonResource());
 
 		if (programBinder != null && programBinder.isPaused()) {
-			exerciseProgressBar.setBarLength(5);
+			exerciseProgressBar.setProgress(0);
+			exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
+					.getCurrentExercise().getDuration()));
 			exerciseProgressBar.spin();
+
+			programProgressBar.setProgress(0);
+			programProgressBar.setBarLength(getDegrees(programBinder.getProgramMsRemaining(), duration));
+			programProgressBar.spin();
 		} else {
+			// Be careful with this, it tends to reset the amount of progress.
 			exerciseProgressBar.stopSpinning();
+			programProgressBar.stopSpinning();
 		}
 	}
 
@@ -133,7 +141,7 @@ public class RunFragment extends RoboFragment {
 				programBinder.start();
 			}
 
-			refreshButtons();
+			refreshPauseState();
 		}
 	};
 
@@ -180,17 +188,17 @@ public class RunFragment extends RoboFragment {
 
 		@Override
 		public void onProgramFinish() {
+			refreshPauseState();
 			programProgressBar.setProgress(ProgressWheel.getMax());
 			exerciseProgressBar.setProgress(ProgressWheel.getMax());
 			exerciseProgressBar.setTextLine1(formatTime(0));
 			exerciseProgressBar.setTextLine2(formatTime(0));
 			exerciseProgressBar.invalidate();
-			refreshButtons();
 		}
 
 		@Override
 		public void onStart() {
-			refreshButtons();
+			refreshPauseState();
 		}
 	};
 }

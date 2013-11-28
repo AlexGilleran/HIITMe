@@ -20,6 +20,7 @@
             progresswheel:barWidth="5dp"
             progresswheel:rimColor="#330097D6"
             progresswheel:rimWidth="2dp"
+            progresswheel:spinSpeed="1px"
             progresswheel:textColorLine1="#222"
             progresswheel:textColorLine2="#AFA"
             progresswheel:textSizeLine1="40sp"
@@ -34,7 +35,8 @@
             progresswheel:barLength="60dp"
             progresswheel:barWidth="5dp"
             progresswheel:rimColor="#330097D6"
-            progresswheel:rimWidth="2dp" />
+            progresswheel:rimWidth="2dp"
+            progresswheel:spinSpeed="1px" />
     </RelativeLayout>
 
     <LinearLayout

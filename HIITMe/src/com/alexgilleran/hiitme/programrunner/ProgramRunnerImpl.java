@@ -5,7 +5,7 @@ import android.os.CountDownTimer;
 import com.alexgilleran.hiitme.model.Program;
 
 public class ProgramRunnerImpl implements ProgramRunner {
-	private static final int DEFAULT_TICK_RATE = 100;
+	private static final int DEFAULT_TICK_RATE = 25;
 	private final int tickRate = DEFAULT_TICK_RATE;
 
 	private CountDownTimer countDown;
@@ -76,6 +76,16 @@ public class ProgramRunnerImpl implements ProgramRunner {
 		countDown.cancel();
 
 		countDown = new ProgramCountDown(programMsRemaining, tickRate);
+	}
+
+	@Override
+	public int getProgramMsRemaining() {
+		return programMsRemaining;
+	}
+
+	@Override
+	public int getExerciseMsRemaining() {
+		return exerciseMsRemaining;
 	}
 
 	private class ProgramCountDown extends CountDownTimer {

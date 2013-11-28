@@ -16,11 +16,11 @@ public interface ProgramBinder {
 	void getProgram(ProgramCallback callback);
 
 	boolean isRunning();
-	
+
 	boolean isActive();
-	
+
 	boolean isStopped();
-	
+
 	boolean isPaused();
 
 	void registerCountDownObserver(CountDownObserver observer);
@@ -28,6 +28,10 @@ public interface ProgramBinder {
 	ProgramNode getCurrentNode();
 
 	Exercise getCurrentExercise();
+
+	int getProgramMsRemaining();
+
+	int getExerciseMsRemaining();
 
 	interface ProgramCallback {
 		void onProgramReady(Program program);

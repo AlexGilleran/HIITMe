@@ -12,4 +12,8 @@ public interface ProgramRunner {
 	boolean isPaused();
 
 	boolean isStopped();
+
+	int getProgramMsRemaining();
+
+	int getExerciseMsRemaining();
 }

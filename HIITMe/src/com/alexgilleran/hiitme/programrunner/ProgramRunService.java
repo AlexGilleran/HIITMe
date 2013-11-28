@@ -167,6 +167,16 @@ public class ProgramRunService extends RoboIntentService {
 		public boolean isPaused() {
 			return programCountDown.isPaused();
 		}
+
+		@Override
+		public int getProgramMsRemaining() {
+			return programCountDown.getProgramMsRemaining();
+		}
+
+		@Override
+		public int getExerciseMsRemaining() {
+			return programCountDown.getExerciseMsRemaining();
+		}
 	}
 
 	private final CountDownObserver observerProxy = new MasterCountDownObserver(observers);
