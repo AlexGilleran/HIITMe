@@ -55,104 +55,105 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 				EffortLevel.REST);
 	}
 
-	@Test
-	public void testNestedRunThrough() {
-		// Just to make sure we don't use this by accident
-		simpleNode = null;
-
-		for (int i = 0; i < 2; i++) {
-			assertEquals(i, nestedNode.getCompletedReps());
-
-			ProgramNode step1Node = nestedNode.getCurrentExercise()
-					.getParentNode();
-
-			for (int j = 0; j < 2; j++) {
-				assertEquals(j, step1Node.getCompletedReps());
-				assertExercise(nestedNode.getCurrentExercise(), "Step 1", 100,
-						EffortLevel.HARD);
-				nestedNode.next();
-			}
-
-			ProgramNode subNode1 = nestedNode.getChildren().get(1);
-
-			// sub2Node1
-			for (int j = 0; j < 2; j++) {
-				ProgramNode sub2Node1 = subNode1.getChildren().get(0);
-				assertEquals(j, sub2Node1.getCompletedReps());
-
-				// sub3node1
-				for (int k = 0; k < 3; k++) {
-					ProgramNode sub3Node1 = sub2Node1.getChildren().get(0);
-					assertEquals(k, sub3Node1.getCompletedReps());
-
-					ProgramNode step2Node = nestedNode.getCurrentExercise()
-							.getParentNode();
-					assertExercise(nestedNode.getCurrentExercise(), "Step 2",
-							200, EffortLevel.EASY);
-					assertEquals(0, step2Node.getCompletedReps());
-					nestedNode.next();
-					assertEquals(1, step2Node.getCompletedReps());
-
-					ProgramNode step3Node = nestedNode.getCurrentExercise()
-							.getParentNode();
-					// sub3Node1 exercise 2
-					for (int l = 0; l < 3; l++) {
-						assertEquals(l, step3Node.getCompletedReps());
-						assertExercise(nestedNode.getCurrentExercise(),
-								"Step 3", 300, EffortLevel.REST);
-						nestedNode.next();
-					}
-				}
-
-				ProgramNode step4Node = nestedNode.getCurrentExercise()
-						.getParentNode();
-				assertEquals(0, step4Node.getCompletedReps());
-				assertExercise(nestedNode.getCurrentExercise(), "Step 4", 400,
-						EffortLevel.REST);
-				nestedNode.next();
-			}
-		}
-	}
-
-	@Test
-	/**
-	 * Tests a simple run through, making sure that the next() method moves through one rep at a time.
-	 */
-	public void testSimpleRunThrough() {
-		assertExercise(simpleNode.getCurrentExercise(), "Step 1", 100,
-				EffortLevel.HARD);
-		assertEquals(0, simpleNode.getCurrentExercise().getParentNode()
-				.getCompletedReps());
-		simpleNode.next();
-		assertExercise(simpleNode.getCurrentExercise(), "Step 1", 100,
-				EffortLevel.HARD);
-		assertEquals(1, simpleNode.getCurrentExercise().getParentNode()
-				.getCompletedReps());
-		simpleNode.next();
-
-		assertExercise(simpleNode.getCurrentExercise(), "Step 2", 200,
-				EffortLevel.EASY);
-		assertEquals(0, simpleNode.getCurrentExercise().getParentNode()
-				.getCompletedReps());
-		simpleNode.next();
-
-		ProgramNode node3 = simpleNode.getCurrentExercise().getParentNode();
-		assertExercise(simpleNode.getCurrentExercise(), "Step 3", 300,
-				EffortLevel.REST);
-		assertEquals(0, node3.getCompletedReps());
-		simpleNode.next();
-		assertExercise(simpleNode.getCurrentExercise(), "Step 3", 300,
-				EffortLevel.REST);
-		assertEquals(1, node3.getCompletedReps());
-		simpleNode.next();
-		assertExercise(simpleNode.getCurrentExercise(), "Step 3", 300,
-				EffortLevel.REST);
-		assertEquals(2, node3.getCompletedReps());
-		simpleNode.next();
-		assertEquals(3, node3.getCompletedReps());
-
-		assertTrue(simpleNode.isFinished());
-	}
+	// @Test
+	// public void testNestedRunThrough() {
+	// // Just to make sure we don't use this by accident
+	// simpleNode = null;
+	//
+	// for (int i = 0; i < 2; i++) {
+	// assertEquals(i, nestedNode.getCompletedReps());
+	//
+	// ProgramNode step1Node = nestedNode.getCurrentExercise()
+	// .getParentNode();
+	//
+	// for (int j = 0; j < 2; j++) {
+	// assertEquals(j, step1Node.getCompletedReps());
+	// assertExercise(nestedNode.getCurrentExercise(), "Step 1", 100,
+	// EffortLevel.HARD);
+	// nestedNode.next();
+	// }
+	//
+	// ProgramNode subNode1 = nestedNode.getChildren().get(1);
+	//
+	// // sub2Node1
+	// for (int j = 0; j < 2; j++) {
+	// ProgramNode sub2Node1 = subNode1.getChildren().get(0);
+	// assertEquals(j, sub2Node1.getCompletedReps());
+	//
+	// // sub3node1
+	// for (int k = 0; k < 3; k++) {
+	// ProgramNode sub3Node1 = sub2Node1.getChildren().get(0);
+	// assertEquals(k, sub3Node1.getCompletedReps());
+	//
+	// ProgramNode step2Node = nestedNode.getCurrentExercise()
+	// .getParentNode();
+	// assertExercise(nestedNode.getCurrentExercise(), "Step 2",
+	// 200, EffortLevel.EASY);
+	// assertEquals(0, step2Node.getCompletedReps());
+	// nestedNode.next();
+	// assertEquals(1, step2Node.getCompletedReps());
+	//
+	// ProgramNode step3Node = nestedNode.getCurrentExercise()
+	// .getParentNode();
+	// // sub3Node1 exercise 2
+	// for (int l = 0; l < 3; l++) {
+	// assertEquals(l, step3Node.getCompletedReps());
+	// assertExercise(nestedNode.getCurrentExercise(),
+	// "Step 3", 300, EffortLevel.REST);
+	// nestedNode.next();
+	// }
+	// }
+	//
+	// ProgramNode step4Node = nestedNode.getCurrentExercise()
+	// .getParentNode();
+	// assertEquals(0, step4Node.getCompletedReps());
+	// assertExercise(nestedNode.getCurrentExercise(), "Step 4", 400,
+	// EffortLevel.REST);
+	// nestedNode.next();
+	// }
+	// }
+	// }
+	//
+	// @Test
+	// /**
+	// * Tests a simple run through, making sure that the next() method moves
+	// through one rep at a time.
+	// */
+	// public void testSimpleRunThrough() {
+	// assertExercise(simpleNode.getCurrentExercise(), "Step 1", 100,
+	// EffortLevel.HARD);
+	// assertEquals(0, simpleNode.getCurrentExercise().getParentNode()
+	// .getCompletedReps());
+	// simpleNode.next();
+	// assertExercise(simpleNode.getCurrentExercise(), "Step 1", 100,
+	// EffortLevel.HARD);
+	// assertEquals(1, simpleNode.getCurrentExercise().getParentNode()
+	// .getCompletedReps());
+	// simpleNode.next();
+	//
+	// assertExercise(simpleNode.getCurrentExercise(), "Step 2", 200,
+	// EffortLevel.EASY);
+	// assertEquals(0, simpleNode.getCurrentExercise().getParentNode()
+	// .getCompletedReps());
+	// simpleNode.next();
+	//
+	// ProgramNode node3 = simpleNode.getCurrentExercise().getParentNode();
+	// assertExercise(simpleNode.getCurrentExercise(), "Step 3", 300,
+	// EffortLevel.REST);
+	// assertEquals(0, node3.getCompletedReps());
+	// simpleNode.next();
+	// assertExercise(simpleNode.getCurrentExercise(), "Step 3", 300,
+	// EffortLevel.REST);
+	// assertEquals(1, node3.getCompletedReps());
+	// simpleNode.next();
+	// assertExercise(simpleNode.getCurrentExercise(), "Step 3", 300,
+	// EffortLevel.REST);
+	// assertEquals(2, node3.getCompletedReps());
+	// simpleNode.next();
+	// assertEquals(3, node3.getCompletedReps());
+	//
+	// assertTrue(simpleNode.isFinished());
+	// }
 
 	@Test
 	/**

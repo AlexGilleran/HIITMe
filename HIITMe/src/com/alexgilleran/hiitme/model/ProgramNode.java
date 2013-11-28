@@ -18,12 +18,8 @@ public class ProgramNode extends Model {
 
 	private List<ProgramNode> children;
 
-	private int completedReps;
-	private int currentChildIndex;
-
 	public ProgramNode() {
 		super();
-		reset();
 	}
 
 	public ProgramNode(int repCount) {
@@ -34,10 +30,6 @@ public class ProgramNode extends Model {
 
 	public void prepareForSave() {
 
-	}
-
-	public int getCompletedReps() {
-		return completedReps;
 	}
 
 	public ProgramNode addChildNode(int repCount) {
@@ -67,88 +59,8 @@ public class ProgramNode extends Model {
 		}
 	}
 
-	public void next() {
-		if (isFinished()) {
-			throw new RuntimeException(
-					"next() called on finished node - node must be reset before next() is called again");
-		}
-
-		if (this.hasChildren()) {
-			// the next node.
-			ProgramNode currentNode = getCurrentNode();
-			currentNode.next();
-
-			if (currentNode.isFinished()) {
-				// Current node finished, go to the next one
-				nextNode();
-			}
-		} else {
-			nextNode();
-		}
-	}
-
 	public boolean hasChildren() {
 		return !getChildren().isEmpty();
-	}
-
-	private void nextNode() {
-		currentChildIndex++;
-
-		if (currentChildIndex >= getChildren().size()) {
-			nextRep();
-		}
-	}
-
-	private void nextRep() {
-		completedReps++;
-
-		currentChildIndex = 0;
-
-		if (!isFinished()) {
-			resetChildren();
-		}
-	}
-
-	public boolean isFinished() {
-		return completedReps >= getTotalReps();
-	}
-
-	public void reset() {
-		completedReps = 0;
-		currentChildIndex = 0;
-
-		resetChildren();
-	}
-
-	private void resetChildren() {
-		for (ProgramNode node : getChildren()) {
-			node.reset();
-		}
-	}
-
-	public ProgramNode getCurrentNode() {
-		if (isFinished()) {
-			throw new RuntimeException("getCurrentNode() called on finished ProgramNode");
-		}
-
-		if (this.hasChildren()) {
-			return this.getChildren().get(currentChildIndex);
-		} else {
-			return this;
-		}
-	}
-
-	public Exercise getCurrentExercise() {
-		if (getAttachedExercise() != null) {
-			return getAttachedExercise();
-		}
-
-		ProgramNode currentNode = getCurrentNode();
-		if (currentNode != this) {
-			return getCurrentNode().getCurrentExercise();
-		} else {
-			return null;
-		}
 	}
 
 	public int getDuration() {

@@ -202,8 +202,8 @@ public class RunFragment extends RoboFragment {
 			exerciseProgressBar.setTextLine1(formatTime(exerciseMsRemaining));
 			exerciseProgressBar.setTextLine2(formatTime(programMsRemaining));
 
-			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, program.getAssociatedNode()
-					.getCurrentExercise().getDuration(), EXERCISE_WHEEL_START_DEGREES));
+			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, programBinder.getCurrentExercise()
+					.getDuration(), EXERCISE_WHEEL_START_DEGREES));
 			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
 		}
 

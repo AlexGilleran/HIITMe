@@ -100,7 +100,6 @@ public class ProgramRunService extends RoboIntentService {
 			if (programRunner == null || programRunner.isStopped()) {
 				startForeground(1, notification);
 
-				program.getAssociatedNode().reset();
 				programRunner = new ProgramRunnerImpl(program, observerProxy);
 
 				programRunner.start();
@@ -145,12 +144,12 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public ProgramNode getCurrentNode() {
-			return program.getAssociatedNode().getCurrentNode();
+			return programRunner.getCurrentNode();
 		}
 
 		@Override
 		public Exercise getCurrentExercise() {
-			return program.getAssociatedNode().getCurrentExercise();
+			return programRunner.getCurrentExercise();
 		}
 
 		@Override

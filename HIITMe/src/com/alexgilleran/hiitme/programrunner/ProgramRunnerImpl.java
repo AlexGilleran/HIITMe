@@ -2,15 +2,17 @@ package com.alexgilleran.hiitme.programrunner;
 
 import android.os.CountDownTimer;
 
+import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.ProgramNode;
 
 public class ProgramRunnerImpl implements ProgramRunner {
 	private static final int DEFAULT_TICK_RATE = 25;
-	private final int tickRate = DEFAULT_TICK_RATE;
+	private final int tickRate;
 
 	private CountDownTimer countDown;
 
-	private Program program;
+	private ProgramNodeState programState;
 	private CountDownObserver observer;
 	private int exerciseMsRemaining;
 	private int programMsRemaining;
@@ -23,12 +25,13 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	}
 
 	public ProgramRunnerImpl(Program program, CountDownObserver observer, int tickRate) {
-		this.program = program;
+		this.programState = new ProgramNodeState(program.getAssociatedNode());
 		this.observer = observer;
-		this.exerciseMsRemaining = program.getAssociatedNode().getCurrentExercise().getDuration();
+		this.exerciseMsRemaining = programState.getCurrentExercise().getDuration();
 		this.programMsRemaining = program.getAssociatedNode().getDuration();
 
 		countDown = new ProgramCountDown(programMsRemaining, tickRate);
+		this.tickRate = tickRate;
 	}
 
 	@Override
@@ -66,6 +69,16 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	@Override
 	public boolean isStopped() {
 		return stopped;
+	}
+
+	@Override
+	public Exercise getCurrentExercise() {
+		return programState.getCurrentExercise();
+	}
+
+	@Override
+	public ProgramNode getCurrentNode() {
+		return programState.getCurrentNode();
 	}
 
 	@Override
@@ -113,12 +126,12 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 			if (exerciseMsRemaining <= 0) {
 				observer.onExerciseFinish();
-				program.getAssociatedNode().next();
+				programState.next();
 
 				// Adding rather than assigning the next exercise duration means
 				// that any time leftover from the first exercise is subtracted
 				// from the next one.
-				exerciseMsRemaining += program.getAssociatedNode().getCurrentExercise().getDuration();
+				exerciseMsRemaining += programState.getCurrentExercise().getDuration();
 			}
 
 			observer.onTick(exerciseMsRemaining, millisUntilFinished);
