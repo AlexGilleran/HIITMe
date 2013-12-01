@@ -14,7 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.TableLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -25,18 +26,17 @@ import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvider;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
 
-public class ProgramNodeView extends TableRow {
-	private final Map<Exercise, TableRow> exerciseRows = new HashMap<Exercise, TableRow>();
+public class ProgramNodeView extends RelativeLayout {
+	private final Map<Exercise, View> exerciseViews = new HashMap<Exercise, View>();
 	private final List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
 
 	private ProgramNode programNode;
 
 	private TextView repView;
-	private EditExerciseListener editListener;
 	private ImageButton addExerciseButton;
 	private ImageButton addGroupButton;
 	private ImageButton moveButton;
-	private TableLayout repLayout;
+	private LinearLayout repLayout;
 
 	private DragPlaceholderProvider placeholderProvider;
 
@@ -67,7 +67,7 @@ public class ProgramNodeView extends TableRow {
 				.findViewById(R.id.button_add_group);
 		this.moveButton = (ImageButton) this
 				.findViewById(R.id.button_move_program_group);
-		this.repLayout = (TableLayout) this.findViewById(R.id.layout_reps);
+		this.repLayout = (LinearLayout) this.findViewById(R.id.layout_reps);
 
 		addGroupButton.setOnClickListener(addGroupListener);
 		addExerciseButton.setOnClickListener(addExerciseListener);
@@ -93,16 +93,16 @@ public class ProgramNodeView extends TableRow {
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
 			ProgramNode child = programNode.getChildren().get(i);
-			TableRow newRow;
+			View newView;
 
 			if (child.getAttachedExercise() != null) {
-				newRow = buildExerciseView(child.getAttachedExercise());
-				exerciseRows.put(child.getAttachedExercise(), newRow);
+				newView = buildExerciseView(child.getAttachedExercise());
+				exerciseViews.put(child.getAttachedExercise(), newView);
 			} else {
-				newRow = buildProgramNodeView(child);
+				newView = buildProgramNodeView(child);
 			}
 
-			repLayout.addView(newRow, i);
+			repLayout.addView(newView, i);
 		}
 
 		TextView repCountView = (TextView) this
@@ -124,12 +124,6 @@ public class ProgramNodeView extends TableRow {
 
 		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
-		exerciseView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				editListener.onEditExercise(exercise);
-			}
-		});
 
 		return exerciseView;
 	}
@@ -142,17 +136,13 @@ public class ProgramNodeView extends TableRow {
 	 * @param node
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
-	private TableRow buildProgramNodeView(ProgramNode node) {
+	private View buildProgramNodeView(ProgramNode node) {
 		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
 				R.layout.view_program_node, null);
 		nodeView.setProgramNode(node);
 		subViews.add(nodeView);
 
 		return nodeView;
-	}
-
-	public void setEditExerciseListener(EditExerciseListener listener) {
-		this.editListener = listener;
 	}
 
 	private void insertAfter(float y, View view) {
@@ -165,7 +155,7 @@ public class ProgramNodeView extends TableRow {
 			return;
 		}
 		for (int i = 0; i < repLayout.getChildCount(); i++) {
-			TableRow row = (TableRow) repLayout.getChildAt(i);
+			View row = (View) repLayout.getChildAt(i);
 			if (y > row.getY() - row.getHeight() / 2
 					&& y < row.getY() + row.getHeight() / 2) {
 				repLayout.addView(view, i);

@@ -2,7 +2,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <!-- This is the line -->
-    <item android:right="-3dp">
+    <item android:right="-300dp"
+        >
         <shape>
             <solid android:color="@android:color/transparent" />
 

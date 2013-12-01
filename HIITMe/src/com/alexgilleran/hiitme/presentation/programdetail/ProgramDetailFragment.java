@@ -67,7 +67,6 @@ public class ProgramDetailFragment extends RoboFragment implements
 
 		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
 				R.layout.view_program_node, null);
-		nodeView.setEditExerciseListener(ProgramDetailFragment.this);
 		nodeView.setProgramNode(program.getAssociatedNode());
 
 		repGroupLayout.addView(nodeView, 0);
