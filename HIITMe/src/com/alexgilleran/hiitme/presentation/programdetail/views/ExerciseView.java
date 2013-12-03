@@ -6,13 +6,14 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TableRow;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 
-public class ExerciseView extends TableRow {
+public class ExerciseView extends LinearLayout {
 	private Spinner effortLevel;
 	private EditText duration;
 	private Exercise exercise;

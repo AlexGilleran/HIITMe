@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:id="@+id/program_node_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="5dp"
     android:layout_marginLeft="5dp"
     android:layout_marginTop="5dp"
@@ -27,7 +28,8 @@
         android:id="@+id/button_add_exercise"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_below="@id/textview_x"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/textview_x"
         android:adjustViewBounds="true"
         android:background="?android:attr/selectableItemBackground"
         android:scaleType="centerInside"
@@ -37,7 +39,8 @@
         android:id="@+id/button_add_group"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_below="@id/button_add_exercise"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/button_add_exercise"
         android:adjustViewBounds="true"
         android:background="?android:attr/selectableItemBackground"
         android:scaleType="centerInside"
@@ -47,19 +50,11 @@
         android:id="@+id/button_move_program_group"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_below="@id/button_add_group"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/button_add_group"
         android:adjustViewBounds="true"
         android:background="?android:attr/selectableItemBackground"
         android:scaleType="centerInside"
         android:src="@drawable/ic_move" />
-
-    <LinearLayout
-        android:id="@+id/layout_reps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/textview_x"
-        android:orientation="vertical" >
-    </LinearLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>

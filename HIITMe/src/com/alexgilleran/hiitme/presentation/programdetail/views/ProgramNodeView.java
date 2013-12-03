@@ -1,9 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import android.content.ClipData;
 import android.content.Context;
@@ -24,19 +22,17 @@ import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvider;
-import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ProgramNodeView extends RelativeLayout {
-	private final Map<Exercise, View> exerciseViews = new HashMap<Exercise, View>();
-	private final List<ProgramNodeView> subViews = new ArrayList<ProgramNodeView>();
-
 	private ProgramNode programNode;
 
 	private TextView repView;
 	private ImageButton addExerciseButton;
 	private ImageButton addGroupButton;
 	private ImageButton moveButton;
-	private LinearLayout repLayout;
+
+	private List<View> subNodeViews = new LinkedList<View>();
 
 	private DragPlaceholderProvider placeholderProvider;
 
@@ -61,13 +57,9 @@ public class ProgramNodeView extends RelativeLayout {
 
 		this.repView = (TextView) this.findViewById(R.id.textview_repcount);
 
-		this.addExerciseButton = (ImageButton) this
-				.findViewById(R.id.button_add_exercise);
-		this.addGroupButton = (ImageButton) this
-				.findViewById(R.id.button_add_group);
-		this.moveButton = (ImageButton) this
-				.findViewById(R.id.button_move_program_group);
-		this.repLayout = (LinearLayout) this.findViewById(R.id.layout_reps);
+		this.addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
+		this.addGroupButton = (ImageButton) this.findViewById(R.id.button_add_group);
+		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
 
 		addGroupButton.setOnClickListener(addGroupListener);
 		addExerciseButton.setOnClickListener(addExerciseListener);
@@ -77,9 +69,9 @@ public class ProgramNodeView extends RelativeLayout {
 	}
 
 	public void edit() {
-		for (ProgramNodeView nodeView : subViews) {
-			nodeView.edit();
-		}
+		// for (View nodeView : subViews) {
+		// nodeView.edit();
+		// }
 	}
 
 	public void setProgramNode(ProgramNode programNode) {
@@ -89,7 +81,10 @@ public class ProgramNodeView extends RelativeLayout {
 	}
 
 	private void render() {
-		repLayout.removeAllViews();
+		for (View view : subNodeViews) {
+			removeView(view);
+		}
+		subNodeViews.clear();
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
 			ProgramNode child = programNode.getChildren().get(i);
@@ -97,16 +92,27 @@ public class ProgramNodeView extends RelativeLayout {
 
 			if (child.getAttachedExercise() != null) {
 				newView = buildExerciseView(child.getAttachedExercise());
-				exerciseViews.put(child.getAttachedExercise(), newView);
 			} else {
 				newView = buildProgramNodeView(child);
 			}
 
-			repLayout.addView(newView, i);
+			newView.setId(ViewUtils.generateViewId());
+
+			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+			if (subNodeViews.isEmpty()) {
+				layoutParams.addRule(ALIGN_PARENT_TOP, TRUE);
+			} else {
+				layoutParams.addRule(BELOW, subNodeViews.get(subNodeViews.size() - 1).getId());
+			}
+			layoutParams.addRule(RIGHT_OF, R.id.textview_x);
+
+			subNodeViews.add(newView);
+			this.addView(newView, layoutParams);
+			((LayoutParams) addExerciseButton.getLayoutParams()).addRule(BELOW, newView.getId());
 		}
 
-		TextView repCountView = (TextView) this
-				.findViewById(R.id.textview_repcount);
+		TextView repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
 	}
 
@@ -119,8 +125,7 @@ public class ProgramNodeView extends RelativeLayout {
 	 *            The {@link Exercise} to source data from.
 	 */
 	private ExerciseView buildExerciseView(final Exercise exercise) {
-		ExerciseView exerciseView = (ExerciseView) inflater.inflate(
-				R.layout.view_exercise, null);
+		ExerciseView exerciseView = (ExerciseView) inflater.inflate(R.layout.view_exercise, null);
 
 		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
@@ -137,33 +142,31 @@ public class ProgramNodeView extends RelativeLayout {
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
 	private View buildProgramNodeView(ProgramNode node) {
-		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
-				R.layout.view_program_node, null);
+		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(R.layout.view_program_node, null);
 		nodeView.setProgramNode(node);
-		subViews.add(nodeView);
 
 		return nodeView;
 	}
 
 	private void insertAfter(float y, View view) {
 		// TODO: This is a mess but it feels roughly right... improve it.
-		y = y - view.getHeight() / 2;
-		if (repLayout.getChildCount() == 0
-				|| y < (repLayout.getChildAt(0).getY() + repLayout
-						.getChildAt(0).getHeight() / 2)) {
-			repLayout.addView(view, 0);
-			return;
-		}
-		for (int i = 0; i < repLayout.getChildCount(); i++) {
-			View row = (View) repLayout.getChildAt(i);
-			if (y > row.getY() - row.getHeight() / 2
-					&& y < row.getY() + row.getHeight() / 2) {
-				repLayout.addView(view, i);
-				return;
-			}
-		}
-		repLayout.addView(view, repLayout.getChildCount());
-		view.requestLayout();
+		// y = y - view.getHeight() / 2;
+		// if (repLayout.getChildCount() == 0
+		// || y < (repLayout.getChildAt(0).getY() +
+		// repLayout.getChildAt(0).getHeight() / 2)) {
+		// repLayout.addView(view, 0);
+		// return;
+		// }
+		// for (int i = 0; i < repLayout.getChildCount(); i++) {
+		// View row = (View) repLayout.getChildAt(i);
+		// if (y > row.getY() - row.getHeight() / 2 && y < row.getY() +
+		// row.getHeight() / 2) {
+		// repLayout.addView(view, i);
+		// return;
+		// }
+		// }
+		// repLayout.addView(view, repLayout.getChildCount());
+		// view.requestLayout();
 	}
 
 	private void movePlaceholder(float y) {
@@ -174,8 +177,8 @@ public class ProgramNodeView extends RelativeLayout {
 
 	private void clearPlaceholder() {
 		if (placeholderProvider.getDragPlaceholder().getParent() != null) {
-			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent())
-					.removeView(placeholderProvider.getDragPlaceholder());
+			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent()).removeView(placeholderProvider
+					.getDragPlaceholder());
 		}
 	}
 
@@ -240,8 +243,7 @@ public class ProgramNodeView extends RelativeLayout {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			ClipData data = ClipData.newPlainText("", "");
-			DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
-					ProgramNodeView.this);
+			DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(ProgramNodeView.this);
 			startDrag(data, shadowBuilder, ProgramNodeView.this, 0);
 			ProgramNodeView.this.setVisibility(GONE);
 			return true;
