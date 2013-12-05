@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
+import android.widget.FrameLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
@@ -21,7 +21,8 @@ import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
  * either contained in a {@link ProgramListActivity} in two-pane mode (on
  * tablets) or a {@link ProgramDetailActivity} on handsets.
  */
-public class ProgramDetailFragment extends RoboFragment implements EditExerciseListener {
+public class ProgramDetailFragment extends RoboFragment implements
+		EditExerciseListener {
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -33,7 +34,7 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	private Program program;
 
 	@InjectView(R.id.frag_programdetail_scrollcontainer)
-	private ScrollView container;
+	private FrameLayout container;
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -50,10 +51,12 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		this.inflater = inflater;
 
-		View rootView = inflater.inflate(R.layout.fragment_program_detail, container, false);
+		View rootView = inflater.inflate(R.layout.fragment_program_detail,
+				container, false);
 
 		return rootView;
 	}
@@ -62,7 +65,8 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(R.layout.view_program_node, null);
+		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(
+				R.layout.view_program_node, null);
 		nodeView.setProgramNode(program.getAssociatedNode());
 
 		container.addView(nodeView);

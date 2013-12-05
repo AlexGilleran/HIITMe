@@ -1,16 +1,14 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import static java.lang.Integer.parseInt;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import android.content.ClipData;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -40,7 +38,7 @@ public class ProgramNodeView extends LinearLayout {
 
 	private List<View> subNodeViews = new LinkedList<View>();
 
-	private static final int[] BG_COLOURS = new int[] { 0xFFE2F4FB, 0xFFFFFFFF };
+	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
 
 	private DragPlaceholderProvider placeholderProvider;
 
@@ -104,24 +102,23 @@ public class ProgramNodeView extends LinearLayout {
 			if (child.getAttachedExercise() != null) {
 				newView = buildExerciseView(child.getAttachedExercise());
 			} else {
+				if (i > 0 && programNode.getChildren().get(i - 1).getAttachedExercise() == null) {
+					View spacer = inflater.inflate(R.layout.spacer, null);
+					subNodeViews.add(spacer);
+					addView(spacer);
+				}
 				newView = buildProgramNodeView(child);
 			}
 
 			newView.setId(ViewUtils.generateViewId());
 
 			subNodeViews.add(newView);
-			this.addView(newView);
-
-			if (i + 1 < programNode.getChildren().size()) {
-				View spacer = new View(getContext());
-				subNodeViews.add(spacer);
-				this.addView(spacer);
-				spacer.getLayoutParams().height = 20;
-				spacer.setLayoutParams(spacer.getLayoutParams());
-			}
+			addView(newView);
 		}
 
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
+		LayerDrawable background = (LayerDrawable) getBackground().mutate();
+		((GradientDrawable) background.findDrawableByLayerId(R.id.card)).setColor(determineBgColour());
 		// this.getBackground().setColorFilter(determineBgColour(),
 		// Mode.OVERLAY);
 		// setBackgroundColor(determineBgColour());
