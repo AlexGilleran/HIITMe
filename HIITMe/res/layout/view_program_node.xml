@@ -1,60 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/program_node_view"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
-    android:layout_marginLeft="5dp"
-    android:layout_marginTop="5dp"
+    android:layout_margin="10dp"
     android:background="@drawable/border_exercise"
-    android:paddingBottom="5dp"
-    android:paddingLeft="5dp"
-    android:paddingTop="5dp" >
+    android:orientation="vertical"
+    android:padding="10dp" >
 
-    <EditText
-        android:id="@+id/textview_repcount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/textview_x"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/textview_repcount"
-        android:text="x" />
+        <TextView
+            android:id="@+id/textview_x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="x" />
 
-    <ImageButton
-        android:id="@+id/button_add_exercise"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/textview_x"
-        android:adjustViewBounds="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_exercise_add" />
+        <TextView
+            android:id="@+id/textview_repcount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <ImageButton
-        android:id="@+id/button_add_group"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/button_add_exercise"
-        android:adjustViewBounds="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_program_node_add" />
+        <ImageButton
+            android:id="@+id/button_add_exercise"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:adjustViewBounds="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_exercise_add" />
 
-    <ImageButton
-        android:id="@+id/button_move_program_group"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/button_add_group"
-        android:adjustViewBounds="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_move" />
+        <ImageButton
+            android:id="@+id/button_add_group"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:adjustViewBounds="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_program_node_add" />
+
+        <ImageButton
+            android:id="@+id/button_move_program_group"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:adjustViewBounds="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_move" />
+    </LinearLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>

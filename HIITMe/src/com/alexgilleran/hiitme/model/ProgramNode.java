@@ -109,6 +109,14 @@ public class ProgramNode extends Model {
 		this.parent = parent;
 	}
 
+	public int getDepth() {
+		if (this.parent == null) {
+			return 0;
+		} else {
+			return parent.getDepth() + 1;
+		}
+	}
+
 	@Override
 	public void save() {
 		ActiveAndroid.beginTransaction();

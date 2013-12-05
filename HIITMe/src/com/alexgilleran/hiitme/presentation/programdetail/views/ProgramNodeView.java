@@ -1,10 +1,15 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import static java.lang.Integer.parseInt;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuff.Mode;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -13,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -24,29 +28,36 @@ import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvider;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
-public class ProgramNodeView extends RelativeLayout {
+public class ProgramNodeView extends LinearLayout {
+	private static final int HEX_RADIX = 16;
+
 	private ProgramNode programNode;
 
-	private TextView repView;
+	private TextView repCountView;
 	private ImageButton addExerciseButton;
 	private ImageButton addGroupButton;
 	private ImageButton moveButton;
 
 	private List<View> subNodeViews = new LinkedList<View>();
 
+	private static final int[] BG_COLOURS = new int[] { 0xFFE2F4FB, 0xFFFFFFFF };
+
 	private DragPlaceholderProvider placeholderProvider;
 
-	private final LayoutInflater inflater;
+	private LayoutInflater inflater;
 
 	public ProgramNodeView(Context context) {
 		super(context);
-
-		inflater = LayoutInflater.from(context);
+		init();
 	}
 
 	public ProgramNodeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		inflater = LayoutInflater.from(context);
+		init();
+	}
+
+	private void init() {
+		inflater = LayoutInflater.from(getContext());
 	}
 
 	@Override
@@ -55,7 +66,7 @@ public class ProgramNodeView extends RelativeLayout {
 			placeholderProvider = (DragPlaceholderProvider) getContext();
 		}
 
-		this.repView = (TextView) this.findViewById(R.id.textview_repcount);
+		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 
 		this.addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
 		this.addGroupButton = (ImageButton) this.findViewById(R.id.button_add_group);
@@ -98,22 +109,27 @@ public class ProgramNodeView extends RelativeLayout {
 
 			newView.setId(ViewUtils.generateViewId());
 
-			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-			if (subNodeViews.isEmpty()) {
-				layoutParams.addRule(ALIGN_PARENT_TOP, TRUE);
-			} else {
-				layoutParams.addRule(BELOW, subNodeViews.get(subNodeViews.size() - 1).getId());
-			}
-			layoutParams.addRule(RIGHT_OF, R.id.textview_x);
-
 			subNodeViews.add(newView);
-			this.addView(newView, layoutParams);
-			((LayoutParams) addExerciseButton.getLayoutParams()).addRule(BELOW, newView.getId());
+			this.addView(newView);
+
+			if (i + 1 < programNode.getChildren().size()) {
+				View spacer = new View(getContext());
+				subNodeViews.add(spacer);
+				this.addView(spacer);
+				spacer.getLayoutParams().height = 20;
+				spacer.setLayoutParams(spacer.getLayoutParams());
+			}
 		}
 
-		TextView repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
+		// this.getBackground().setColorFilter(determineBgColour(),
+		// Mode.OVERLAY);
+		// setBackgroundColor(determineBgColour());
+	}
+
+	private int determineBgColour() {
+		int colorIndex = programNode.getDepth() % BG_COLOURS.length;
+		return BG_COLOURS[colorIndex];
 	}
 
 	/**
