@@ -7,20 +7,28 @@
             android:shape="rectangle" >
             <corners android:radius="3dp" />
 
-            <solid android:color="#ccc" />
+            <solid android:color="#c7c7c7" />
         </shape>
     </item>
-    <item
-        android:id="@+id/card"
-        android:bottom="1dp">
+    <item android:top="1px">
         <shape
             android:dither="true"
             android:shape="rectangle" >
             <corners android:radius="3dp" />
 
-            <stroke
-                android:width="1px"
-                android:color="#ccc" />
+            <solid android:color="#cccccc" />
+        </shape>
+    </item>
+    <item
+        android:id="@+id/card"
+        android:bottom="1.8dp"
+        android:left="1px"
+        android:right="1px"
+        android:top="1px">
+        <shape
+            android:dither="true"
+            android:shape="rectangle" >
+            <corners android:radius="3dp" />
 
             <solid android:color="@android:color/white" />
 

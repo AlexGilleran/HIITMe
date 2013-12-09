@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -27,8 +26,6 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvide
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ProgramNodeView extends LinearLayout {
-	private static final int HEX_RADIX = 16;
-
 	private ProgramNode programNode;
 
 	private TextView repCountView;
@@ -40,7 +37,7 @@ public class ProgramNodeView extends LinearLayout {
 
 	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
 
-	private DragPlaceholderProvider placeholderProvider;
+	// private DragPlaceholderProvider placeholderProvider;
 
 	private LayoutInflater inflater;
 
@@ -60,9 +57,9 @@ public class ProgramNodeView extends LinearLayout {
 
 	@Override
 	public void onFinishInflate() {
-		if (getContext() instanceof DragPlaceholderProvider) {
-			placeholderProvider = (DragPlaceholderProvider) getContext();
-		}
+		// if (getContext() instanceof DragPlaceholderProvider) {
+		// placeholderProvider = (DragPlaceholderProvider) getContext();
+		// }
 
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 
@@ -102,14 +99,14 @@ public class ProgramNodeView extends LinearLayout {
 			if (child.getAttachedExercise() != null) {
 				newView = buildExerciseView(child.getAttachedExercise());
 			} else {
-				if (i > 0 && programNode.getChildren().get(i - 1).getAttachedExercise() == null) {
-					View spacer = inflater.inflate(R.layout.spacer, null);
-					subNodeViews.add(spacer);
-					addView(spacer);
-				}
 				newView = buildProgramNodeView(child);
 			}
 
+			if (i > 0) {
+				View spacer = inflater.inflate(R.layout.spacer, null);
+				subNodeViews.add(spacer);
+				addView(spacer);
+			}
 			newView.setId(ViewUtils.generateViewId());
 
 			subNodeViews.add(newView);
@@ -163,70 +160,68 @@ public class ProgramNodeView extends LinearLayout {
 
 	private void insertAfter(float y, View view) {
 		// TODO: This is a mess but it feels roughly right... improve it.
-		// y = y - view.getHeight() / 2;
-		// if (repLayout.getChildCount() == 0
-		// || y < (repLayout.getChildAt(0).getY() +
-		// repLayout.getChildAt(0).getHeight() / 2)) {
-		// repLayout.addView(view, 0);
-		// return;
-		// }
-		// for (int i = 0; i < repLayout.getChildCount(); i++) {
-		// View row = (View) repLayout.getChildAt(i);
-		// if (y > row.getY() - row.getHeight() / 2 && y < row.getY() +
-		// row.getHeight() / 2) {
-		// repLayout.addView(view, i);
-		// return;
-		// }
-		// }
-		// repLayout.addView(view, repLayout.getChildCount());
-		// view.requestLayout();
+		y = y - view.getHeight() / 2;
+		if (this.getChildCount() == 0 || y < (this.getChildAt(0).getY() + this.getChildAt(0).getHeight() / 2)) {
+			this.addView(view, 0);
+			return;
+		}
+		for (int i = 0; i < this.getChildCount(); i++) {
+			View row = (View) this.getChildAt(i);
+			if (y > row.getY() && y < row.getY() + row.getHeight()) {
+				this.addView(view, i);
+				return;
+			}
+		}
+		this.addView(view, this.getChildCount());
+		view.requestLayout();
 	}
 
-	private void movePlaceholder(float y) {
-		clearPlaceholder();
+	private void movePlaceholder(View view, float y) {
+		clearPlaceholder(view);
 
-		insertAfter(y, placeholderProvider.getDragPlaceholder());
+		insertAfter(y, view);
 	}
 
-	private void clearPlaceholder() {
-		if (placeholderProvider.getDragPlaceholder().getParent() != null) {
-			((ViewGroup) placeholderProvider.getDragPlaceholder().getParent()).removeView(placeholderProvider
-					.getDragPlaceholder());
+	private void clearPlaceholder(View view) {
+		if (view.getParent() != null) {
+			((ViewGroup) view.getParent()).removeView(view);
 		}
 	}
 
 	private OnDragListener dragListener = new OnDragListener() {
 		@Override
-		public boolean onDrag(View v, DragEvent event) {
+		public boolean onDrag(View reciever, DragEvent event) {
 			int action = event.getAction();
 			float y = event.getY();
-			View view;
+			View draggedView = (View) event.getLocalState();
 
 			switch (action) {
 			case DragEvent.ACTION_DRAG_STARTED:
 				// do nothing
 				break;
 			case DragEvent.ACTION_DRAG_ENTERED:
-				movePlaceholder(event.getY());
+				movePlaceholder(draggedView, event.getY());
 				break;
 			case DragEvent.ACTION_DRAG_EXITED:
 				// ProgramNodeView.this.setOnTouchListener(null);
-				clearPlaceholder();
+				clearPlaceholder(draggedView);
 				break;
 			case DragEvent.ACTION_DROP:
-				clearPlaceholder();
-				view = (View) event.getLocalState();
+				clearPlaceholder(draggedView);
+				draggedView = (View) event.getLocalState();
 				// Dropped, reassign View to ViewGroup
-				ViewGroup owner = (ViewGroup) view.getParent();
-				owner.removeView(view);
-				insertAfter(y, view);
-				view.setVisibility(View.VISIBLE);
+				if (draggedView.getParent() != null) {
+					ViewGroup owner = (ViewGroup) draggedView.getParent();
+					owner.removeView(draggedView);
+				}
+				insertAfter(y, draggedView);
+				// draggedView.setVisibility(View.VISIBLE);
 				break;
 			case DragEvent.ACTION_DRAG_ENDED:
-				clearPlaceholder();
+				clearPlaceholder(draggedView);
 				break;
 			case DragEvent.ACTION_DRAG_LOCATION:
-				movePlaceholder(event.getY());
+				movePlaceholder(draggedView, event.getY());
 				break;
 			default:
 				break;
@@ -252,13 +247,15 @@ public class ProgramNodeView extends LinearLayout {
 	};
 
 	private final OnTouchListener moveListener = new OnTouchListener() {
-
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			ClipData data = ClipData.newPlainText("", "");
-			DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(ProgramNodeView.this);
+			DragShadowBuilder shadowBuilder = new View.DragShadowBuilder();
 			startDrag(data, shadowBuilder, ProgramNodeView.this, 0);
-			ProgramNodeView.this.setVisibility(GONE);
+			// ProgramNodeView.this.setVisibility(GONE);
+			if (getParent() != null) {
+				((ViewGroup) getParent()).removeView(ProgramNodeView.this);
+			}
 			return true;
 		}
 	};
