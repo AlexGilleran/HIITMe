@@ -22,12 +22,16 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
+import com.alexgilleran.hiitme.sound.SoundPlayer;
 import com.google.inject.Inject;
 
 public class ProgramRunService extends RoboIntentService {
 
 	@Inject
 	private ProgramDAO programDao;
+
+	@Inject
+	private SoundPlayer soundPlayer;
 
 	private Program program;
 
@@ -205,6 +209,7 @@ public class ProgramRunService extends RoboIntentService {
 
 		@Override
 		public void onExerciseFinish() {
+			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
 			for (CountDownObserver observer : observers) {
 				observer.onExerciseFinish();
 			}
