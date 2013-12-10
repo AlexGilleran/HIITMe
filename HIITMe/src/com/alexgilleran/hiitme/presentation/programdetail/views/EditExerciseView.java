@@ -69,7 +69,7 @@ public class EditExerciseView extends LinearLayout implements
 	@Override
 	public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
 		if (picker == repCountPicker) {
-			exercise.getExerciseGroup().setTotalReps(newVal);
+			exercise.getParentNode().setTotalReps(newVal);
 		} else {
 			exercise.setDuration(getDuration());
 		}

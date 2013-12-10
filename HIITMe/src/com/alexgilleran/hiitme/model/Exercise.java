@@ -35,10 +35,6 @@ public class Exercise extends Model {
 		return exerciseGroup;
 	}
 
-	public ProgramNode getExerciseGroup() {
-		return exerciseGroup;
-	}
-
 	public void setExerciseGroup(ProgramNode exerciseGroup) {
 		this.exerciseGroup = exerciseGroup;
 	}

@@ -77,7 +77,7 @@ public class Program extends Model {
 		ProgramNodeState state = new ProgramNodeState(getAssociatedNode());
 
 		while (!state.isFinished()) {
-			result.add(state.getCurrentNode());
+			result.add(state.getCurrentExercise().getParentNode());
 			state.next();
 		}
 

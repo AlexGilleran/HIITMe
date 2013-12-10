@@ -36,7 +36,7 @@ public class EditExerciseFragment extends RoboDialogFragment {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				exercise.save();
-				exercise.getExerciseGroup().save();
+				exercise.getParentNode().save();
 			}
 		});
 
