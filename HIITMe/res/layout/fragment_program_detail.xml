@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<view xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    ProgramDetailFragmentView=""
+    class="com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment$ProgramDetailFragmentView"
     android:fillViewport="false" >
 
     <FrameLayout
@@ -11,4 +14,4 @@
         android:padding="5dp" >
     </FrameLayout>
 
-</ScrollView>
+</view>

@@ -29,7 +29,7 @@ import com.google.inject.Inject;
  * This activity is mostly just a 'shell' activity containing nothing more than
  * a {@link ProgramDetailFragment}.
  */
-public class ProgramDetailActivity extends RoboFragmentActivity implements DragPlaceholderProvider {
+public class ProgramDetailActivity extends RoboFragmentActivity {
 	@Inject
 	private ProgramDAO programDao;
 
@@ -38,8 +38,6 @@ public class ProgramDetailActivity extends RoboFragmentActivity implements DragP
 	private RunFragment runFragment;
 
 	private Program program;
-
-	private View dragPlaceholder;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,11 +49,9 @@ public class ProgramDetailActivity extends RoboFragmentActivity implements DragP
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		if (savedInstanceState == null) {
-			FragmentTransaction transaction = getSupportFragmentManager()
-					.beginTransaction();
+			FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-			program = programDao.getProgram(getIntent().getLongExtra(
-					Program.PROGRAM_ID_NAME, -1));
+			program = programDao.getProgram(getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
 
 			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
 			detailFragment.setProgram(program);
@@ -63,9 +59,6 @@ public class ProgramDetailActivity extends RoboFragmentActivity implements DragP
 
 			transaction.commit();
 		}
-
-		dragPlaceholder = getLayoutInflater().inflate(
-				R.layout.view_move_placeholder, null);
 	}
 
 	@Override
@@ -77,8 +70,7 @@ public class ProgramDetailActivity extends RoboFragmentActivity implements DragP
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			NavUtils.navigateUpTo(this, new Intent(this,
-					ProgramListActivity.class));
+			NavUtils.navigateUpTo(this, new Intent(this, ProgramListActivity.class));
 			return true;
 		case R.id.actionbar_icon_run:
 			if (runFragment == null) {
@@ -104,10 +96,5 @@ public class ProgramDetailActivity extends RoboFragmentActivity implements DragP
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.run_menu, menu);
 		return true;
-	}
-
-	@Override
-	public View getDragPlaceholder() {
-		return dragPlaceholder;
 	}
 }

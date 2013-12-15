@@ -3,18 +3,13 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
-import android.view.DragEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -22,10 +17,10 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.ProgramNode;
-import com.alexgilleran.hiitme.presentation.programdetail.DragPlaceholderProvider;
+import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
-public class ProgramNodeView extends LinearLayout {
+public class ProgramNodeView extends DraggableView {
 	private ProgramNode programNode;
 
 	private TextView repCountView;
@@ -33,26 +28,16 @@ public class ProgramNodeView extends LinearLayout {
 	private ImageButton addGroupButton;
 	private ImageButton moveButton;
 
-	private List<View> subNodeViews = new LinkedList<View>();
+	private List<DraggableView> subNodeViews = new LinkedList<DraggableView>();
 
 	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
 
-	// private DragPlaceholderProvider placeholderProvider;
-
-	private LayoutInflater inflater;
-
 	public ProgramNodeView(Context context) {
 		super(context);
-		init();
 	}
 
 	public ProgramNodeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
-	}
-
-	private void init() {
-		inflater = LayoutInflater.from(getContext());
 	}
 
 	@Override
@@ -69,9 +54,9 @@ public class ProgramNodeView extends LinearLayout {
 
 		addGroupButton.setOnClickListener(addGroupListener);
 		addExerciseButton.setOnClickListener(addExerciseListener);
-		moveButton.setOnTouchListener(moveListener);
+		// moveButton.setOnTouchListener(moveListener);
 
-		this.setOnDragListener(dragListener);
+		// this.setOnDragListener(dragListener);
 	}
 
 	public void edit() {
@@ -94,19 +79,15 @@ public class ProgramNodeView extends LinearLayout {
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
 			ProgramNode child = programNode.getChildren().get(i);
-			View newView;
+			DraggableView newView;
 
 			if (child.getAttachedExercise() != null) {
 				newView = buildExerciseView(child.getAttachedExercise());
 			} else {
 				newView = buildProgramNodeView(child);
 			}
+			newView.setDragManager(dragManager);
 
-			if (i > 0) {
-				View spacer = inflater.inflate(R.layout.spacer, null);
-				subNodeViews.add(spacer);
-				addView(spacer);
-			}
 			newView.setId(ViewUtils.generateViewId());
 
 			subNodeViews.add(newView);
@@ -119,6 +100,14 @@ public class ProgramNodeView extends LinearLayout {
 		// this.getBackground().setColorFilter(determineBgColour(),
 		// Mode.OVERLAY);
 		// setBackgroundColor(determineBgColour());
+	}
+
+	public void setDragManager(DragManager dragManager) {
+		super.setDragManager(dragManager);
+
+		for (DraggableView view : subNodeViews) {
+			view.setDragManager(dragManager);
+		}
 	}
 
 	private int determineBgColour() {
@@ -135,7 +124,7 @@ public class ProgramNodeView extends LinearLayout {
 	 *            The {@link Exercise} to source data from.
 	 */
 	private ExerciseView buildExerciseView(final Exercise exercise) {
-		ExerciseView exerciseView = (ExerciseView) inflater.inflate(R.layout.view_exercise, null);
+		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, null);
 
 		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
@@ -151,8 +140,8 @@ public class ProgramNodeView extends LinearLayout {
 	 * @param node
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
-	private View buildProgramNodeView(ProgramNode node) {
-		ProgramNodeView nodeView = (ProgramNodeView) inflater.inflate(R.layout.view_program_node, null);
+	private ProgramNodeView buildProgramNodeView(ProgramNode node) {
+		ProgramNodeView nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
 		nodeView.setProgramNode(node);
 
 		return nodeView;
@@ -188,47 +177,47 @@ public class ProgramNodeView extends LinearLayout {
 		}
 	}
 
-	private OnDragListener dragListener = new OnDragListener() {
-		@Override
-		public boolean onDrag(View reciever, DragEvent event) {
-			int action = event.getAction();
-			float y = event.getY();
-			View draggedView = (View) event.getLocalState();
-
-			switch (action) {
-			case DragEvent.ACTION_DRAG_STARTED:
-				// do nothing
-				break;
-			case DragEvent.ACTION_DRAG_ENTERED:
-				movePlaceholder(draggedView, event.getY());
-				break;
-			case DragEvent.ACTION_DRAG_EXITED:
-				// ProgramNodeView.this.setOnTouchListener(null);
-				clearPlaceholder(draggedView);
-				break;
-			case DragEvent.ACTION_DROP:
-				clearPlaceholder(draggedView);
-				draggedView = (View) event.getLocalState();
-				// Dropped, reassign View to ViewGroup
-				if (draggedView.getParent() != null) {
-					ViewGroup owner = (ViewGroup) draggedView.getParent();
-					owner.removeView(draggedView);
-				}
-				insertAfter(y, draggedView);
-				// draggedView.setVisibility(View.VISIBLE);
-				break;
-			case DragEvent.ACTION_DRAG_ENDED:
-				clearPlaceholder(draggedView);
-				break;
-			case DragEvent.ACTION_DRAG_LOCATION:
-				movePlaceholder(draggedView, event.getY());
-				break;
-			default:
-				break;
-			}
-			return true;
-		}
-	};
+	// private OnDragListener dragListener = new OnDragListener() {
+	// @Override
+	// public boolean onDrag(View reciever, DragEvent event) {
+	// int action = event.getAction();
+	// float y = event.getY();
+	// View draggedView = (View) event.getLocalState();
+	//
+	// switch (action) {
+	// case DragEvent.ACTION_DRAG_STARTED:
+	// // do nothing
+	// break;
+	// case DragEvent.ACTION_DRAG_ENTERED:
+	// movePlaceholder(draggedView, event.getY());
+	// break;
+	// case DragEvent.ACTION_DRAG_EXITED:
+	// // ProgramNodeView.this.setOnTouchListener(null);
+	// clearPlaceholder(draggedView);
+	// break;
+	// case DragEvent.ACTION_DROP:
+	// clearPlaceholder(draggedView);
+	// draggedView = (View) event.getLocalState();
+	// // Dropped, reassign View to ViewGroup
+	// if (draggedView.getParent() != null) {
+	// ViewGroup owner = (ViewGroup) draggedView.getParent();
+	// owner.removeView(draggedView);
+	// }
+	// insertAfter(y, draggedView);
+	// // draggedView.setVisibility(View.VISIBLE);
+	// break;
+	// case DragEvent.ACTION_DRAG_ENDED:
+	// clearPlaceholder(draggedView);
+	// break;
+	// case DragEvent.ACTION_DRAG_LOCATION:
+	// movePlaceholder(draggedView, event.getY());
+	// break;
+	// default:
+	// break;
+	// }
+	// return true;
+	// }
+	// };
 
 	private final OnClickListener addExerciseListener = new OnClickListener() {
 		@Override
@@ -246,17 +235,17 @@ public class ProgramNodeView extends LinearLayout {
 		}
 	};
 
-	private final OnTouchListener moveListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			ClipData data = ClipData.newPlainText("", "");
-			DragShadowBuilder shadowBuilder = new View.DragShadowBuilder();
-			startDrag(data, shadowBuilder, ProgramNodeView.this, 0);
-			// ProgramNodeView.this.setVisibility(GONE);
-			if (getParent() != null) {
-				((ViewGroup) getParent()).removeView(ProgramNodeView.this);
-			}
-			return true;
-		}
-	};
+	// private final OnTouchListener moveListener = new OnTouchListener() {
+	// @Override
+	// public boolean onTouch(View v, MotionEvent event) {
+	// ClipData data = ClipData.newPlainText("", "");
+	// DragShadowBuilder shadowBuilder = new View.DragShadowBuilder();
+	// startDrag(data, shadowBuilder, ProgramNodeView.this, 0);
+	// // ProgramNodeView.this.setVisibility(GONE);
+	// if (getParent() != null) {
+	// ((ViewGroup) getParent()).removeView(ProgramNodeView.this);
+	// }
+	// return true;
+	// }
+	// };
 }

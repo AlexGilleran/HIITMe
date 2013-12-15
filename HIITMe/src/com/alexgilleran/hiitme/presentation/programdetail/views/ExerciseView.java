@@ -2,9 +2,17 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -13,22 +21,18 @@ import android.widget.TableRow;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 
-public class ExerciseView extends LinearLayout {
+public class ExerciseView extends DraggableView {
 	private Spinner effortLevel;
 	private EditText duration;
 	private Exercise exercise;
 	private ProgramNodeView nodeView;
 
-	final LayoutInflater inflater;
-
 	public ExerciseView(Context context) {
 		super(context);
-		inflater = LayoutInflater.from(context);
 	}
 
 	public ExerciseView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		inflater = LayoutInflater.from(context);
 	}
 
 	@Override
@@ -50,6 +54,8 @@ public class ExerciseView extends LinearLayout {
 				return true;
 			}
 		});
+
+		setOnTouchListener(startDragListener);
 	}
 
 	public ProgramNodeView getNodeView() {
@@ -70,4 +76,13 @@ public class ExerciseView extends LinearLayout {
 		effortLevel.setSelection(exercise.getEffortLevel().ordinal());
 		duration.setText(Integer.toString(exercise.getDuration() / 1000));
 	}
+
+	private OnTouchListener startDragListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			dragManager.startDrag(ExerciseView.this);
+
+			return false;
+		}
+	};
 }
