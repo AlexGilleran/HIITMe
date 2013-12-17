@@ -85,4 +85,9 @@ public class ExerciseView extends DraggableView {
 			return false;
 		}
 	};
+
+	@Override
+	public DraggableView findNextInTree() {
+		return parent.findNextAfter(this);
+	}
 }

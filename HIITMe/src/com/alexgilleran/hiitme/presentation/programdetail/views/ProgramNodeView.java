@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -87,7 +86,7 @@ public class ProgramNodeView extends DraggableView {
 			} else {
 				newView = buildProgramNodeView(child);
 			}
-			newView.setDragManager(dragManager);
+			newView.initialise(dragManager, this);
 
 			newView.setId(ViewUtils.generateViewId());
 
@@ -103,11 +102,12 @@ public class ProgramNodeView extends DraggableView {
 		// setBackgroundColor(determineBgColour());
 	}
 
-	public void setDragManager(DragManager dragManager) {
-		super.setDragManager(dragManager);
+	@Override
+	public void initialise(DragManager dragManager, ProgramNodeView parent) {
+		super.initialise(dragManager, parent);
 
 		for (DraggableView view : subNodeViews) {
-			view.setDragManager(dragManager);
+			view.initialise(dragManager, this);
 		}
 	}
 
@@ -235,6 +235,33 @@ public class ProgramNodeView extends DraggableView {
 			render();
 		}
 	};
+
+	@Override
+	public DraggableView findNextInTree() {
+		if (subNodeViews.isEmpty()) {
+			return parent.findNextAfter(this);
+		}
+
+		return subNodeViews.get(0);
+	}
+
+	public DraggableView findNextAfter(DraggableView view) {
+		// TODO: This is O(clusterfuck), improve it if we can.
+		int index = subNodeViews.indexOf(view);
+
+		if (index == -1) {
+			return null;
+		}
+		if (index + 1 < subNodeViews.size()) {
+			return subNodeViews.get(index + 1);
+		}
+
+		if (parent == null) {
+			return null;
+		}
+
+		return parent.findNextAfter(this);
+	}
 
 	// private final OnTouchListener moveListener = new OnTouchListener() {
 	// @Override

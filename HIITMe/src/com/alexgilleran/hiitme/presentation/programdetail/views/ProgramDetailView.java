@@ -1,5 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import java.util.ArrayList;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ScrollView;
@@ -35,9 +38,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private int INVALID_POINTER_ID = -1;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
-	private DraggableView dragView, aboveView, belowView;
+	private DraggableView dragView;
 	private Program program;
 	private int scrollState;
+	private final int MOVE_DURATION = 150;
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -61,7 +65,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	@Override
 	public void onFinishInflate() {
 		nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
-		nodeView.setDragManager(this);
+		nodeView.initialise(this, null);
 		((ViewGroup) this.findViewById(R.id.frag_programdetail_scrollcontainer)).addView(nodeView);
 	}
 
@@ -84,6 +88,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		case MotionEvent.ACTION_DOWN:
 			downX = (int) event.getX();
 			downY = (int) event.getY();
+
 			activePointerId = event.getPointerId(0);
 			break;
 		case MotionEvent.ACTION_MOVE:
@@ -173,64 +178,69 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		final int deltaY = lastEventY - downY;
 		int deltaYTotal = hoverCellOriginalBounds.top + totalOffset + deltaY;
 
-		// View belowView = getViewForID(mBelowItemId);
-		// View mobileView = getViewForID(mMobileItemId);
-		// View aboveView = getViewForID(mAboveItemId);
+		View belowView = dragView.findNextInTree();
 
-		// boolean isBelow = (belowView != null) && (deltaYTotal >
-		// belowView.getTop());
+		boolean isBelow = (belowView != null) && (deltaYTotal > belowView.getTop());
 		// boolean isAbove = (aboveView != null) && (deltaYTotal <
 		// aboveView.getTop());
 
-		// if (isBelow || isAbove) {
-		//
-		// final long switchItemID = isBelow ? mBelowItemId : mAboveItemId;
-		// View switchView = isBelow ? belowView : aboveView;
-		// final int originalItem = getPositionForView(mobileView);
-		//
-		// if (switchView == null) {
-		// updateNeighborViewsForID(mMobileItemId);
-		// return;
-		// }
-		//
-		// swapElements(mCheeseList, originalItem,
-		// getPositionForView(switchView));
-		//
-		// ((BaseAdapter) getAdapter()).notifyDataSetChanged();
-		//
-		// mDownY = mLastEventY;
-		//
-		// final int switchViewStartTop = switchView.getTop();
-		//
-		// mobileView.setVisibility(View.VISIBLE);
-		// switchView.setVisibility(View.INVISIBLE);
-		//
-		// updateNeighborViewsForID(mMobileItemId);
-		//
-		// final ViewTreeObserver observer = getViewTreeObserver();
-		// observer.addOnPreDrawListener(new
-		// ViewTreeObserver.OnPreDrawListener() {
-		// public boolean onPreDraw() {
-		// observer.removeOnPreDrawListener(this);
-		//
-		// View switchView = getViewForID(switchItemID);
-		//
-		// mTotalOffset += deltaY;
-		//
-		// int switchViewNewTop = switchView.getTop();
-		// int delta = switchViewStartTop - switchViewNewTop;
-		//
-		// switchView.setTranslationY(delta);
-		//
-		// ObjectAnimator animator = ObjectAnimator.ofFloat(switchView,
-		// View.TRANSLATION_Y, 0);
-		// animator.setDuration(MOVE_DURATION);
-		// animator.start();
-		//
-		// return true;
-		// }
-		// });
-		// }
+		if (isBelow) {// || isAbove) {
+			// View switchView = isBelow ? belowView : aboveView;
+			final View switchView = belowView;
+
+			swapElements(dragView, switchView);
+			// swapElements(mCheeseList, originalItem,
+			// getPositionForView(switchView));
+
+			downY = lastEventY;
+
+			final int switchViewStartTop = switchView.getTop();
+
+			dragView.setVisibility(View.VISIBLE);
+			switchView.setVisibility(View.VISIBLE);
+
+			final ViewTreeObserver observer = getViewTreeObserver();
+			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+				public boolean onPreDraw() {
+					observer.removeOnPreDrawListener(this);
+
+					totalOffset += deltaY;
+
+					int switchViewNewTop = switchView.getTop();
+					int delta = switchViewStartTop - switchViewNewTop;
+
+					switchView.setTranslationY(delta);
+
+					ObjectAnimator animator = ObjectAnimator.ofFloat(switchView, View.TRANSLATION_Y, 0);
+					animator.setDuration(MOVE_DURATION);
+					animator.start();
+
+					return true;
+				}
+			});
+		}
+	}
+
+	private void swapElements(View view1, View view2) {
+		ViewGroup view1Parent = (ViewGroup) view1.getParent();
+		ViewGroup view2Parent = (ViewGroup) view2.getParent();
+		int view1Index = getChildIndex(view1Parent, view1);
+		int view2Index = getChildIndex(view2Parent, view2);
+
+		view1Parent.removeView(view1);
+		view2Parent.addView(view1, view2Index);
+
+		view2Parent.removeView(view2);
+		view1Parent.addView(view2, view1Index);
+	}
+
+	private int getChildIndex(ViewGroup viewGroup, View child) {
+		for (int i = 0; i < viewGroup.getChildCount(); i++) {
+			if (viewGroup.getChildAt(i) == child) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	@Override
@@ -255,29 +265,11 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 * single time an invalidate call is made.
 	 */
 	private BitmapDrawable getAndAddHoverView(View v) {
-		Bitmap b = getBitmapWithBorder(v);
+		Bitmap b = getBitmapFromView(v);
 
 		BitmapDrawable drawable = new BitmapDrawable(getResources(), b);
 
 		return drawable;
-	}
-
-	/** Draws a black border over the screenshot of the view passed in. */
-	private Bitmap getBitmapWithBorder(View v) {
-		Bitmap bitmap = getBitmapFromView(v);
-		Canvas can = new Canvas(bitmap);
-
-		Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-		Paint paint = new Paint();
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(2);
-		paint.setColor(Color.BLACK);
-
-		can.drawBitmap(bitmap, 0, 0, null);
-		can.drawRect(rect, paint);
-
-		return bitmap;
 	}
 
 	/** Returns a bitmap showing a screenshot of the view passed in. */
@@ -354,8 +346,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
-					aboveView = null;
-					belowView = null;
 					dragView.setVisibility(VISIBLE);
 					hoverCell = null;
 					setEnabled(true);

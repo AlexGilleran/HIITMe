@@ -7,9 +7,10 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
-public class DraggableView extends LinearLayout {
+public abstract class DraggableView extends LinearLayout {
 	protected LayoutInflater layoutInflater;
 	protected DragManager dragManager;
+	protected ProgramNodeView parent;
 
 	public DraggableView(Context context) {
 		super(context);
@@ -21,7 +22,10 @@ public class DraggableView extends LinearLayout {
 		layoutInflater = LayoutInflater.from(context);
 	}
 
-	public void setDragManager(DragManager dragManager) {
+	public void initialise(DragManager dragManager, ProgramNodeView parent) {
 		this.dragManager = dragManager;
+		this.parent = parent;
 	}
+
+	public abstract DraggableView findNextInTree();
 }
