@@ -80,7 +80,9 @@ public class ExerciseView extends DraggableView {
 	private OnTouchListener startDragListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
-			dragManager.startDrag(ExerciseView.this);
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				dragManager.startDrag(ExerciseView.this);
+			}
 
 			return false;
 		}

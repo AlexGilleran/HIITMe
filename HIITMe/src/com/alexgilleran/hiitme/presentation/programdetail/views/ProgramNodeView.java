@@ -28,8 +28,6 @@ public class ProgramNodeView extends DraggableView {
 	private ImageButton addGroupButton;
 	private ImageButton moveButton;
 
-	private List<DraggableView> subNodeViews = new LinkedList<DraggableView>();
-
 	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
 
 	public ProgramNodeView(Context context) {
@@ -72,10 +70,9 @@ public class ProgramNodeView extends DraggableView {
 	}
 
 	private void render() {
-		for (View view : subNodeViews) {
-			removeView(view);
+		for (int i = 1; i < getChildCount(); i++) {
+			removeViewAt(i);
 		}
-		subNodeViews.clear();
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
 			ProgramNode child = programNode.getChildren().get(i);
@@ -90,7 +87,6 @@ public class ProgramNodeView extends DraggableView {
 
 			newView.setId(ViewUtils.generateViewId());
 
-			subNodeViews.add(newView);
 			addView(newView);
 		}
 
@@ -106,8 +102,8 @@ public class ProgramNodeView extends DraggableView {
 	public void initialise(DragManager dragManager, ProgramNodeView parent) {
 		super.initialise(dragManager, parent);
 
-		for (DraggableView view : subNodeViews) {
-			view.initialise(dragManager, this);
+		for (int i = 1; i < getChildCount(); i++) {
+			((DraggableView) getChildAt(i)).initialise(dragManager, this);
 		}
 	}
 
@@ -146,36 +142,6 @@ public class ProgramNodeView extends DraggableView {
 		nodeView.setProgramNode(node);
 
 		return nodeView;
-	}
-
-	private void insertAfter(float y, View view) {
-		// TODO: This is a mess but it feels roughly right... improve it.
-		y = y - view.getHeight() / 2;
-		if (this.getChildCount() == 0 || y < (this.getChildAt(0).getY() + this.getChildAt(0).getHeight() / 2)) {
-			this.addView(view, 0);
-			return;
-		}
-		for (int i = 0; i < this.getChildCount(); i++) {
-			View row = (View) this.getChildAt(i);
-			if (y > row.getY() && y < row.getY() + row.getHeight()) {
-				this.addView(view, i);
-				return;
-			}
-		}
-		this.addView(view, this.getChildCount());
-		view.requestLayout();
-	}
-
-	private void movePlaceholder(View view, float y) {
-		clearPlaceholder(view);
-
-		insertAfter(y, view);
-	}
-
-	private void clearPlaceholder(View view) {
-		if (view.getParent() != null) {
-			((ViewGroup) view.getParent()).removeView(view);
-		}
 	}
 
 	// private OnDragListener dragListener = new OnDragListener() {
@@ -220,6 +186,11 @@ public class ProgramNodeView extends DraggableView {
 	// }
 	// };
 
+	@Override
+	public void removeView(View view) {
+		super.removeView(view);
+	}
+
 	private final OnClickListener addExerciseListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
@@ -238,22 +209,25 @@ public class ProgramNodeView extends DraggableView {
 
 	@Override
 	public DraggableView findNextInTree() {
-		if (subNodeViews.isEmpty()) {
+		if (getChildCount() == 1) {
 			return parent.findNextAfter(this);
 		}
 
-		return subNodeViews.get(0);
+		return (DraggableView) getChildAt(1);
 	}
 
 	public DraggableView findNextAfter(DraggableView view) {
-		// TODO: This is O(clusterfuck), improve it if we can.
-		int index = subNodeViews.indexOf(view);
+		int index = 0;
 
-		if (index == -1) {
-			return null;
+		// TODO: This is O(clusterfuck), improve it if we can.
+		for (int i = 1; i < getChildCount(); i++) {
+			if (getChildAt(i) == view) {
+				index = i;
+			}
 		}
-		if (index + 1 < subNodeViews.size()) {
-			return subNodeViews.get(index + 1);
+
+		if (index + 1 < getChildCount()) {
+			return (DraggableView) getChildAt(index + 1);
 		}
 
 		if (parent == null) {

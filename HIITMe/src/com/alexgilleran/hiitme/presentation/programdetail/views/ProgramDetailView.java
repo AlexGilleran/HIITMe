@@ -1,6 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import java.util.ArrayList;
+import java.util.Currency;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
@@ -102,8 +104,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			int deltaY = lastEventY - downY;
 
 			if (hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null) {
-				hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY
-						+ totalOffset);
+				hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
+				// + totalOffset);
 				hoverCell.setBounds(hoverCellCurrentBounds);
 				invalidate();
 
@@ -176,11 +178,11 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void handleCellSwitch() {
 		final int deltaY = lastEventY - downY;
-		int deltaYTotal = hoverCellOriginalBounds.top + totalOffset + deltaY;
 
 		View belowView = dragView.findNextInTree();
 
-		boolean isBelow = (belowView != null) && (deltaYTotal > belowView.getTop());
+		boolean isBelow = (belowView != null)
+				&& (hoverCellCurrentBounds.top > belowView.getTop() - dragView.getHeight() / 2);
 		// boolean isAbove = (aboveView != null) && (deltaYTotal <
 		// aboveView.getTop());
 
@@ -189,14 +191,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			final View switchView = belowView;
 
 			swapElements(dragView, switchView);
-			// swapElements(mCheeseList, originalItem,
-			// getPositionForView(switchView));
-
-			downY = lastEventY;
 
 			final int switchViewStartTop = switchView.getTop();
 
-			dragView.setVisibility(View.VISIBLE);
 			switchView.setVisibility(View.VISIBLE);
 
 			final ViewTreeObserver observer = getViewTreeObserver();
@@ -250,13 +247,31 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 		int w = view.getWidth();
 		int h = view.getHeight();
-		int top = view.getTop();
-		int left = view.getLeft();
+		int top = getCompleteTop(view, 0);
+		int left = getCompleteLeft(view, 0);
 
 		hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
 		hoverCellOriginalBounds = new Rect(hoverCellCurrentBounds);
 		hoverCell.setBounds(hoverCellCurrentBounds);
 		view.setVisibility(View.INVISIBLE);
+	}
+
+	private int getCompleteTop(View view, int topSoFar) {
+		topSoFar += view.getTop();
+		if (view.getParent() != null && view.getParent() instanceof View && !(view.getParent() instanceof ScrollView)) {
+			return getCompleteTop((View) view.getParent(), topSoFar);
+		} else {
+			return topSoFar;
+		}
+	}
+
+	private int getCompleteLeft(View view, int leftSoFar) {
+		leftSoFar += view.getLeft();
+		if (view.getParent() != null && view.getParent() instanceof View && !(view.getParent() instanceof ScrollView)) {
+			return getCompleteLeft((View) view.getParent(), leftSoFar);
+		} else {
+			return leftSoFar;
+		}
 	}
 
 	/**
