@@ -92,4 +92,9 @@ public class ExerciseView extends DraggableView {
 	public DraggableView findNextInTree() {
 		return parent.findNextAfter(this);
 	}
+
+	@Override
+	public DraggableView findViewAtTop(int top) {
+		return this;
+	}
 }

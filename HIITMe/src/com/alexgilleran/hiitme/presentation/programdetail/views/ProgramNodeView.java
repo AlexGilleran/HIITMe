@@ -237,6 +237,22 @@ public class ProgramNodeView extends DraggableView {
 		return parent.findNextAfter(this);
 	}
 
+	@Override
+	public DraggableView findViewAtTop(int top) {
+		if (top < getChildAt(0).getTop() + getChildAt(0).getHeight()) {
+			return this;
+		}
+
+		// TODO: Guess the correct place instead of going top-to-bottom
+		for (int i = 1; i < getChildCount(); i++) {
+			View child = getChildAt(i);
+			if (top >= child.getTop() && top < child.getTop() + child.getHeight()) {
+				return ((DraggableView) child).findViewAtTop(top - child.getTop());
+			}
+		}
+
+		return null;
+	}
 	// private final OnTouchListener moveListener = new OnTouchListener() {
 	// @Override
 	// public boolean onTouch(View v, MotionEvent event) {

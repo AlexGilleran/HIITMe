@@ -178,17 +178,12 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void handleCellSwitch() {
 		final int deltaY = lastEventY - downY;
+		final int offset = deltaY > 0 ? dragView.getHeight() / 2 : -dragView.getHeight() / 2;
 
-		View belowView = dragView.findNextInTree();
+		final View switchView = nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
 
-		boolean isBelow = (belowView != null)
-				&& (hoverCellCurrentBounds.top > belowView.getTop() - dragView.getHeight() / 2);
-		// boolean isAbove = (aboveView != null) && (deltaYTotal <
-		// aboveView.getTop());
-
-		if (isBelow) {// || isAbove) {
+		if (switchView != dragView && switchView != null) {// || isAbove) {
 			// View switchView = isBelow ? belowView : aboveView;
-			final View switchView = belowView;
 
 			swapElements(dragView, switchView);
 
@@ -218,17 +213,24 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
-	private void swapElements(View view1, View view2) {
-		ViewGroup view1Parent = (ViewGroup) view1.getParent();
-		ViewGroup view2Parent = (ViewGroup) view2.getParent();
-		int view1Index = getChildIndex(view1Parent, view1);
-		int view2Index = getChildIndex(view2Parent, view2);
+	private void swapElements(View dragView, View switchView) {
 
-		view1Parent.removeView(view1);
-		view2Parent.addView(view1, view2Index);
+		ViewGroup dragViewParent = (ViewGroup) dragView.getParent();
+		ViewGroup switchViewParent = (ViewGroup) switchView.getParent();
+		int switchViewIndex = getChildIndex(switchViewParent, switchView);
 
-		view2Parent.removeView(view2);
-		view1Parent.addView(view2, view1Index);
+		if (dragViewParent == switchViewParent) {
+			int dragViewIndex = getChildIndex(dragViewParent, dragView);
+
+			dragViewParent.removeView(dragView);
+			switchViewParent.addView(dragView, switchViewIndex);
+
+			switchViewParent.removeView(switchView);
+			dragViewParent.addView(switchView, dragViewIndex);
+		} else {
+			dragViewParent.removeView(dragView);
+			switchViewParent.addView(dragView, switchViewIndex);
+		}
 	}
 
 	private int getChildIndex(ViewGroup viewGroup, View child) {
