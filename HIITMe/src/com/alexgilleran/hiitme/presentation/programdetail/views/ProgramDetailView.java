@@ -345,7 +345,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 				return;
 			}
 
-			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, dragView.getTop());
+			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView, 0));
 
 			ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
 					hoverCellCurrentBounds);

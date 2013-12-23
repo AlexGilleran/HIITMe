@@ -1,14 +1,10 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -206,15 +202,6 @@ public class ProgramNodeView extends DraggableView {
 			render();
 		}
 	};
-
-	@Override
-	public DraggableView findNextInTree() {
-		if (getChildCount() == 1) {
-			return parent.findNextAfter(this);
-		}
-
-		return (DraggableView) getChildAt(1);
-	}
 
 	public DraggableView findNextAfter(DraggableView view) {
 		int index = 0;
