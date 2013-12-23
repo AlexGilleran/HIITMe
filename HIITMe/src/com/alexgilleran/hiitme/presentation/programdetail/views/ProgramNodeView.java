@@ -224,22 +224,40 @@ public class ProgramNodeView extends DraggableView {
 		return parent.findNextAfter(this);
 	}
 
-	@Override
-	public DraggableView findViewAtTop(int top) {
+	public InsertionPoint findViewAtTop(int top) {
 		if (top < getChildAt(0).getTop() + getChildAt(0).getHeight()) {
-			return this;
+			return new InsertionPoint(1, this, null);
 		}
 
 		// TODO: Guess the correct place instead of going top-to-bottom
 		for (int i = 1; i < getChildCount(); i++) {
 			View child = getChildAt(i);
 			if (top >= child.getTop() && top < child.getTop() + child.getHeight()) {
-				return ((DraggableView) child).findViewAtTop(top - child.getTop());
+				// TODO: there's gotta be a better way than instanceofs
+				// everywhere
+				if (child instanceof ProgramNodeView) {
+					return ((ProgramNodeView) child).findViewAtTop(top - child.getTop());
+				} else if (i != getChildCount() - 1) {
+					return new InsertionPoint(i, this, child);
+				}
 			}
 		}
 
-		return null;
+		return new InsertionPoint(-1, this, null);
 	}
+
+	public class InsertionPoint {
+		int index;
+		ProgramNodeView parent;
+		View swapWith;
+
+		public InsertionPoint(int index, ProgramNodeView parent, View swapWith) {
+			this.index = index;
+			this.parent = parent;
+			this.swapWith = swapWith;
+		}
+	}
+
 	// private final OnTouchListener moveListener = new OnTouchListener() {
 	// @Override
 	// public boolean onTouch(View v, MotionEvent event) {

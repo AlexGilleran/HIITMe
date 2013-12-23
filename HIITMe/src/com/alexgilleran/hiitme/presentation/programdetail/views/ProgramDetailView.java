@@ -1,8 +1,5 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import java.util.ArrayList;
-import java.util.Currency;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -11,8 +8,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
@@ -23,12 +18,12 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
+import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.InsertionPoint;
 
 public class ProgramDetailView extends ScrollView implements DragManager {
 	private int INVALID_ID = -1;
@@ -178,18 +173,40 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void handleCellSwitch() {
 		final int deltaY = lastEventY - downY;
-		final int offset = deltaY > 0 ? dragView.getHeight() / 2 : -dragView.getHeight() / 2;
+		final int offset = dragView.getHeight() / 2;
 
-		final View switchView = nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
+		// final View switchView =
+		// nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
+		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
 
-		if (switchView != dragView && switchView != null) {// || isAbove) {
+		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 			// View switchView = isBelow ? belowView : aboveView;
 
-			swapElements(dragView, switchView);
+			swapElements(dragView, insertionPoint, deltaY);
 
-			final int switchViewStartTop = switchView.getTop();
+		}
+	}
 
-			switchView.setVisibility(View.VISIBLE);
+	private void swapElements(View dragView, final InsertionPoint insertionPoint, final int deltaY) {
+		ViewGroup dragViewParent = (ViewGroup) dragView.getParent();
+
+		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {
+			int dragViewIndex = getChildIndex(dragViewParent, dragView);
+
+			dragViewParent.removeView(dragView);
+
+			if (insertionPoint.index == -1) {
+				insertionPoint.parent.addView(dragView);
+			} else {
+				insertionPoint.parent.addView(dragView, insertionPoint.index);
+			}
+
+			insertionPoint.parent.removeView(insertionPoint.swapWith);
+			dragViewParent.addView(insertionPoint.swapWith, dragViewIndex);
+
+			final int switchViewStartTop = insertionPoint.swapWith.getTop();
+
+			insertionPoint.swapWith.setVisibility(View.VISIBLE);
 
 			final ViewTreeObserver observer = getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -198,38 +215,21 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 					totalOffset += deltaY;
 
-					int switchViewNewTop = switchView.getTop();
+					int switchViewNewTop = insertionPoint.swapWith.getTop();
 					int delta = switchViewStartTop - switchViewNewTop;
 
-					switchView.setTranslationY(delta);
+					insertionPoint.swapWith.setTranslationY(delta);
 
-					ObjectAnimator animator = ObjectAnimator.ofFloat(switchView, View.TRANSLATION_Y, 0);
+					ObjectAnimator animator = ObjectAnimator.ofFloat(insertionPoint.swapWith, View.TRANSLATION_Y, 0);
 					animator.setDuration(MOVE_DURATION);
 					animator.start();
 
 					return true;
 				}
 			});
-		}
-	}
-
-	private void swapElements(View dragView, View switchView) {
-
-		ViewGroup dragViewParent = (ViewGroup) dragView.getParent();
-		ViewGroup switchViewParent = (ViewGroup) switchView.getParent();
-		int switchViewIndex = getChildIndex(switchViewParent, switchView);
-
-		if (dragViewParent == switchViewParent) {
-			int dragViewIndex = getChildIndex(dragViewParent, dragView);
-
-			dragViewParent.removeView(dragView);
-			switchViewParent.addView(dragView, switchViewIndex);
-
-			switchViewParent.removeView(switchView);
-			dragViewParent.addView(switchView, dragViewIndex);
 		} else {
 			dragViewParent.removeView(dragView);
-			switchViewParent.addView(dragView, switchViewIndex);
+			insertionPoint.parent.addView(dragView, insertionPoint.index);
 		}
 	}
 

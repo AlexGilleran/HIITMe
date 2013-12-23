@@ -26,6 +26,4 @@ public abstract class DraggableView extends LinearLayout {
 		this.dragManager = dragManager;
 		this.parent = parent;
 	}
-
-	public abstract DraggableView findViewAtTop(int top);
 }

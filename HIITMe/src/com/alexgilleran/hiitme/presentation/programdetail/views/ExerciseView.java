@@ -87,9 +87,4 @@ public class ExerciseView extends DraggableView {
 			return false;
 		}
 	};
-
-	@Override
-	public DraggableView findViewAtTop(int top) {
-		return this;
-	}
 }
