@@ -16,6 +16,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ScrollView;
@@ -38,7 +42,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private DraggableView dragView;
 	private Program program;
 	private int scrollState;
-	private final int MOVE_DURATION = 150;
+	private static final int MOVE_DURATION = 150;
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -187,7 +191,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
-	private void swapElements(View dragView, final InsertionPoint insertionPoint, final int deltaY) {
+	private void swapElements(final View dragView, final InsertionPoint insertionPoint, final int deltaY) {
 		ViewGroup dragViewParent = (ViewGroup) dragView.getParent();
 
 		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {
@@ -229,9 +233,57 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			});
 		} else {
 			dragViewParent.removeView(dragView);
+
 			insertionPoint.parent.addView(dragView, insertionPoint.index);
+			final float targetHeight = 100;
+
+			// final ViewTreeObserver observer = getViewTreeObserver();
+			// observer.addOnPreDrawListener(new
+			// ViewTreeObserver.OnPreDrawListener() {
+			// public boolean onPreDraw() {
+			// ObjectAnimator animator = ObjectAnimator.ofFloat(dragView,
+			// View.SCALE_Y, 0.5f, 1f);
+			// animator.setDuration(MOVE_DURATION);
+			if (animation != null) {
+				animation.cancel();
+			}
+
+			animation = new Animation() {
+				@Override
+				protected void applyTransformation(float interpolatedTime, Transformation t) {
+					super.applyTransformation(interpolatedTime, t);
+
+					dragView.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
+					dragView.requestLayout();
+				}
+			};
+			animation.setFillAfter(true);
+
+			// animation.setAnimationListener(new AnimationListener() {
+			//
+			// @Override
+			// public void onAnimationEnd(Animation animation) {
+			// }
+			//
+			// @Override
+			// public void onAnimationRepeat(Animation animation) {
+			// dragView.requestLayout();
+			// }
+			//
+			// @Override
+			// public void onAnimationStart(Animation animation) {
+			//
+			// }
+			// });
+			animation.setDuration(2000);
+			dragView.startAnimation(animation);
+			// return true;
+			// }
+			// });
 		}
 	}
+
+	Animation animation;
 
 	private int getChildIndex(ViewGroup viewGroup, View child) {
 		for (int i = 0; i < viewGroup.getChildCount(); i++) {
