@@ -1,9 +1,9 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
-import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
+import android.view.View;
 
 public interface DragManager {
 
-	void startDrag(DraggableView draggedView);
+	void startDrag(View draggedView);
 
 }

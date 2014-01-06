@@ -4,12 +4,16 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 
-public class ExerciseView extends DraggableView {
+public class ExerciseView extends RelativeLayout implements DraggableView {
+	private DragManager dragManager;
+
 	private TextView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
@@ -21,6 +25,10 @@ public class ExerciseView extends DraggableView {
 
 	public ExerciseView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+	}
+
+	public void setDragManager(DragManager dragManager) {
+		this.dragManager = dragManager;
 	}
 
 	@Override
@@ -49,7 +57,11 @@ public class ExerciseView extends DraggableView {
 
 	private void render() {
 		effortLevel.setText(exercise.getEffortLevel().toString());
-		duration.setText(Integer.toString(exercise.getDuration() / 1000));
+		
+		int minutes = exercise.getDuration() / 1000 / 60;
+		int seconds = exercise.getDuration() / 1000 % 60;
+		int ms = exercise.getDuration() % 1000;
+		duration.setText(minutes + ":" + seconds + "." + ms);
 	}
 
 	private OnTouchListener startDragListener = new OnTouchListener() {

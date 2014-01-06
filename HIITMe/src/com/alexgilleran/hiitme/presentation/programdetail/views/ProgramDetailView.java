@@ -40,7 +40,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private int downY, activePointerId, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
-	private DraggableView dragView;
+	private View dragView;
 	private Program program;
 
 	private int dragScrollUpThreshold;
@@ -66,7 +66,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	@Override
 	public void onFinishInflate() {
 		nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
-		nodeView.initialise(this, null);
+		nodeView.setDragManager(this);
 		((ViewGroup) this.findViewById(R.id.frag_programdetail_scrollcontainer)).addView(nodeView);
 
 		WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
@@ -250,7 +250,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	@Override
-	public void startDrag(DraggableView view) {
+	public void startDrag(View view) {
 		dragView = view;
 		hoverCell = getAndAddHoverView(view);
 

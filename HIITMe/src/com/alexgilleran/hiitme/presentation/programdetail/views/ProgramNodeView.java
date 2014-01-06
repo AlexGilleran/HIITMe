@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -16,7 +18,11 @@ import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
-public class ProgramNodeView extends DraggableView {
+public class ProgramNodeView extends LinearLayout implements DraggableView {
+	private LayoutInflater layoutInflater;
+	private DragManager dragManager;
+	private ProgramNodeView parent;
+
 	private ProgramNode programNode;
 
 	private TextView repCountView;
@@ -28,10 +34,12 @@ public class ProgramNodeView extends DraggableView {
 
 	public ProgramNodeView(Context context) {
 		super(context);
+		layoutInflater = LayoutInflater.from(context);
 	}
 
 	public ProgramNodeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		layoutInflater = LayoutInflater.from(context);
 	}
 
 	@Override
@@ -65,18 +73,14 @@ public class ProgramNodeView extends DraggableView {
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
 			ProgramNode child = programNode.getChildren().get(i);
-			DraggableView newView;
 
 			if (child.getAttachedExercise() != null) {
-				newView = buildExerciseView(child.getAttachedExercise());
+				initialiseChild(buildExerciseView(child.getAttachedExercise()));
 			} else {
-				newView = buildProgramNodeView(child);
+				ProgramNodeView programNodeView = buildProgramNodeView(child);
+				programNodeView.setParent(parent);
+				initialiseChild(programNodeView);
 			}
-			newView.initialise(dragManager, this);
-
-			newView.setId(ViewUtils.generateViewId());
-
-			addView(newView);
 		}
 
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
@@ -84,13 +88,25 @@ public class ProgramNodeView extends DraggableView {
 		((GradientDrawable) background.findDrawableByLayerId(R.id.card)).setColor(determineBgColour());
 	}
 
+	private <V extends View & DraggableView> void initialiseChild(V newView) {
+		newView.setDragManager(dragManager);
+
+		newView.setId(ViewUtils.generateViewId());
+
+		addView(newView);
+	}
+
 	@Override
-	public void initialise(DragManager dragManager, ProgramNodeView parent) {
-		super.initialise(dragManager, parent);
+	public void setDragManager(DragManager dragManager) {
+		this.dragManager = dragManager;
 
 		for (int i = 1; i < getChildCount(); i++) {
-			((DraggableView) getChildAt(i)).initialise(dragManager, this);
+			((DraggableView) getChildAt(i)).setDragManager(dragManager);
 		}
+	}
+
+	public void setParent(ProgramNodeView parent) {
+		this.parent = parent;
 	}
 
 	private int determineBgColour() {
