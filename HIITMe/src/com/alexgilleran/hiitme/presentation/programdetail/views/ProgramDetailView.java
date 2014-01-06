@@ -1,5 +1,8 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -28,28 +31,25 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.InsertionPoint;
 
 public class ProgramDetailView extends ScrollView implements DragManager {
+	private static final int DRAG_SCROLL_INTERVAL = 100;
 	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
 	private static final int MOVE_DURATION = 150;
-	private static final int INVALID_ID = -1;
+	private int INVALID_POINTER_ID = -1;
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
 
 	private LayoutInflater layoutInflater;
 	private ProgramNodeView nodeView;
-	private boolean isMobileScrolling;
 	private int downY, activePointerId, lastEventY;
-	private int INVALID_POINTER_ID = -1;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
 	private DraggableView dragView;
 	private Program program;
-	private int scrollState;
-	private boolean waitingForScrollToFinish;
 
 	private int smoothScrollAmountAtEdge;
-
 	private int dragScrollUpThreshold;
 	private int dragScrollDownThreshold;
 	private int downScrollY;
+	private Timer scrollTimer;
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -96,8 +96,36 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
+	private void stopScrolling() {
+		if (scrollTimer != null) {
+			scrollTimer.cancel();
+			scrollTimer = null;
+		}
+	}
+
+	private void startScrolling(final int scrollY) {
+		TimerTask timerTask = new TimerTask() {
+			@Override
+			public void run() {
+				scrollBy(0, scrollY);
+				post(handlePointerMoveRunnable);
+			}
+		};
+		scrollTimer = new Timer();
+		scrollTimer.scheduleAtFixedRate(timerTask, 0, DRAG_SCROLL_INTERVAL);
+	}
+
+	private Runnable handlePointerMoveRunnable = new Runnable() {
+		@Override
+		public void run() {
+			handlePointerMove();
+		}
+	};
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		stopScrolling();
+
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			downY = (int) event.getY();
@@ -111,26 +139,15 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			}
 
 			if (hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null) {
-				int pointerIndex = event.findPointerIndex(activePointerId);
-
-				lastEventY = (int) event.getY(pointerIndex);
-
 				if (lastEventY > dragScrollDownThreshold) {
-					scrollBy(0, (int) (lastEventY - dragScrollDownThreshold));
+					startScrolling((int) (lastEventY - dragScrollDownThreshold) / 2);
 				} else if (lastEventY < dragScrollUpThreshold) {
-					scrollBy(0, (int) (lastEventY - dragScrollUpThreshold));
+					startScrolling((int) (lastEventY - dragScrollUpThreshold) / 2);
 				}
 
-				int deltaY = lastEventY - downY + getScrollY() - downScrollY;
-
-				hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
-				hoverCell.setBounds(hoverCellCurrentBounds);
-				invalidate();
-
-				handleCellSwitch();
-
-				isMobileScrolling = false;
-				// handleMobileCellScroll();
+				int pointerIndex = event.findPointerIndex(activePointerId);
+				lastEventY = (int) event.getY(pointerIndex);
+				handlePointerMove();
 
 				return false;
 			}
@@ -164,8 +181,14 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		return true;
 	}
 
-	private void handleMobileCellScroll() {
-		isMobileScrolling = handleMobileCellScroll(hoverCellCurrentBounds);
+	private void handlePointerMove() {
+		int deltaY = lastEventY - downY + getScrollY() - downScrollY;
+
+		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
+		hoverCell.setBounds(hoverCellCurrentBounds);
+		invalidate();
+
+		handleCellSwitch();
 	}
 
 	/**
@@ -323,22 +346,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 * the hover cell back to its correct location.
 	 */
 	private void touchEventsEnded() {
-		if (cellIsMobile() || waitingForScrollToFinish) {
-			// hoverCell = null;
-			waitingForScrollToFinish = false;
-			// mIsMobileScrolling = false;
-			// mActivePointerId = INVALID_POINTER_ID;
-
-			// If the autoscroller has not completed scrolling, we need to wait
-			// for it to
-			// finish in order to determine the final location of where the
-			// hover cell
-			// should be animated to.
-			if (scrollState != OnScrollListener.SCROLL_STATE_IDLE) {
-				waitingForScrollToFinish = true;
-				return;
-			}
-
+		if (cellIsMobile()) {
 			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView, 0));
 
 			ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
