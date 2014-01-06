@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
@@ -32,7 +31,6 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.
 
 public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final int DRAG_SCROLL_INTERVAL = 100;
-	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
 	private static final int MOVE_DURATION = 150;
 	private int INVALID_POINTER_ID = -1;
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
@@ -45,7 +43,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private DraggableView dragView;
 	private Program program;
 
-	private int smoothScrollAmountAtEdge;
 	private int dragScrollUpThreshold;
 	private int dragScrollDownThreshold;
 	private int downScrollY;
@@ -71,8 +68,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
 		nodeView.initialise(this, null);
 		((ViewGroup) this.findViewById(R.id.frag_programdetail_scrollcontainer)).addView(nodeView);
-		smoothScrollAmountAtEdge = (int) (SMOOTH_SCROLL_AMOUNT_AT_EDGE / getContext().getResources()
-				.getDisplayMetrics().density);
 
 		WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
@@ -189,32 +184,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		invalidate();
 
 		handleCellSwitch();
-	}
-
-	/**
-	 * This method is in charge of determining if the hover cell is above or
-	 * below the bounds of the listview. If so, the listview does an appropriate
-	 * upward or downward smooth scroll so as to reveal new items.
-	 */
-	public boolean handleMobileCellScroll(Rect r) {
-		int offset = computeVerticalScrollOffset();
-		int height = getHeight();
-		int extent = computeVerticalScrollExtent();
-		int range = computeVerticalScrollRange();
-		int hoverViewTop = r.top;
-		int hoverHeight = r.height();
-
-		if (hoverViewTop <= 0 && offset > 0) {
-			smoothScrollBy(-smoothScrollAmountAtEdge, 0);
-			return true;
-		}
-
-		if (hoverViewTop + hoverHeight >= height && (offset + extent) < range) {
-			smoothScrollBy(smoothScrollAmountAtEdge, 0);
-			return true;
-		}
-
-		return false;
 	}
 
 	private void handleCellSwitch() {
