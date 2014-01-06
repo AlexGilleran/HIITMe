@@ -1,19 +1,17 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import android.content.ClipData;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 
 public class ExerciseView extends DraggableView {
-	private Spinner effortLevel;
-	private EditText duration;
+	private TextView effortLevel;
+	private TextView duration;
 	private Exercise exercise;
 	private ProgramNodeView nodeView;
 
@@ -29,21 +27,8 @@ public class ExerciseView extends DraggableView {
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 
-		effortLevel = (Spinner) findViewById(R.id.exercise_effort_level);
-		duration = (EditText) findViewById(R.id.exercise_duration);
-
-		effortLevel.setAdapter(new EffortLevelAdapter());
-		effortLevel.setOnLongClickListener(new OnLongClickListener() {
-
-			@Override
-			public boolean onLongClick(View view) {
-				ClipData data = ClipData.newPlainText("", "");
-				DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(ExerciseView.this);
-				ExerciseView.this.startDrag(data, shadowBuilder, ExerciseView.this, 0);
-				ExerciseView.this.setVisibility(View.INVISIBLE);
-				return true;
-			}
-		});
+		effortLevel = (TextView) findViewById(R.id.exercise_effort_level);
+		duration = (TextView) findViewById(R.id.exercise_duration);
 
 		setOnTouchListener(startDragListener);
 	}
@@ -63,7 +48,7 @@ public class ExerciseView extends DraggableView {
 	}
 
 	private void render() {
-		effortLevel.setSelection(exercise.getEffortLevel().ordinal());
+		effortLevel.setText(exercise.getEffortLevel().toString());
 		duration.setText(Integer.toString(exercise.getDuration() / 1000));
 	}
 

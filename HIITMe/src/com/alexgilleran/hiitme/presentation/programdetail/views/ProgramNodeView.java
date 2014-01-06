@@ -36,10 +36,6 @@ public class ProgramNodeView extends DraggableView {
 
 	@Override
 	public void onFinishInflate() {
-		// if (getContext() instanceof DragPlaceholderProvider) {
-		// placeholderProvider = (DragPlaceholderProvider) getContext();
-		// }
-
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 
 		this.addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
@@ -48,9 +44,6 @@ public class ProgramNodeView extends DraggableView {
 
 		addGroupButton.setOnClickListener(addGroupListener);
 		addExerciseButton.setOnClickListener(addExerciseListener);
-		// moveButton.setOnTouchListener(moveListener);
-
-		// this.setOnDragListener(dragListener);
 	}
 
 	public void edit() {
@@ -193,7 +186,7 @@ public class ProgramNodeView extends DraggableView {
 				if (child instanceof ProgramNodeView) {
 					return ((ProgramNodeView) child).findViewAtTop(top - child.getTop());
 				}
-				
+
 				return new InsertionPoint(i, this, child);
 			}
 		}
