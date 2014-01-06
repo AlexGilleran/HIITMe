@@ -89,9 +89,6 @@ public class ProgramNodeView extends DraggableView {
 		repCountView.setText(Integer.toString(programNode.getTotalReps()));
 		LayerDrawable background = (LayerDrawable) getBackground().mutate();
 		((GradientDrawable) background.findDrawableByLayerId(R.id.card)).setColor(determineBgColour());
-		// this.getBackground().setColorFilter(determineBgColour(),
-		// Mode.OVERLAY);
-		// setBackgroundColor(determineBgColour());
 	}
 
 	@Override
@@ -139,48 +136,6 @@ public class ProgramNodeView extends DraggableView {
 
 		return nodeView;
 	}
-
-	// private OnDragListener dragListener = new OnDragListener() {
-	// @Override
-	// public boolean onDrag(View reciever, DragEvent event) {
-	// int action = event.getAction();
-	// float y = event.getY();
-	// View draggedView = (View) event.getLocalState();
-	//
-	// switch (action) {
-	// case DragEvent.ACTION_DRAG_STARTED:
-	// // do nothing
-	// break;
-	// case DragEvent.ACTION_DRAG_ENTERED:
-	// movePlaceholder(draggedView, event.getY());
-	// break;
-	// case DragEvent.ACTION_DRAG_EXITED:
-	// // ProgramNodeView.this.setOnTouchListener(null);
-	// clearPlaceholder(draggedView);
-	// break;
-	// case DragEvent.ACTION_DROP:
-	// clearPlaceholder(draggedView);
-	// draggedView = (View) event.getLocalState();
-	// // Dropped, reassign View to ViewGroup
-	// if (draggedView.getParent() != null) {
-	// ViewGroup owner = (ViewGroup) draggedView.getParent();
-	// owner.removeView(draggedView);
-	// }
-	// insertAfter(y, draggedView);
-	// // draggedView.setVisibility(View.VISIBLE);
-	// break;
-	// case DragEvent.ACTION_DRAG_ENDED:
-	// clearPlaceholder(draggedView);
-	// break;
-	// case DragEvent.ACTION_DRAG_LOCATION:
-	// movePlaceholder(draggedView, event.getY());
-	// break;
-	// default:
-	// break;
-	// }
-	// return true;
-	// }
-	// };
 
 	@Override
 	public void removeView(View view) {
@@ -237,9 +192,9 @@ public class ProgramNodeView extends DraggableView {
 				// everywhere
 				if (child instanceof ProgramNodeView) {
 					return ((ProgramNodeView) child).findViewAtTop(top - child.getTop());
-				} else if (i != getChildCount() - 1) {
-					return new InsertionPoint(i, this, child);
 				}
+				
+				return new InsertionPoint(i, this, child);
 			}
 		}
 
@@ -257,18 +212,4 @@ public class ProgramNodeView extends DraggableView {
 			this.swapWith = swapWith;
 		}
 	}
-
-	// private final OnTouchListener moveListener = new OnTouchListener() {
-	// @Override
-	// public boolean onTouch(View v, MotionEvent event) {
-	// ClipData data = ClipData.newPlainText("", "");
-	// DragShadowBuilder shadowBuilder = new View.DragShadowBuilder();
-	// startDrag(data, shadowBuilder, ProgramNodeView.this, 0);
-	// // ProgramNodeView.this.setVisibility(GONE);
-	// if (getParent() != null) {
-	// ((ViewGroup) getParent()).removeView(ProgramNodeView.this);
-	// }
-	// return true;
-	// }
-	// };
 }

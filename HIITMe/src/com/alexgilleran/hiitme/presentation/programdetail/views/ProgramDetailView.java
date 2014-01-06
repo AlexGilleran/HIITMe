@@ -17,8 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.ScaleAnimation;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -179,19 +177,14 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		final int deltaY = lastEventY - downY;
 		final int offset = dragView.getHeight() / 2;
 
-		// final View switchView =
-		// nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
 		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
 
 		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
-			// View switchView = isBelow ? belowView : aboveView;
-
-			swapElements(dragView, insertionPoint, deltaY);
-
+			insertAt(dragView, insertionPoint, deltaY);
 		}
 	}
 
-	private void swapElements(final View dragView, final InsertionPoint insertionPoint, final int deltaY) {
+	private void insertAt(final View dragView, final InsertionPoint insertionPoint, final int deltaY) {
 		ViewGroup dragViewParent = (ViewGroup) dragView.getParent();
 
 		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {
@@ -210,7 +203,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 			final int switchViewStartTop = insertionPoint.swapWith.getTop();
 
-			insertionPoint.swapWith.setVisibility(View.VISIBLE);
+			// insertionPoint.swapWith.setVisibility(View.VISIBLE);
 
 			final ViewTreeObserver observer = getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -235,55 +228,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			dragViewParent.removeView(dragView);
 
 			insertionPoint.parent.addView(dragView, insertionPoint.index);
-			final float targetHeight = 100;
-
-			// final ViewTreeObserver observer = getViewTreeObserver();
-			// observer.addOnPreDrawListener(new
-			// ViewTreeObserver.OnPreDrawListener() {
-			// public boolean onPreDraw() {
-			// ObjectAnimator animator = ObjectAnimator.ofFloat(dragView,
-			// View.SCALE_Y, 0.5f, 1f);
-			// animator.setDuration(MOVE_DURATION);
-			if (animation != null) {
-				animation.cancel();
-			}
-
-			animation = new Animation() {
-				@Override
-				protected void applyTransformation(float interpolatedTime, Transformation t) {
-					super.applyTransformation(interpolatedTime, t);
-
-					dragView.getLayoutParams().height = (int) (targetHeight * interpolatedTime);
-					dragView.requestLayout();
-				}
-			};
-			animation.setFillAfter(true);
-
-			// animation.setAnimationListener(new AnimationListener() {
-			//
-			// @Override
-			// public void onAnimationEnd(Animation animation) {
-			// }
-			//
-			// @Override
-			// public void onAnimationRepeat(Animation animation) {
-			// dragView.requestLayout();
-			// }
-			//
-			// @Override
-			// public void onAnimationStart(Animation animation) {
-			//
-			// }
-			// });
-			animation.setDuration(2000);
-			dragView.startAnimation(animation);
-			// return true;
-			// }
-			// });
 		}
 	}
-
-	Animation animation;
 
 	private int getChildIndex(ViewGroup viewGroup, View child) {
 		for (int i = 0; i < viewGroup.getChildCount(); i++) {
@@ -308,6 +254,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		hoverCellOriginalBounds = new Rect(hoverCellCurrentBounds);
 		hoverCell.setBounds(hoverCellCurrentBounds);
 		view.setVisibility(View.INVISIBLE);
+
+		invalidate();
 	}
 
 	private int getCompleteTop(View view, int topSoFar) {
@@ -347,11 +295,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		Canvas canvas = new Canvas(bitmap);
 		v.draw(canvas);
 		return bitmap;
-	}
-
-	@Override
-	public BitmapDrawable getHoverCell() {
-		return hoverCell;
 	}
 
 	private boolean cellIsMobile() {
@@ -418,7 +361,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 					dragView.setVisibility(VISIBLE);
 					hoverCell = null;
 					setEnabled(true);
-					invalidate();
+					ProgramDetailView.this.invalidate();
 				}
 			});
 			hoverViewAnimator.start();
