@@ -8,17 +8,17 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
-import android.widget.AbsListView;
+import android.view.WindowManager;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ScrollView;
 
@@ -28,19 +28,28 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.InsertionPoint;
 
 public class ProgramDetailView extends ScrollView implements DragManager {
-	private int INVALID_ID = -1;
-	private OnScrollListener onScrollListener;
+	private final int SMOOTH_SCROLL_AMOUNT_AT_EDGE = 15;
+	private static final int MOVE_DURATION = 150;
+	private static final int INVALID_ID = -1;
+	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
+
 	private LayoutInflater layoutInflater;
 	private ProgramNodeView nodeView;
 	private boolean isMobileScrolling;
-	private int downX, downY, activePointerId, lastEventY, totalOffset;
+	private int downY, activePointerId, lastEventY;
 	private int INVALID_POINTER_ID = -1;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
 	private DraggableView dragView;
 	private Program program;
 	private int scrollState;
-	private static final int MOVE_DURATION = 150;
+	private boolean waitingForScrollToFinish;
+
+	private int smoothScrollAmountAtEdge;
+
+	private int dragScrollUpThreshold;
+	private int dragScrollDownThreshold;
+	private int downScrollY;
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -58,14 +67,20 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	@Override
-	protected void onScrollChanged(int x, int y, int oldx, int oldy) {
-	}
-
-	@Override
 	public void onFinishInflate() {
 		nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
 		nodeView.initialise(this, null);
 		((ViewGroup) this.findViewById(R.id.frag_programdetail_scrollcontainer)).addView(nodeView);
+		smoothScrollAmountAtEdge = (int) (SMOOTH_SCROLL_AMOUNT_AT_EDGE / getContext().getResources()
+				.getDisplayMetrics().density);
+
+		WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point screenSize = new Point();
+		display.getSize(screenSize);
+
+		dragScrollUpThreshold = (int) (screenSize.y * DRAG_SCROLL_THRESHOLD_FRACTION);
+		dragScrollDownThreshold = (int) (screenSize.y * (1 - DRAG_SCROLL_THRESHOLD_FRACTION));
 	}
 
 	public void setProgram(Program program) {
@@ -85,8 +100,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	public boolean onTouchEvent(MotionEvent event) {
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
-			downX = (int) event.getX();
 			downY = (int) event.getY();
+			downScrollY = getScrollY();
 
 			activePointerId = event.getPointerId(0);
 			break;
@@ -95,14 +110,20 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 				break;
 			}
 
-			int pointerIndex = event.findPointerIndex(activePointerId);
-
-			lastEventY = (int) event.getY(pointerIndex);
-			int deltaY = lastEventY - downY;
-
 			if (hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null) {
+				int pointerIndex = event.findPointerIndex(activePointerId);
+
+				lastEventY = (int) event.getY(pointerIndex);
+
+				if (lastEventY > dragScrollDownThreshold) {
+					scrollBy(0, (int) (lastEventY - dragScrollDownThreshold));
+				} else if (lastEventY < dragScrollUpThreshold) {
+					scrollBy(0, (int) (lastEventY - dragScrollUpThreshold));
+				}
+
+				int deltaY = lastEventY - downY + getScrollY() - downScrollY;
+
 				hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
-				// + totalOffset);
 				hoverCell.setBounds(hoverCellCurrentBounds);
 				invalidate();
 
@@ -113,6 +134,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 				return false;
 			}
+
 			break;
 		case MotionEvent.ACTION_UP:
 			touchEventsEnded();
@@ -152,24 +174,23 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 * upward or downward smooth scroll so as to reveal new items.
 	 */
 	public boolean handleMobileCellScroll(Rect r) {
-		// int offset = computeVerticalScrollOffset();
-		// int height = getHeight();
-		// int extent = computeVerticalScrollExtent();
-		// int range = computeVerticalScrollRange();
-		// int hoverViewTop = r.top;
-		// int hoverHeight = r.height();
-		//
-		// if (hoverViewTop <= 0 && offset > 0) {
-		// smoothScrollBy(-mSmoothScrollAmountAtEdge, 0);
-		// return true;
-		// }
-		//
-		// if (hoverViewTop + hoverHeight >= height && (offset + extent) <
-		// range) {
-		// smoothScrollBy(mSmoothScrollAmountAtEdge, 0);
-		// return true;
-		// }
-		//
+		int offset = computeVerticalScrollOffset();
+		int height = getHeight();
+		int extent = computeVerticalScrollExtent();
+		int range = computeVerticalScrollRange();
+		int hoverViewTop = r.top;
+		int hoverHeight = r.height();
+
+		if (hoverViewTop <= 0 && offset > 0) {
+			smoothScrollBy(-smoothScrollAmountAtEdge, 0);
+			return true;
+		}
+
+		if (hoverViewTop + hoverHeight >= height && (offset + extent) < range) {
+			smoothScrollBy(smoothScrollAmountAtEdge, 0);
+			return true;
+		}
+
 		return false;
 	}
 
@@ -203,14 +224,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 			final int switchViewStartTop = insertionPoint.swapWith.getTop();
 
-			// insertionPoint.swapWith.setVisibility(View.VISIBLE);
-
 			final ViewTreeObserver observer = getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				public boolean onPreDraw() {
 					observer.removeOnPreDrawListener(this);
-
-					totalOffset += deltaY;
 
 					int switchViewNewTop = insertionPoint.swapWith.getTop();
 					int delta = switchViewStartTop - switchViewNewTop;
@@ -300,24 +317,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private boolean cellIsMobile() {
 		return hoverCell != null;
 	}
-
-	boolean waitingForScrollToFinish;
-
-	private OnScrollListener scrollListener = new OnScrollListener() {
-
-		@Override
-		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void onScrollStateChanged(AbsListView view, int scrollState) {
-			// TODO Auto-generated method stub
-
-		}
-
-	};
 
 	/**
 	 * Resets all the appropriate fields to a default state while also animating
