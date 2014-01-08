@@ -10,47 +10,27 @@
     android:paddingRight="10dip"
     android:paddingTop="10dip" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <TextView
-            android:id="@+id/textview_x"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="x" />
-
-        <TextView
             android:id="@+id/textview_repcount"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <ImageButton
-            android:id="@+id/button_add_exercise"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:adjustViewBounds="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_exercise_add" />
-
-        <ImageButton
-            android:id="@+id/button_add_group"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:adjustViewBounds="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_program_node_add" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="20sp" />
 
         <ImageButton
             android:id="@+id/button_move_program_group"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
-            android:background="?android:attr/selectableItemBackground"
             android:scaleType="centerInside"
             android:src="@drawable/ic_move" />
-    </LinearLayout>
+    </RelativeLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>

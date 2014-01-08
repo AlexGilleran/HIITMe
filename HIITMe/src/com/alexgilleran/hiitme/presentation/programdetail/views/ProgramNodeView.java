@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -26,8 +27,6 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	private ProgramNode programNode;
 
 	private TextView repCountView;
-	private ImageButton addExerciseButton;
-	private ImageButton addGroupButton;
 	private ImageButton moveButton;
 
 	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
@@ -45,14 +44,19 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
-
-		this.addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
-		this.addGroupButton = (ImageButton) this.findViewById(R.id.button_add_group);
 		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
 
-		addGroupButton.setOnClickListener(addGroupListener);
-		addExerciseButton.setOnClickListener(addExerciseListener);
+		moveButton.setOnTouchListener(moveListener);
 	}
+
+	private OnTouchListener moveListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			dragManager.startDrag(ProgramNodeView.this, event);
+
+			return false;
+		}
+	};
 
 	public void edit() {
 		// for (View nodeView : subViews) {
@@ -83,7 +87,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 			}
 		}
 
-		repCountView.setText(Integer.toString(programNode.getTotalReps()));
+		repCountView.setText("x" + programNode.getTotalReps());
 		LayerDrawable background = (LayerDrawable) getBackground().mutate();
 		((GradientDrawable) background.findDrawableByLayerId(R.id.card)).setColor(determineBgColour());
 	}
@@ -150,22 +154,6 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	public void removeView(View view) {
 		super.removeView(view);
 	}
-
-	private final OnClickListener addExerciseListener = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			programNode.addChildExercise("", 0, EffortLevel.HARD, 5);
-			render();
-		}
-	};
-
-	private final OnClickListener addGroupListener = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			programNode.addChildNode(1);
-			render();
-		}
-	};
 
 	public DraggableView findNextAfter(DraggableView view) {
 		int index = 0;

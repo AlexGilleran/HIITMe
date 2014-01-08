@@ -179,9 +179,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void handleCellSwitch() {
 		final int deltaY = lastEventY - downY;
-		final int offset = dragView.getHeight() / 2;
+		// final int offset = dragView.getHeight() / 2;
 
-		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top + offset);
+		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top);
 
 		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 			insertAt(dragView, insertionPoint, deltaY);
