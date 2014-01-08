@@ -32,12 +32,11 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.
 public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final int DRAG_SCROLL_INTERVAL = 100;
 	private static final int MOVE_DURATION = 150;
-	private int INVALID_POINTER_ID = -1;
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
 
 	private LayoutInflater layoutInflater;
 	private ProgramNodeView nodeView;
-	private int downY, activePointerId, lastEventY;
+	private int downY, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
 	private View dragView;
@@ -123,28 +122,20 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
-			downY = (int) event.getY();
-			downScrollY = getScrollY();
 
-			activePointerId = event.getPointerId(0);
-			break;
+			return true;
 		case MotionEvent.ACTION_MOVE:
-			if (activePointerId == INVALID_POINTER_ID) {
-				break;
-			}
-
 			if (hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null) {
+				lastEventY = (int) event.getRawY();
 				if (lastEventY > dragScrollDownThreshold) {
 					startScrolling((int) (lastEventY - dragScrollDownThreshold) / 2);
 				} else if (lastEventY < dragScrollUpThreshold) {
 					startScrolling((int) (lastEventY - dragScrollUpThreshold) / 2);
 				}
 
-				int pointerIndex = event.findPointerIndex(activePointerId);
-				lastEventY = (int) event.getY(pointerIndex);
 				handlePointerMove();
 
-				return false;
+				return true;
 			}
 
 			break;
@@ -173,7 +164,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			break;
 		}
 
-		return true;
+		return false;
 	}
 
 	private void handlePointerMove() {
@@ -250,7 +241,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	@Override
-	public void startDrag(View view) {
+	public void startDrag(View view, MotionEvent event) {
+		downY = (int) event.getRawY();
+		downScrollY = getScrollY();
+
 		dragView = view;
 		hoverCell = getAndAddHoverView(view);
 

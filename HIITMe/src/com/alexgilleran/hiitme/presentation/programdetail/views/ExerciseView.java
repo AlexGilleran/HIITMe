@@ -2,8 +2,10 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,6 +19,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
+	private ImageButton moveButton;
 	private ProgramNodeView nodeView;
 
 	public ExerciseView(Context context) {
@@ -37,8 +40,15 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 		effortLevel = (TextView) findViewById(R.id.exercise_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
+		moveButton = (ImageButton) findViewById(R.id.button_move);
 
-		setOnTouchListener(startDragListener);
+		moveButton.setOnTouchListener(startDragListener);
+		moveButton.setOnDragListener(new OnDragListener() {
+			@Override
+			public boolean onDrag(View v, DragEvent event) {
+				return false;
+			}
+		});
 	}
 
 	public ProgramNodeView getNodeView() {
@@ -57,18 +67,27 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	private void render() {
 		effortLevel.setText(exercise.getEffortLevel().toString());
-		
+
 		int minutes = exercise.getDuration() / 1000 / 60;
 		int seconds = exercise.getDuration() / 1000 % 60;
-		int ms = exercise.getDuration() % 1000;
-		duration.setText(minutes + ":" + seconds + "." + ms);
+		duration.setText(timeToString(minutes) + "." + timeToString(seconds));
+	}
+
+	private String timeToString(int number) {
+		if (number >= 10) {
+			return Integer.toString(number);
+		} else if (number == 0) {
+			return "00";
+		} else {
+			return "0" + number;
+		}
 	}
 
 	private OnTouchListener startDragListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragManager.startDrag(ExerciseView.this);
+				dragManager.startDrag(ExerciseView.this, event);
 			}
 
 			return false;
