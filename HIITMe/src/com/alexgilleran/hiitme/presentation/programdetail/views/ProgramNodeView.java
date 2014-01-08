@@ -176,7 +176,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 		return parent.findNextAfter(this);
 	}
 
-	public InsertionPoint findViewAtTop(int top) {
+	public InsertionPoint findViewAtTop(int top, View viewToSwapIn) {
 		if (top < getChildAt(0).getTop() + getChildAt(0).getHeight()) {
 			return new InsertionPoint(1, this, null);
 		}
@@ -187,8 +187,8 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 			if (top >= child.getTop() && top < child.getTop() + child.getHeight()) {
 				// TODO: there's gotta be a better way than instanceofs
 				// everywhere
-				if (child instanceof ProgramNodeView) {
-					return ((ProgramNodeView) child).findViewAtTop(top - child.getTop());
+				if (child != viewToSwapIn && child instanceof ProgramNodeView) {
+					return ((ProgramNodeView) child).findViewAtTop(top - child.getTop(), viewToSwapIn);
 				}
 
 				return new InsertionPoint(i, this, child);
