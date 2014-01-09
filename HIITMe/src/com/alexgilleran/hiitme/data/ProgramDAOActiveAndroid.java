@@ -5,6 +5,7 @@ import java.util.List;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.ProgramNode;
 
 public class ProgramDAOActiveAndroid implements ProgramDAO {
 
@@ -15,12 +16,18 @@ public class ProgramDAOActiveAndroid implements ProgramDAO {
 
 	@Override
 	public Program getProgram(long programId) {
-		return new Select().from(Program.class)
-				.where("Id=?", Long.valueOf(programId)).executeSingle();
+		return new Select().from(Program.class).where("Id=?", Long.valueOf(programId)).executeSingle();
 	}
 
 	@Override
 	public void deleteAllPrograms() {
 		new Delete().from(Program.class).execute();
+	}
+
+	@Override
+	public void replaceProgramNode(Program program, ProgramNode programNode) {
+		program.getAssociatedNode().delete();
+		program.setAssociatedNode(programNode);
+		program.save();
 	}
 }

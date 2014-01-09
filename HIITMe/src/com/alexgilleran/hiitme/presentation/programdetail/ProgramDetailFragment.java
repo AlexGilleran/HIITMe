@@ -2,34 +2,21 @@ package com.alexgilleran.hiitme.presentation.programdetail;
 
 import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
-import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
+import com.google.inject.Inject;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is
@@ -46,6 +33,9 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	private LayoutInflater inflater;
 
 	private Program program;
+
+	@Inject
+	private ProgramDAO programDao;
 
 	@InjectView(R.id.root)
 	private ProgramDetailView detailView;
@@ -79,7 +69,7 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		detailView.setProgram(program);
+		detailView.setProgramNode(program.getAssociatedNode());
 	}
 
 	@Override
@@ -87,6 +77,14 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 		EditExerciseFragment editExercise = new EditExerciseFragment();
 		editExercise.setExercise(exerciseToEdit);
 		editExercise.show(getFragmentManager(), "editexercise");
+	}
+
+	public boolean isBeingEdited() {
+		return detailView.isBeingEdited();
+	}
+
+	public void save() {
+		programDao.replaceProgramNode(program, detailView.getProgramNode());
 	}
 
 }

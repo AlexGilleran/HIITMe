@@ -54,6 +54,10 @@ public class Program extends Model {
 		return programNode;
 	}
 
+	public void setAssociatedNode(ProgramNode programNode) {
+		this.programNode = programNode;
+	}
+
 	@Override
 	public void save() {
 		ActiveAndroid.beginTransaction();

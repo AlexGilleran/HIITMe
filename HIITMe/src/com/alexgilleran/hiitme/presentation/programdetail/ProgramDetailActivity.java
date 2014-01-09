@@ -39,6 +39,8 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 
 	private Program program;
 
+	private ProgramDetailFragment detailFragment;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,7 +55,7 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 
 			program = programDao.getProgram(getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
 
-			ProgramDetailFragment detailFragment = new ProgramDetailFragment();
+			detailFragment = new ProgramDetailFragment();
 			detailFragment.setProgram(program);
 			transaction.add(R.id.program_detail_container, detailFragment);
 
@@ -80,6 +82,9 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 
 			}
 			return true;
+		case R.id.actionbar_icon_save:
+			detailFragment.save();
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -95,6 +100,11 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.run_menu, menu);
+
+		boolean isBeingEdited = detailFragment.isBeingEdited();
+		menu.findItem(R.id.actionbar_icon_save).setVisible(isBeingEdited);
+		menu.findItem(R.id.actionbar_icon_edit).setVisible(!isBeingEdited);
+
 		return true;
 	}
 }

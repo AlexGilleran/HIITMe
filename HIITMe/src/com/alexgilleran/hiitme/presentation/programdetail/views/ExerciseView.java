@@ -97,7 +97,14 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	@Override
 	public ProgramNode getProgramNode() {
-		return exercise.getParentNode();
+		ProgramNode node = new ProgramNode();
+		node.setTotalReps(1);
+
+		// TODO: Create a whole new exercise.
+//		Exercise exercise = new Exercise();
+		node.setAttachedExercise(exercise);
+
+		return node;
 	}
 
 	@Override

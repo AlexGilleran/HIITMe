@@ -57,4 +57,10 @@ public class ProgramDAOStub implements ProgramDAO {
 		
 	}
 
+	@Override
+	public void replaceProgramNode(Program program, ProgramNode programNode) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

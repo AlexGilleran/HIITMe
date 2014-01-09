@@ -1,5 +1,8 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -13,9 +16,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
@@ -218,7 +219,29 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public ProgramNode getProgramNode() {
+		ProgramNode programNode = new ProgramNode();
+		
+		// TODO: jesus christ.
+		programNode.setTotalReps(Integer.parseInt(repCountView.getText().toString().substring(1)));
+
+		for (DraggableView child : getChildren()) {
+			programNode.addChildNode(child.getProgramNode());
+		}
+
 		return programNode;
+	}
+
+	private List<DraggableView> getChildren() {
+		List<DraggableView> children = new ArrayList<DraggableView>();
+
+		for (int i = 1; i < getChildCount(); i++) {
+			View child = getChildAt(i);
+			if (child instanceof DraggableView) {
+				children.add((DraggableView) child);
+			}
+		}
+
+		return children;
 	}
 
 	@Override

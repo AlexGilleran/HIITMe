@@ -8,6 +8,12 @@
         android:title="@string/caption_actionbar_edit">
     </item>
     <item
+        android:id="@+id/actionbar_icon_save"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="always"
+        android:title="@string/caption_actionbar_play">
+    </item>
+    <item
         android:id="@+id/actionbar_icon_run"
         android:icon="@drawable/ic_action_play"
         android:showAsAction="always"

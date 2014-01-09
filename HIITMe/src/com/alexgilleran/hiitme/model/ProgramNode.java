@@ -112,6 +112,9 @@ public class ProgramNode extends Model {
 	}
 
 	public void setAttachedExercise(Exercise attachedExercise) {
+		if (attachedExercise != null) {
+			attachedExercise.setExerciseGroup(this);
+		}
 		this.attachedExercise = attachedExercise;
 	}
 
