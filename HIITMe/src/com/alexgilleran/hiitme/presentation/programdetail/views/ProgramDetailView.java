@@ -39,8 +39,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private int downY, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
-	private View dragView;
-	private Program program;
+	private DraggableView dragView;
 
 	private int dragScrollUpThreshold;
 	private int dragScrollDownThreshold;
@@ -78,7 +77,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	public void setProgram(Program program) {
-		this.program = program;
 		nodeView.setProgramNode(program.getAssociatedNode());
 	}
 
@@ -138,7 +136,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			break;
 		case MotionEvent.ACTION_UP:
 			touchEventsEnded();
-			break;
+			return true;
 		case MotionEvent.ACTION_CANCEL:
 			// touchEventsCancelled();
 			break;
@@ -176,7 +174,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void handleCellSwitch() {
 		final int deltaY = lastEventY - downY;
-		// final int offset = dragView.getHeight() / 2;
 
 		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top, dragView);
 
@@ -185,18 +182,18 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
-	private void insertAt(final View dragView, final InsertionPoint insertionPoint, final int deltaY) {
-		ViewGroup dragViewParent = (ViewGroup) dragView.getParent();
+	private void insertAt(final DraggableView dragView, final InsertionPoint insertionPoint, final int deltaY) {
+		ProgramNodeView dragViewParent = dragView.getParentProgramNodeView();
 
 		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {
-			int dragViewIndex = getChildIndex(dragViewParent, dragView);
+			int dragViewIndex = getChildIndex(dragViewParent, dragView.asView());
 
-			dragViewParent.removeView(dragView);
+			dragViewParent.removeViewAt(dragViewIndex);
 
 			if (insertionPoint.index == -1) {
-				insertionPoint.parent.addView(dragView);
+				insertionPoint.parent.addChild(dragView);
 			} else {
-				insertionPoint.parent.addView(dragView, insertionPoint.index);
+				insertionPoint.parent.addChild(dragView, insertionPoint.index);
 			}
 
 			insertionPoint.parent.removeView(insertionPoint.swapWith);
@@ -222,9 +219,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 				}
 			});
 		} else {
-			dragViewParent.removeView(dragView);
-
-			insertionPoint.parent.addView(dragView, insertionPoint.index);
+			dragViewParent.removeChild(dragView);
+			insertionPoint.parent.addChild(dragView, insertionPoint.index);
 		}
 	}
 
@@ -238,22 +234,22 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	@Override
-	public void startDrag(View view, MotionEvent event) {
+	public void startDrag(DraggableView view, MotionEvent event) {
 		downY = (int) event.getRawY();
 		downScrollY = getScrollY();
 
 		dragView = view;
 		hoverCell = getAndAddHoverView(view);
 
-		int w = view.getWidth();
-		int h = view.getHeight();
-		int top = getCompleteTop(view, 0);
-		int left = getCompleteLeft(view, 0);
+		int w = view.asView().getWidth();
+		int h = view.asView().getHeight();
+		int top = getCompleteTop(view.asView(), 0);
+		int left = getCompleteLeft(view.asView(), 0);
 
 		hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
 		hoverCellOriginalBounds = new Rect(hoverCellCurrentBounds);
 		hoverCell.setBounds(hoverCellCurrentBounds);
-		view.setVisibility(View.INVISIBLE);
+		view.asView().setVisibility(View.INVISIBLE);
 
 		invalidate();
 	}
@@ -281,8 +277,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 * size. The hover cell's BitmapDrawable is drawn on top of the bitmap every
 	 * single time an invalidate call is made.
 	 */
-	private BitmapDrawable getAndAddHoverView(View v) {
-		Bitmap b = getBitmapFromView(v);
+	private BitmapDrawable getAndAddHoverView(DraggableView v) {
+		Bitmap b = getBitmapFromView(v.asView());
 
 		BitmapDrawable drawable = new BitmapDrawable(getResources(), b);
 
@@ -307,7 +303,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 */
 	private void touchEventsEnded() {
 		if (cellIsMobile()) {
-			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView, 0));
+			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView.asView(), 0));
 
 			ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
 					hoverCellCurrentBounds);
@@ -325,7 +321,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
-					dragView.setVisibility(VISIBLE);
+					dragView.asView().setVisibility(VISIBLE);
 					hoverCell = null;
 					setEnabled(true);
 					ProgramDetailView.this.invalidate();

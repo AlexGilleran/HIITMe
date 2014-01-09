@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
@@ -38,6 +39,11 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 
 	public ProgramNodeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		layoutInflater = LayoutInflater.from(context);
+	}
+
+	public ProgramNodeView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
 		layoutInflater = LayoutInflater.from(context);
 	}
 
@@ -127,7 +133,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	 *            The {@link Exercise} to source data from.
 	 */
 	private ExerciseView buildExerciseView(final Exercise exercise) {
-		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, null);
+		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, this, false);
 
 		exerciseView.setNodeView(this);
 		exerciseView.setExercise(exercise);
@@ -144,7 +150,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
 	private ProgramNodeView buildProgramNodeView(ProgramNode node) {
-		ProgramNodeView nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
+		ProgramNodeView nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
 		nodeView.setProgramNode(node);
 
 		return nodeView;
@@ -176,7 +182,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 		return parent.findNextAfter(this);
 	}
 
-	public InsertionPoint findViewAtTop(int top, View viewToSwapIn) {
+	public InsertionPoint findViewAtTop(int top, DraggableView viewToSwapIn) {
 		if (top < getChildAt(0).getTop() + getChildAt(0).getHeight()) {
 			return new InsertionPoint(1, this, null);
 		}
@@ -208,5 +214,33 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 			this.parent = parent;
 			this.swapWith = swapWith;
 		}
+	}
+
+	@Override
+	public ProgramNode getProgramNode() {
+		return programNode;
+	}
+
+	@Override
+	public View asView() {
+		return this;
+	}
+
+	public void addChild(DraggableView child) {
+		addView(child.asView());
+	}
+
+	public void addChild(DraggableView child, int index) {
+		addView(child.asView(), index);
+	}
+
+	public void removeChild(DraggableView view) {
+		// TODO: Would by index be quicker? It certainly is more perilous.
+		removeView(view.asView());
+	}
+
+	@Override
+	public ProgramNodeView getParentProgramNodeView() {
+		return (ProgramNodeView) getParent();
 	}
 }

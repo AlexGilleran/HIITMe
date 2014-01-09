@@ -3,12 +3,10 @@
     android:id="@+id/program_node_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:paddingBottom="20dp"
     android:background="@drawable/border_exercise"
-    android:orientation="vertical"
-    android:paddingBottom="20dip"
-    android:paddingLeft="10dip"
-    android:paddingRight="10dip"
-    android:paddingTop="10dip" >
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:layout_width="match_parent"

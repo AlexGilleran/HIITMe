@@ -1,10 +1,11 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
 import android.view.MotionEvent;
-import android.view.View;
+
+import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
 
 public interface DragManager {
 
-	void startDrag(View draggedView, MotionEvent event);
+	void startDrag(DraggableView draggedView, MotionEvent event);
 
 }

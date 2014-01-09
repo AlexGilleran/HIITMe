@@ -33,13 +33,27 @@ public class ProgramNode extends Model {
 	}
 
 	public ProgramNode addChildNode(int repCount) {
-		checkCanHaveChildren();
-
 		ProgramNode newNode = new ProgramNode(repCount);
-		getChildren().add(newNode);
-		newNode.setParent(this);
+
+		addChildNode(newNode);
 
 		return newNode;
+	}
+
+	public void addChildNode(ProgramNode node) {
+		addChildNode(node, getChildren().size());
+	}
+
+	public void addChildNode(ProgramNode node, int index) {
+		checkCanHaveChildren();
+
+		getChildren().add(index, node);
+		node.setParent(this);
+	}
+
+	public void removeChild(ProgramNode child) {
+		child.setParent(null);
+		getChildren().remove(child);
 	}
 
 	public Exercise addChildExercise(String name, int duration, EffortLevel effortLevel, int repCount) {

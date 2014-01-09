@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.ProgramNode;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
@@ -93,4 +94,19 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			return false;
 		}
 	};
+
+	@Override
+	public ProgramNode getProgramNode() {
+		return exercise.getParentNode();
+	}
+
+	@Override
+	public View asView() {
+		return this;
+	}
+
+	@Override
+	public ProgramNodeView getParentProgramNodeView() {
+		return (ProgramNodeView) getParent();
+	}
 }
