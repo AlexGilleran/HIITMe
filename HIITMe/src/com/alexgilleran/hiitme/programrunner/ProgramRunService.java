@@ -19,7 +19,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.alexgilleran.hiitme.sound.SoundPlayer;
@@ -147,7 +147,7 @@ public class ProgramRunService extends RoboIntentService {
 		}
 
 		@Override
-		public ProgramNode getCurrentNode() {
+		public Node getCurrentNode() {
 			return programRunner.getCurrentNode();
 		}
 

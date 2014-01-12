@@ -1,16 +1,16 @@
 package com.alexgilleran.hiitme.programrunner;
 
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 
 public class ProgramNodeState {
-	private ProgramNode wrappedNode;
+	private Node wrappedNode;
 	private ProgramNodeState[] children;
 
 	private int completedReps;
 	private int currentChildIndex;
 
-	public ProgramNodeState(ProgramNode node) {
+	public ProgramNodeState(Node node) {
 		this.wrappedNode = node;
 
 		children = new ProgramNodeState[node.getChildren().size()];
@@ -59,7 +59,7 @@ public class ProgramNodeState {
 		}
 	}
 
-	public ProgramNode getCurrentNode() {
+	public Node getCurrentNode() {
 		return getCurrentNodeState().wrappedNode;
 	}
 

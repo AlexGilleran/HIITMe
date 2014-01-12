@@ -25,7 +25,7 @@ import android.view.WindowManager;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.InsertionPoint;
 
@@ -76,7 +76,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		dragScrollDownThreshold = (int) (screenSize.y * (1 - DRAG_SCROLL_THRESHOLD_FRACTION));
 	}
 
-	public void setProgramNode(ProgramNode programNode) {
+	public void setProgramNode(Node programNode) {
 		nodeView.setProgramNode(programNode);
 	}
 
@@ -119,7 +119,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		return true;
 	}
 
-	public ProgramNode getProgramNode() {
+	public Node getProgramNode() {
 		return nodeView.getProgramNode();
 	}
 

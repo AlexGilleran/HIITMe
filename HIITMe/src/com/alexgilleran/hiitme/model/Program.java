@@ -1,41 +1,27 @@
 package com.alexgilleran.hiitme.model;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
 import com.alexgilleran.hiitme.programrunner.ProgramNodeState;
-import com.alexgilleran.hiitme.util.PeekaheadQueue;
 import com.alexgilleran.hiitme.util.PeekaheadLinkedList;
+import com.alexgilleran.hiitme.util.PeekaheadQueue;
 
-@Table(name = "program")
-public class Program extends Model {
+public class Program extends DatabaseModel {
 
 	public static final String PROGRAM_ID_NAME = "PROGRAM_ID";
 
 	/**
 	 * Name of the program
 	 */
-	@Column(name = "name")
 	private String name;
 	/**
 	 * Description *
 	 */
-	@Column(name = "description")
 	private String description;
 
-	@Column(name = "associated_node")
-	private ProgramNode programNode;
+	private Node programNode;
 
-	public Program() {
-
-	}
-
-	public Program(String name, String description, int reps) {
+	public Program(String name, String description) {
 		this.name = name;
 		this.description = description;
-
-		getAssociatedNode().setTotalReps(reps);
 	}
 
 	public String getName() {
@@ -46,28 +32,16 @@ public class Program extends Model {
 		return description;
 	}
 
-	public ProgramNode getAssociatedNode() {
+	public Node getAssociatedNode() {
 		if (programNode == null) {
-			programNode = new ProgramNode();
+			programNode = new Node();
 		}
 
 		return programNode;
 	}
 
-	public void setAssociatedNode(ProgramNode programNode) {
+	public void setAssociatedNode(Node programNode) {
 		this.programNode = programNode;
-	}
-
-	@Override
-	public void save() {
-		ActiveAndroid.beginTransaction();
-		try {
-			programNode.save();
-			super.save();
-			ActiveAndroid.setTransactionSuccessful();
-		} finally {
-			ActiveAndroid.endTransaction();
-		}
 	}
 
 	@Override
@@ -75,8 +49,8 @@ public class Program extends Model {
 		return getName();
 	}
 
-	public PeekaheadQueue<ProgramNode> asQueue() {
-		PeekaheadQueue<ProgramNode> result = new PeekaheadLinkedList<ProgramNode>();
+	public PeekaheadQueue<Node> asQueue() {
+		PeekaheadQueue<Node> result = new PeekaheadLinkedList<Node>();
 
 		ProgramNodeState state = new ProgramNodeState(getAssociatedNode());
 

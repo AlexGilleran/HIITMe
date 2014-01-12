@@ -35,8 +35,9 @@ public class EditExerciseFragment extends RoboDialogFragment {
 		builder.setPositiveButton("OK", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				exercise.save();
-				exercise.getParentNode().save();
+				// TODO
+				// exercise.save();
+				// exercise.getParentNode().save();
 			}
 		});
 

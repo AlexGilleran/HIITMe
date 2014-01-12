@@ -1,28 +1,20 @@
 package com.alexgilleran.hiitme.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-
-@Table(name = "program_node")
-public class ProgramNode extends Model {
-	@Column(name = "total_reps")
+public class Node extends DatabaseModel {
 	private int totalReps;
-	@Column(name = "attached_exercise")
 	private Exercise attachedExercise;
-	@Column(name = "parent")
-	private ProgramNode parent;
+	private Node parent;
 
-	private List<ProgramNode> children;
+	private List<Node> children;
 
-	public ProgramNode() {
+	public Node() {
 		super();
 	}
 
-	public ProgramNode(int repCount) {
+	public Node(int repCount) {
 		this();
 
 		setTotalReps(repCount);
@@ -32,26 +24,26 @@ public class ProgramNode extends Model {
 
 	}
 
-	public ProgramNode addChildNode(int repCount) {
-		ProgramNode newNode = new ProgramNode(repCount);
+	public Node addChildNode(int repCount) {
+		Node newNode = new Node(repCount);
 
 		addChildNode(newNode);
 
 		return newNode;
 	}
 
-	public void addChildNode(ProgramNode node) {
+	public void addChildNode(Node node) {
 		addChildNode(node, getChildren().size());
 	}
 
-	public void addChildNode(ProgramNode node, int index) {
+	public void addChildNode(Node node, int index) {
 		checkCanHaveChildren();
 
 		getChildren().add(index, node);
 		node.setParent(this);
 	}
 
-	public void removeChild(ProgramNode child) {
+	public void removeChild(Node child) {
 		child.setParent(null);
 		getChildren().remove(child);
 	}
@@ -59,7 +51,7 @@ public class ProgramNode extends Model {
 	public Exercise addChildExercise(String name, int duration, EffortLevel effortLevel, int repCount) {
 		checkCanHaveChildren();
 
-		ProgramNode containerNode = addChildNode(repCount);
+		Node containerNode = addChildNode(repCount);
 		Exercise newExercise = new Exercise(name, duration, effortLevel, containerNode);
 		containerNode.setAttachedExercise(newExercise);
 
@@ -83,7 +75,7 @@ public class ProgramNode extends Model {
 		} else {
 			int total = 0;
 
-			for (ProgramNode child : getChildren()) {
+			for (Node child : getChildren()) {
 				total += child.getDuration();
 			}
 
@@ -103,9 +95,10 @@ public class ProgramNode extends Model {
 		this.totalReps = totalReps;
 	}
 
-	public List<ProgramNode> getChildren() {
+	public List<Node> getChildren() {
 		if (children == null) {
-			children = getMany(ProgramNode.class, "parent");
+			// TODO
+			children = new ArrayList<Node>();
 		}
 
 		return children;
@@ -118,11 +111,11 @@ public class ProgramNode extends Model {
 		this.attachedExercise = attachedExercise;
 	}
 
-	public ProgramNode getParent() {
+	public Node getParent() {
 		return parent;
 	}
 
-	public void setParent(ProgramNode parent) {
+	public void setParent(Node parent) {
 		this.parent = parent;
 	}
 
@@ -134,36 +127,4 @@ public class ProgramNode extends Model {
 		}
 	}
 
-	@Override
-	public void save() {
-		ActiveAndroid.beginTransaction();
-		try {
-			// Hack to get around ActiveAndroid's non-handling of circular
-			// dependencies.
-
-			for (ProgramNode child : getChildren()) {
-				child.setParent(null);
-				child.save();
-			}
-			Exercise attachedExercise = getAttachedExercise();
-			this.setAttachedExercise(null);
-
-			super.save();
-
-			for (ProgramNode child : getChildren()) {
-				child.setParent(this);
-				child.save();
-			}
-
-			if (attachedExercise != null) {
-				attachedExercise.save();
-				this.setAttachedExercise(attachedExercise);
-				super.save();
-			}
-
-			ActiveAndroid.setTransactionSuccessful();
-		} finally {
-			ActiveAndroid.endTransaction();
-		}
-	}
 }

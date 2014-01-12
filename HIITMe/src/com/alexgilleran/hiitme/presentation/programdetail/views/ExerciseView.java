@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
@@ -96,8 +96,8 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	};
 
 	@Override
-	public ProgramNode getProgramNode() {
-		ProgramNode node = new ProgramNode();
+	public Node getProgramNode() {
+		Node node = new Node();
 		node.setTotalReps(1);
 
 		// TODO: Create a whole new exercise.

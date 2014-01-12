@@ -1,26 +1,25 @@
 package com.alexgilleran.hiitme.model;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-
-@Table(name = "exercise")
-public class Exercise extends Model {
-	@Column(name = "duration")
+public class Exercise extends DatabaseModel {
+	private String name;
 	private int duration;
-	@Column(name = "effort_level")
 	private EffortLevel effortLevel;
-	@Column(name = "exercise_group")
-	private ProgramNode exerciseGroup;
+	private Node exerciseGroup;
 
 	public Exercise() {
 		super();
 	}
 
-	public Exercise(String name, int duration, EffortLevel effortLevel, ProgramNode node) {
+	public Exercise(int duration, EffortLevel effortLevel, Node node) {
 		this.duration = duration;
 		this.effortLevel = effortLevel;
 		this.exerciseGroup = node;
+	}
+
+	public Exercise(String name, int duration, EffortLevel effortLevel, Node node) {
+		this(duration, effortLevel, node);
+
+		this.name = name;
 	}
 
 	public int getDuration() {
@@ -31,11 +30,11 @@ public class Exercise extends Model {
 		return effortLevel;
 	}
 
-	public ProgramNode getParentNode() {
+	public Node getParentNode() {
 		return exerciseGroup;
 	}
 
-	public void setExerciseGroup(ProgramNode exerciseGroup) {
+	public void setExerciseGroup(Node exerciseGroup) {
 		this.exerciseGroup = exerciseGroup;
 	}
 
@@ -47,8 +46,11 @@ public class Exercise extends Model {
 		this.effortLevel = effortLevel;
 	}
 
-	@Override
-	public void save() {
-		super.save();
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

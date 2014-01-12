@@ -9,16 +9,16 @@ import org.junit.Test;
 
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 
 public class ProgramNodeImplTest extends BaseProgramTest {
-	ProgramNode simpleNode;
-	ProgramNode nestedNode;
+	Node simpleNode;
+	Node nestedNode;
 
 	@Before
 	public void setUp() {
-		simpleNode = new ProgramNode(1);
-		nestedNode = new ProgramNode(2);
+		simpleNode = new Node(1);
+		nestedNode = new Node(2);
 
 		setupSimpleNode(simpleNode);
 		setupNestedNode(nestedNode);
@@ -28,28 +28,28 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 	public void testNestedTraversal() {
 		assertEquals(2, nestedNode.getTotalReps());
 
-		ProgramNode step1Node = nestedNode.getChildren().get(0);
+		Node step1Node = nestedNode.getChildren().get(0);
 		assertEquals(2, step1Node.getTotalReps());
 		assertExercise(step1Node.getAttachedExercise(), "Step 1", 100,
 				EffortLevel.HARD);
 
-		ProgramNode subNode1 = nestedNode.getChildren().get(1);
+		Node subNode1 = nestedNode.getChildren().get(1);
 		assertEquals(1, subNode1.getTotalReps());
 
-		ProgramNode sub2Node1 = subNode1.getChildren().get(0);
+		Node sub2Node1 = subNode1.getChildren().get(0);
 		assertEquals(2, sub2Node1.getTotalReps());
-		ProgramNode step4Node = sub2Node1.getChildren().get(1);
+		Node step4Node = sub2Node1.getChildren().get(1);
 		assertEquals(1, step4Node.getTotalReps());
 		assertExercise(step4Node.getAttachedExercise(), "Step 4", 400,
 				EffortLevel.REST);
 
-		ProgramNode sub3Node1 = sub2Node1.getChildren().get(0);
+		Node sub3Node1 = sub2Node1.getChildren().get(0);
 		assertEquals(3, sub3Node1.getTotalReps());
-		ProgramNode step2Node = sub3Node1.getChildren().get(0);
+		Node step2Node = sub3Node1.getChildren().get(0);
 		assertEquals(1, step2Node.getTotalReps());
 		assertExercise(step2Node.getAttachedExercise(), "Step 2", 200,
 				EffortLevel.EASY);
-		ProgramNode step3Node = sub3Node1.getChildren().get(1);
+		Node step3Node = sub3Node1.getChildren().get(1);
 		assertEquals(3, step3Node.getTotalReps());
 		assertExercise(step3Node.getAttachedExercise(), "Step 3", 300,
 				EffortLevel.REST);
@@ -163,9 +163,9 @@ public class ProgramNodeImplTest extends BaseProgramTest {
 		assertTrue(simpleNode.hasChildren());
 		assertEquals(3, simpleNode.getChildren().size());
 
-		ProgramNode step1 = simpleNode.getChildren().get(0);
-		ProgramNode step2 = simpleNode.getChildren().get(1);
-		ProgramNode step3 = simpleNode.getChildren().get(2);
+		Node step1 = simpleNode.getChildren().get(0);
+		Node step2 = simpleNode.getChildren().get(1);
+		Node step3 = simpleNode.getChildren().get(2);
 
 		assertEquals(2, step1.getTotalReps());
 		assertEquals(1, step2.getTotalReps());

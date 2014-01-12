@@ -25,13 +25,7 @@
 			<artifactId>roboguice</artifactId>
 			<version>2.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.activeandroid</groupId>
-			<artifactId>activeandroid-parent</artifactId>
-			<version>3.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/activeandroid-3.0.jar</systemPath>
-		</dependency>
+
 		<!-- For the optional Nullable annotation -->
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>

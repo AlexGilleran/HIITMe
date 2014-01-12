@@ -3,15 +3,16 @@ package com.alexgilleran.hiitme.data;
 import java.util.List;
 
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 
 public interface ProgramDAO {
 	List<Program> getAllPrograms();
 
 	Program getProgram(long programId);
 
-	void deleteAllPrograms();
+	void replaceProgramNode(Program program, Node programNode);
 
-	void replaceProgramNode(Program program, ProgramNode programNode);
-
+	long insertProgram(Program program);
+	
+	void deleteProgram(Program program);
 }

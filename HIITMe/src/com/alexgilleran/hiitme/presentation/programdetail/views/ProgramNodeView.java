@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
@@ -26,7 +26,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	private DragManager dragManager;
 	private ProgramNodeView parent;
 
-	private ProgramNode programNode;
+	private Node programNode;
 
 	private TextView repCountView;
 	private ImageButton moveButton;
@@ -71,7 +71,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 		// }
 	}
 
-	public void setProgramNode(ProgramNode programNode) {
+	public void setProgramNode(Node programNode) {
 		this.programNode = programNode;
 
 		render();
@@ -83,7 +83,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 		}
 
 		for (int i = 0; i < programNode.getChildren().size(); i++) {
-			ProgramNode child = programNode.getChildren().get(i);
+			Node child = programNode.getChildren().get(i);
 
 			if (child.getAttachedExercise() != null) {
 				initialiseChild(buildExerciseView(child.getAttachedExercise()));
@@ -150,7 +150,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	 * @param node
 	 *            The child node to pass to the {@link ProgramNodeView}.
 	 */
-	private ProgramNodeView buildProgramNodeView(ProgramNode node) {
+	private ProgramNodeView buildProgramNodeView(Node node) {
 		ProgramNodeView nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
 		nodeView.setProgramNode(node);
 
@@ -218,8 +218,8 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public ProgramNode getProgramNode() {
-		ProgramNode programNode = new ProgramNode();
+	public Node getProgramNode() {
+		Node programNode = new Node();
 		
 		// TODO: jesus christ.
 		programNode.setTotalReps(Integer.parseInt(repCountView.getText().toString().substring(1)));

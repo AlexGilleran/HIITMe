@@ -1,7 +1,7 @@
 package com.alexgilleran.hiitme.programrunner;
 
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 
 public interface ProgramRunner {
 	void start();
@@ -24,5 +24,5 @@ public interface ProgramRunner {
 
 	Exercise getNextExercise();
 
-	ProgramNode getCurrentNode();
+	Node getCurrentNode();
 }

@@ -4,7 +4,7 @@ import android.os.CountDownTimer;
 
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.model.ProgramNode;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.util.PeekaheadQueue;
 
 public class ProgramRunnerImpl implements ProgramRunner {
@@ -13,7 +13,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 	private CountDownTimer countDown;
 
-	private PeekaheadQueue<ProgramNode> nodeQueue;
+	private PeekaheadQueue<Node> nodeQueue;
 	private CountDownObserver observer;
 	private int exerciseMsRemaining;
 	private int programMsRemaining;
@@ -78,13 +78,13 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	}
 
 	@Override
-	public ProgramNode getCurrentNode() {
+	public Node getCurrentNode() {
 		return nodeQueue.peek();
 	}
 
 	@Override
 	public Exercise getNextExercise() {
-		ProgramNode next = nodeQueue.peek(1);
+		Node next = nodeQueue.peek(1);
 		return next != null ? next.getAttachedExercise() : null;
 	}
 
