@@ -38,12 +38,14 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		db.execSQL(programTable.getCreateSql());
 
 		Program tabata = new Program("Tabata", "The tabata protocol");
+		tabata.getAssociatedNode().setTotalReps(8);
 		tabata.getAssociatedNode().addChildExercise("Hard", 2000, EffortLevel.HARD, 1);
 		tabata.getAssociatedNode().addChildExercise("Rest", 1000, EffortLevel.REST, 1);
 
 		insertProgram(tabata, db);
 
 		Program nestTest = new Program("NestTest", "A nested test program");
+		nestTest.getAssociatedNode().setTotalReps(2);
 		Node nestNode1 = nestTest.getAssociatedNode().addChildNode(2);
 		Node nestNode11 = nestNode1.addChildNode(2);
 		Node nestNode111 = nestNode11.addChildNode(1);
@@ -158,6 +160,10 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 	private Exercise getExercise(long id, SQLiteDatabase db) {
 		Cursor cursor = db.query(ExerciseTable.NAME, null, exerciseTable.getSingleQuery(id), null, null, null, null);
 
+		if (!cursor.moveToFirst()) {
+			return null;
+		}
+		
 		Exercise exercise = new Exercise();
 
 		exercise.setId(id);
@@ -194,18 +200,23 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		return db.insertOrThrow(ProgramTable.NAME, null, programValues);
 	}
 
-	private long insertNode(Node node) {
+	public long insertNode(Node node) {
 		return insertNode(node, getWritableDatabase());
 	}
 
 	private long insertNode(Node node, SQLiteDatabase db) {
 		ContentValues nodeValues = new ContentValues();
 		nodeValues.put(NodeTable.Columns.TOTAL_REPS.name, node.getTotalReps());
+
+		if (node.getParent() != null && node.getParent().getId() > 0) {
+			nodeValues.put(NodeTable.Columns.PARENT_NODE_ID.name, node.getParent().getId());
+		}
+
 		if (node.getAttachedExercise() != null) {
 			long exerciseId = saveExercise(node.getAttachedExercise(), db);
 			nodeValues.put(NodeTable.Columns.EXERCISE_ID.name, exerciseId);
 		}
-		long id = insert(nodeTable, node, nodeValues, db);
+		node.setId(insert(nodeTable, node, nodeValues, db));
 
 		if (node.hasChildren()) {
 			for (Node child : node.getChildren()) {
@@ -213,7 +224,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 			}
 		}
 
-		return id;
+		return node.getId();
 	}
 
 	private long saveExercise(Exercise exercise) {
