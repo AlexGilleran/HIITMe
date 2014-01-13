@@ -12,7 +12,7 @@ public interface ProgramDAO {
 
 	void replaceProgramNode(Program program, Node programNode);
 
-	long insertProgram(Program program);
+	long saveProgram(Program program);
 	
 	void deleteProgram(Program program);
 }

@@ -10,4 +10,8 @@ public abstract class DatabaseModel {
 	public void setId(long id) {
 		this.id = id;
 	}
+	
+	public boolean isAlreadyPersisted() {
+		return id > 0;
+	}
 }

@@ -84,7 +84,8 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	}
 
 	public void save() {
-		programDao.replaceProgramNode(program, detailView.getProgramNode());
+		program.setAssociatedNode(detailView.getProgramNode());
+		programDao.saveProgram(program);
 	}
 
 }
