@@ -25,8 +25,7 @@ import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
  * {@link ProgramListFragment.Callbacks} interface to listen for item
  * selections.
  */
-public class ProgramListActivity extends RoboFragmentActivity implements
-		ProgramListFragment.Callbacks {
+public class ProgramListActivity extends RoboFragmentActivity implements ProgramListFragment.Callbacks {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -48,8 +47,7 @@ public class ProgramListActivity extends RoboFragmentActivity implements
 
 			// In two-pane mode, list items should be given the
 			// 'activated' state when touched.
-			((ProgramListFragment) this.getSupportFragmentManager()
-					.findFragmentById(R.id.program_list))
+			((ProgramListFragment) this.getSupportFragmentManager().findFragmentById(R.id.program_list))
 					.setActivateOnItemClick(true);
 		}
 
@@ -67,11 +65,10 @@ public class ProgramListActivity extends RoboFragmentActivity implements
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putLong(Program.PROGRAM_ID_NAME, id + 1);
+			arguments.putLong(Program.PROGRAM_ID_NAME, id);
 			ProgramDetailFragment fragment = new ProgramDetailFragment();
 			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.program_detail_container, fragment).commit();
+			getSupportFragmentManager().beginTransaction().replace(R.id.program_detail_container, fragment).commit();
 
 		} else {
 			// In single-pane mode, simply start the detail activity

@@ -6,7 +6,7 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Node;
 
 public interface ProgramDAO {
-	List<Program> getAllPrograms();
+	List<Program> getProgramList();
 
 	Program getProgram(long programId);
 

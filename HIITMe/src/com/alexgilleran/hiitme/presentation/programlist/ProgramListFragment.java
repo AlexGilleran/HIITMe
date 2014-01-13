@@ -82,7 +82,7 @@ public class ProgramListFragment extends RoboListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setListAdapter(new ProgramAdapter(ProgramDAO.getAllPrograms()));
+		setListAdapter(new ProgramAdapter(ProgramDAO.getProgramList()));
 	}
 
 	@Override

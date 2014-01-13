@@ -106,7 +106,7 @@ public class Node extends DatabaseModel {
 
 	public void setAttachedExercise(Exercise attachedExercise) {
 		if (attachedExercise != null) {
-			attachedExercise.setExerciseGroup(this);
+			attachedExercise.setNode(this);
 		}
 		this.attachedExercise = attachedExercise;
 	}
@@ -125,6 +125,10 @@ public class Node extends DatabaseModel {
 		} else {
 			return parent.getDepth() + 1;
 		}
+	}
+
+	public void setChildren(List<Node> children) {
+		this.children = children;
 	}
 
 }

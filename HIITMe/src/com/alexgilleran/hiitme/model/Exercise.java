@@ -34,7 +34,7 @@ public class Exercise extends DatabaseModel {
 		return exerciseGroup;
 	}
 
-	public void setExerciseGroup(Node exerciseGroup) {
+	public void setNode(Node exerciseGroup) {
 		this.exerciseGroup = exerciseGroup;
 	}
 
