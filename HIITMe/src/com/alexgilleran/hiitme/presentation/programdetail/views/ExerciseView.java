@@ -13,6 +13,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
 	private DragManager dragManager;
@@ -21,7 +22,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView duration;
 	private Exercise exercise;
 	private ImageButton moveButton;
-	private ProgramNodeView nodeView;
+	private NodeView nodeView;
 
 	public ExerciseView(Context context) {
 		super(context);
@@ -52,11 +53,11 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		});
 	}
 
-	public ProgramNodeView getNodeView() {
+	public NodeView getNodeView() {
 		return nodeView;
 	}
 
-	public void setNodeView(ProgramNodeView nodeView) {
+	public void setNodeView(NodeView nodeView) {
 		this.nodeView = nodeView;
 	}
 
@@ -101,7 +102,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		node.setTotalReps(1);
 
 		// TODO: Create a whole new exercise.
-//		Exercise exercise = new Exercise();
+		// Exercise exercise = new Exercise();
 		node.setAttachedExercise(exercise);
 
 		return node;
@@ -113,7 +114,12 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public ProgramNodeView getParentProgramNodeView() {
-		return (ProgramNodeView) getParent();
+	public NodeView getParentProgramNodeView() {
+		return (NodeView) getParent();
+	}
+
+	@Override
+	public void setEditable(boolean editable) {
+		moveButton.setVisibility(ViewUtils.getVisibilityInt(editable));
 	}
 }

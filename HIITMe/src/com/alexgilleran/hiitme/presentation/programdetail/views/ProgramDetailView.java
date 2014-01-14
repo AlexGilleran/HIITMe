@@ -27,7 +27,7 @@ import android.widget.ScrollView;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
-import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView.InsertionPoint;
+import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView.InsertionPoint;
 
 public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final int DRAG_SCROLL_INTERVAL = 100;
@@ -35,7 +35,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
 
 	private LayoutInflater layoutInflater;
-	private ProgramNodeView nodeView;
+	private NodeView nodeView;
 	private int downY, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
@@ -45,6 +45,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private int dragScrollDownThreshold;
 	private int downScrollY;
 	private Timer scrollTimer;
+	private boolean isBeingEdited = false;
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -63,7 +64,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	@Override
 	public void onFinishInflate() {
-		nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, null);
+		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, null);
 		nodeView.setDragManager(this);
 		((ViewGroup) this.findViewById(R.id.frag_programdetail_scrollcontainer)).addView(nodeView);
 
@@ -115,8 +116,23 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	};
 
 	public boolean isBeingEdited() {
-		// TODO
-		return true;
+		return isBeingEdited;
+	}
+
+	public void startEditing() {
+		isBeingEdited = true;
+
+		refreshEditability();
+	}
+
+	public void stopEditing() {
+		isBeingEdited = false;
+
+		refreshEditability();
+	}
+
+	private void refreshEditability() {
+		nodeView.setEditable(isBeingEdited);
 	}
 
 	public Node getProgramNode() {
@@ -192,7 +208,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	private void insertAt(final DraggableView dragView, final InsertionPoint insertionPoint, final int deltaY) {
-		ProgramNodeView dragViewParent = dragView.getParentProgramNodeView();
+		NodeView dragViewParent = dragView.getParentProgramNodeView();
 
 		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {
 			int dragViewIndex = getChildIndex(dragViewParent, dragView.asView());

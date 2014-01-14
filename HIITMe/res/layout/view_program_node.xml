@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.alexgilleran.hiitme.presentation.programdetail.views.NodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/program_node_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -28,7 +28,8 @@
             android:layout_alignParentTop="true"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_move" />
+            android:src="@drawable/ic_move" 
+            android:visibility="gone"/>
     </RelativeLayout>
 
-</com.alexgilleran.hiitme.presentation.programdetail.views.ProgramNodeView>
+</com.alexgilleran.hiitme.presentation.programdetail.views.NodeView>

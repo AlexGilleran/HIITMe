@@ -28,6 +28,7 @@
         android:layout_centerVertical="true"
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_move" />
+        android:src="@drawable/ic_move"
+        android:visibility="gone" />
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView>

@@ -1,5 +1,6 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import static com.alexgilleran.hiitme.util.ViewUtils.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +22,10 @@ import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
-public class ProgramNodeView extends LinearLayout implements DraggableView {
+public class NodeView extends LinearLayout implements DraggableView {
 	private LayoutInflater layoutInflater;
 	private DragManager dragManager;
-	private ProgramNodeView parent;
+	private NodeView parent;
 
 	private Node programNode;
 
@@ -33,17 +34,17 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 
 	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
 
-	public ProgramNodeView(Context context) {
+	public NodeView(Context context) {
 		super(context);
 		layoutInflater = LayoutInflater.from(context);
 	}
 
-	public ProgramNodeView(Context context, AttributeSet attrs) {
+	public NodeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		layoutInflater = LayoutInflater.from(context);
 	}
 
-	public ProgramNodeView(Context context, AttributeSet attrs, int defStyle) {
+	public NodeView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		layoutInflater = LayoutInflater.from(context);
 	}
@@ -59,7 +60,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	private OnTouchListener moveListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
-			dragManager.startDrag(ProgramNodeView.this, event);
+			dragManager.startDrag(NodeView.this, event);
 
 			return false;
 		}
@@ -88,7 +89,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 			if (child.getAttachedExercise() != null) {
 				initialiseChild(buildExerciseView(child.getAttachedExercise()));
 			} else {
-				ProgramNodeView programNodeView = buildProgramNodeView(child);
+				NodeView programNodeView = buildProgramNodeView(child);
 				programNodeView.setParent(parent);
 				initialiseChild(programNodeView);
 			}
@@ -116,7 +117,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 		}
 	}
 
-	public void setParent(ProgramNodeView parent) {
+	public void setParent(NodeView parent) {
 		this.parent = parent;
 	}
 
@@ -143,15 +144,15 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	}
 
 	/**
-	 * Populates an existing row meant to contain a {@link ProgramNodeView}.
+	 * Populates an existing row meant to contain a {@link NodeView}.
 	 * 
 	 * @param row
 	 *            The row to populate.
 	 * @param node
-	 *            The child node to pass to the {@link ProgramNodeView}.
+	 *            The child node to pass to the {@link NodeView}.
 	 */
-	private ProgramNodeView buildProgramNodeView(Node node) {
-		ProgramNodeView nodeView = (ProgramNodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
+	private NodeView buildProgramNodeView(Node node) {
+		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
 		nodeView.setProgramNode(node);
 
 		return nodeView;
@@ -194,8 +195,8 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 			if (top >= child.getTop() && top < child.getTop() + child.getHeight()) {
 				// TODO: there's gotta be a better way than instanceofs
 				// everywhere
-				if (child != viewToSwapIn && child instanceof ProgramNodeView) {
-					return ((ProgramNodeView) child).findViewAtTop(top - child.getTop(), viewToSwapIn);
+				if (child != viewToSwapIn && child instanceof NodeView) {
+					return ((NodeView) child).findViewAtTop(top - child.getTop(), viewToSwapIn);
 				}
 
 				return new InsertionPoint(i, this, child);
@@ -207,10 +208,10 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 
 	public class InsertionPoint {
 		int index;
-		ProgramNodeView parent;
+		NodeView parent;
 		View swapWith;
 
-		public InsertionPoint(int index, ProgramNodeView parent, View swapWith) {
+		public InsertionPoint(int index, NodeView parent, View swapWith) {
 			this.index = index;
 			this.parent = parent;
 			this.swapWith = swapWith;
@@ -220,7 +221,7 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	@Override
 	public Node getProgramNode() {
 		Node programNode = new Node();
-		
+
 		// TODO: jesus christ.
 		programNode.setTotalReps(Integer.parseInt(repCountView.getText().toString().substring(1)));
 
@@ -263,7 +264,16 @@ public class ProgramNodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public ProgramNodeView getParentProgramNodeView() {
-		return (ProgramNodeView) getParent();
+	public NodeView getParentProgramNodeView() {
+		return (NodeView) getParent();
+	}
+
+	@Override
+	public void setEditable(boolean editable) {
+		moveButton.setVisibility(getVisibilityInt(editable));
+
+		for (DraggableView child : getChildren()) {
+			child.setEditable(editable);
+		}
 	}
 }

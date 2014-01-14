@@ -12,6 +12,7 @@ public interface DraggableView {
 
 	View asView();
 
-	ProgramNodeView getParentProgramNodeView();
+	NodeView getParentProgramNodeView();
 
+	void setEditable(boolean editable);
 }

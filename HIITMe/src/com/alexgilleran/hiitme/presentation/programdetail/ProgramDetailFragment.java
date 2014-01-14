@@ -88,4 +88,11 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 		programDao.saveProgram(program);
 	}
 
+	public void startEditing() {
+		detailView.startEditing();
+	}
+
+	public void stopEditing() {
+		detailView.stopEditing();
+	}
 }

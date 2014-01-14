@@ -11,7 +11,6 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
@@ -84,6 +83,12 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 			return true;
 		case R.id.actionbar_icon_save:
 			detailFragment.save();
+			detailFragment.stopEditing();
+			invalidateOptionsMenu();
+			return true;
+		case R.id.actionbar_icon_edit:
+			detailFragment.startEditing();
+			invalidateOptionsMenu();
 			return true;
 		}
 
@@ -101,9 +106,8 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.run_menu, menu);
 
-		boolean isBeingEdited = detailFragment.isBeingEdited();
-		menu.findItem(R.id.actionbar_icon_save).setVisible(isBeingEdited);
-		menu.findItem(R.id.actionbar_icon_edit).setVisible(!isBeingEdited);
+		menu.findItem(R.id.actionbar_icon_save).setVisible(detailFragment.isBeingEdited());
+		menu.findItem(R.id.actionbar_icon_edit).setVisible(!detailFragment.isBeingEdited());
 
 		return true;
 	}

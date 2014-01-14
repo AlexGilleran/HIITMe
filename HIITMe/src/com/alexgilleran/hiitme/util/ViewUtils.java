@@ -2,6 +2,8 @@ package com.alexgilleran.hiitme.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import android.view.View;
+
 public class ViewUtils {
 	private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
@@ -28,5 +30,9 @@ public class ViewUtils {
 				return result;
 			}
 		}
+	}
+
+	public static int getVisibilityInt(boolean visible) {
+		return visible ? View.VISIBLE : View.GONE;
 	}
 }
