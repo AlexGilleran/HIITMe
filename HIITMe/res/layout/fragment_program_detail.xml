@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    ProgramDetailFragmentView=""
-    android:fillViewport="false" >
+    android:orientation="vertical" >
 
-    <FrameLayout
-        android:id="@+id/frag_programdetail_scrollcontainer"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp" >
-    </FrameLayout>
+        android:text="blah" />
 
-</com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="blah" />
+
+    <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="false" >
+
+        <FrameLayout
+            android:id="@+id/root_node_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp" >
+        </FrameLayout>
+    </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
+
+</LinearLayout>

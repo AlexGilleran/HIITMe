@@ -40,7 +40,7 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 	@InjectView(R.id.root)
 	private ProgramDetailView detailView;
 
-	@InjectView(R.id.frag_programdetail_scrollcontainer)
+	@InjectView(R.id.root_node_view_container)
 	private FrameLayout container;
 
 	/** Mandatory empty constructor */

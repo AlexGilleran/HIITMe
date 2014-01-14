@@ -11,17 +11,15 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
@@ -41,8 +39,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private BitmapDrawable hoverCell;
 	private DraggableView dragView;
 
-	private int dragScrollUpThreshold;
-	private int dragScrollDownThreshold;
+	private int dragScrollUpThreshold = -1;
+	private int dragScrollDownThreshold = -1;
 	private int downScrollY;
 	private Timer scrollTimer;
 	private boolean isBeingEdited = false;
@@ -66,15 +64,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	public void onFinishInflate() {
 		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, null);
 		nodeView.setDragManager(this);
-		((ViewGroup) this.findViewById(R.id.frag_programdetail_scrollcontainer)).addView(nodeView);
+		((ViewGroup) this.findViewById(R.id.root_node_view_container)).addView(nodeView);
 
-		WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-		Display display = wm.getDefaultDisplay();
-		Point screenSize = new Point();
-		display.getSize(screenSize);
-
-		dragScrollUpThreshold = (int) (screenSize.y * DRAG_SCROLL_THRESHOLD_FRACTION);
-		dragScrollDownThreshold = (int) (screenSize.y * (1 - DRAG_SCROLL_THRESHOLD_FRACTION));
+		getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
 	}
 
 	public void setProgramNode(Node programNode) {
@@ -139,18 +131,25 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		return nodeView.getProgramNode();
 	}
 
+	private boolean scrollParamsSet() {
+		return dragScrollDownThreshold >= 0 && dragScrollUpThreshold >= 0;
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		stopScrolling();
 
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_MOVE:
-			if (hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null) {
+			if (currentlyDragging()) {
 				lastEventY = (int) event.getRawY();
-				if (lastEventY > dragScrollDownThreshold) {
-					startScrolling((int) (lastEventY - dragScrollDownThreshold) / 2);
-				} else if (lastEventY < dragScrollUpThreshold) {
-					startScrolling((int) (lastEventY - dragScrollUpThreshold) / 2);
+
+				if (scrollParamsSet()) {
+					if (lastEventY > dragScrollDownThreshold) {
+						startScrolling((int) (lastEventY - dragScrollDownThreshold) / 2);
+					} else if (lastEventY < dragScrollUpThreshold) {
+						startScrolling((int) (lastEventY - dragScrollUpThreshold) / 2);
+					}
 				}
 
 				handlePointerMove();
@@ -185,6 +184,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 
 		return super.onTouchEvent(event);
+	}
+
+	private boolean currentlyDragging() {
+		return hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null;
 	}
 
 	private void handlePointerMove() {
@@ -361,6 +364,17 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
+	private OnGlobalLayoutListener layoutListener = new OnGlobalLayoutListener() {
+		@Override
+		public void onGlobalLayout() {
+			int[] location = new int[2];
+			getLocationOnScreen(location);
+
+			int thresholdFractionPx = (int) (getHeight() * DRAG_SCROLL_THRESHOLD_FRACTION);
+			dragScrollUpThreshold = location[1] + thresholdFractionPx;
+			dragScrollDownThreshold = location[1] + getHeight() - thresholdFractionPx;
+		}
+	};
 	/**
 	 * This TypeEvaluator is used to animate the BitmapDrawable back to its
 	 * final location when the user lifts his finger by modifying the

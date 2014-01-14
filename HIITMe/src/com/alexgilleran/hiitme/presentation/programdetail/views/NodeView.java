@@ -1,12 +1,11 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import static com.alexgilleran.hiitme.util.ViewUtils.*;
+import static com.alexgilleran.hiitme.util.ViewUtils.getVisibilityInt;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -207,18 +206,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return new InsertionPoint(-1, this, null);
 	}
 
-	public class InsertionPoint {
-		int index;
-		NodeView parent;
-		View swapWith;
-
-		public InsertionPoint(int index, NodeView parent, View swapWith) {
-			this.index = index;
-			this.parent = parent;
-			this.swapWith = swapWith;
-		}
-	}
-
 	@Override
 	public Node getProgramNode() {
 		Node programNode = new Node();
@@ -281,5 +268,17 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
 		setBackgroundResource(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
+	}
+
+	public class InsertionPoint {
+		int index;
+		NodeView parent;
+		View swapWith;
+
+		public InsertionPoint(int index, NodeView parent, View swapWith) {
+			this.index = index;
+			this.parent = parent;
+			this.swapWith = swapWith;
+		}
 	}
 }
