@@ -224,22 +224,23 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 				insertionPoint.parent.addChild(dragView, insertionPoint.index);
 			}
 
-			insertionPoint.parent.removeView(insertionPoint.swapWith);
-			dragViewParent.addView(insertionPoint.swapWith, dragViewIndex);
+			insertionPoint.parent.removeView(insertionPoint.swapWith.asView());
+			dragViewParent.addView(insertionPoint.swapWith.asView(), dragViewIndex);
 
-			final int switchViewStartTop = insertionPoint.swapWith.getTop();
+			final int switchViewStartTop = insertionPoint.swapWith.asView().getTop();
 
 			final ViewTreeObserver observer = getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				public boolean onPreDraw() {
 					observer.removeOnPreDrawListener(this);
 
-					int switchViewNewTop = insertionPoint.swapWith.getTop();
+					int switchViewNewTop = insertionPoint.swapWith.asView().getTop();
 					int delta = switchViewStartTop - switchViewNewTop;
 
-					insertionPoint.swapWith.setTranslationY(delta);
+					insertionPoint.swapWith.asView().setTranslationY(delta);
 
-					ObjectAnimator animator = ObjectAnimator.ofFloat(insertionPoint.swapWith, View.TRANSLATION_Y, 0);
+					ObjectAnimator animator = ObjectAnimator.ofFloat(insertionPoint.swapWith.asView(),
+							View.TRANSLATION_Y, 0);
 					animator.setDuration(MOVE_DURATION);
 					animator.start();
 

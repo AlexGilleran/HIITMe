@@ -191,15 +191,15 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 		// TODO: Guess the correct place instead of going top-to-bottom
 		for (int i = 1; i < getChildCount(); i++) {
-			View child = getChildAt(i);
-			if (top >= child.getTop() && top < child.getTop() + child.getHeight()) {
-				// TODO: there's gotta be a better way than instanceofs
-				// everywhere
-				if (child != viewToSwapIn && child instanceof NodeView) {
-					return ((NodeView) child).findViewAtTop(top - child.getTop(), viewToSwapIn);
-				}
+			View childView = getChildAt(i);
+			int upperBound = i + 1 < getChildCount() ? getChildAt(i + 1).getTop() : getTop() + getHeight();
 
-				return new InsertionPoint(i, this, child);
+			if (top >= childView.getTop() && top < upperBound) {
+				if (childView != viewToSwapIn && childView instanceof NodeView) {
+					return ((NodeView) childView).findViewAtTop(top - (childView.getTop()), viewToSwapIn);
+				} else if (childView instanceof DraggableView) {
+					return new InsertionPoint(i, this, (DraggableView) childView);
+				}
 			}
 		}
 
@@ -273,9 +273,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public class InsertionPoint {
 		int index;
 		NodeView parent;
-		View swapWith;
+		DraggableView swapWith;
 
-		public InsertionPoint(int index, NodeView parent, View swapWith) {
+		public InsertionPoint(int index, NodeView parent, DraggableView swapWith) {
 			this.index = index;
 			this.parent = parent;
 			this.swapWith = swapWith;

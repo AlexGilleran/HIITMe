@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:fillViewport="false" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="blah" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="blah" />
-
-    <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView
-        android:id="@+id/root"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="false" >
+        android:orientation="vertical" >
+
+        <TextView
+            style="@style/EditableText"
+            android:text="blah" />
+
+        <TextView
+            style="@style/SubtitleText"
+            android:text="blah" />
 
         <FrameLayout
             android:id="@+id/root_node_view_container"
@@ -26,6 +24,6 @@
             android:layout_height="wrap_content"
             android:padding="5dp" >
         </FrameLayout>
-    </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
+    </LinearLayout>
 
-</LinearLayout>
+</com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
