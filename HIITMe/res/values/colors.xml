@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="lighter_blue">#FFC5EAF8</color>
+    <color name="darker_blue">#FFE2F4FB</color>
+    <color name="being_dragged">#FFFFC488</color>
+    <color name="base_background">#FFFFFFFF</color>
+</resources>

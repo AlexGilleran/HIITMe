@@ -78,7 +78,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	public void setProgramNode(Node programNode) {
-		nodeView.setProgramNode(programNode);
+		nodeView.init(programNode, null);
 	}
 
 	@Override
@@ -260,6 +260,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	@Override
 	public void startDrag(DraggableView view, MotionEvent event) {
+		view.setBeingDragged(true);
+
 		downY = (int) event.getRawY();
 		downScrollY = getScrollY();
 
@@ -346,6 +348,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 				@Override
 				public void onAnimationEnd(Animator animation) {
+					dragView.setBeingDragged(false);
 					dragView.asView().setVisibility(VISIBLE);
 					hoverCell = null;
 					setEnabled(true);

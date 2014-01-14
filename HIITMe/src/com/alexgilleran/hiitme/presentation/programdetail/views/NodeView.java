@@ -32,8 +32,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private TextView repCountView;
 	private ImageButton moveButton;
 
-	private static final int[] BG_COLOURS = new int[] { 0xFFC5EAF8, 0xFFE2F4FB };
-
 	public NodeView(Context context) {
 		super(context);
 		layoutInflater = LayoutInflater.from(context);
@@ -72,8 +70,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 		// }
 	}
 
-	public void setProgramNode(Node programNode) {
+	public void init(Node programNode, NodeView parent) {
 		this.programNode = programNode;
+		this.parent = parent;
 
 		render();
 	}
@@ -90,14 +89,12 @@ public class NodeView extends LinearLayout implements DraggableView {
 				initialiseChild(buildExerciseView(child.getAttachedExercise()));
 			} else {
 				NodeView programNodeView = buildProgramNodeView(child);
-				programNodeView.setParent(parent);
 				initialiseChild(programNodeView);
 			}
 		}
 
 		repCountView.setText("x" + programNode.getTotalReps());
-		LayerDrawable background = (LayerDrawable) getBackground().mutate();
-		((GradientDrawable) background.findDrawableByLayerId(R.id.card)).setColor(determineBgColour());
+		setBackgroundResource(determineBgDrawableRes());
 	}
 
 	private <V extends View & DraggableView> void initialiseChild(V newView) {
@@ -117,13 +114,17 @@ public class NodeView extends LinearLayout implements DraggableView {
 		}
 	}
 
-	public void setParent(NodeView parent) {
-		this.parent = parent;
+	private int determineBgDrawableRes() {
+		int depth = getDepth();
+
+		return depth % 2 == 0 ? R.drawable.card_nested_even_depth : R.drawable.card_nested_odd_depth;
 	}
 
-	private int determineBgColour() {
-		int colorIndex = programNode.getDepth() % BG_COLOURS.length;
-		return BG_COLOURS[colorIndex];
+	private int getDepth() {
+		if (parent != null) {
+			return 1 + parent.getDepth();
+		}
+		return 0;
 	}
 
 	/**
@@ -153,7 +154,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	 */
 	private NodeView buildProgramNodeView(Node node) {
 		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
-		nodeView.setProgramNode(node);
+		nodeView.init(node, this);
 
 		return nodeView;
 	}
@@ -275,5 +276,10 @@ public class NodeView extends LinearLayout implements DraggableView {
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
+	}
+
+	@Override
+	public void setBeingDragged(boolean beingDragged) {
+		setBackgroundResource(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
 	}
 }

@@ -2,7 +2,7 @@
 <com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/border_exercise" >
+    android:background="@drawable/card_base" >
 
     <TextView
         android:id="@+id/exercise_effort_level"
