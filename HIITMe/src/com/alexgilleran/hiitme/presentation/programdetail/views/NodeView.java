@@ -28,7 +28,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	private LayoutInflater layoutInflater;
 	private DragManager dragManager;
-	private NodeView parent;
 
 	private Node programNode;
 
@@ -58,15 +57,14 @@ public class NodeView extends LinearLayout implements DraggableView {
 		moveButton.setOnTouchListener(moveListener);
 	}
 
-	public void init(Node programNode, NodeView parent) {
+	public void init(Node programNode) {
 		this.programNode = programNode;
-		this.parent = parent;
 
 		render();
 	}
 
 	private void render() {
-		for (int i = 1; i < getChildCount(); i++) {
+		for (int i = FIRST_DRAGGABLE_VIEW_INDEX; i < getLastDraggableChildIndex(); i++) {
 			removeViewAt(i);
 		}
 
@@ -74,21 +72,49 @@ public class NodeView extends LinearLayout implements DraggableView {
 			Node child = programNode.getChildren().get(i);
 
 			if (child.getAttachedExercise() != null) {
-				initialiseChild(buildExerciseView(child.getAttachedExercise()));
+				addChild(buildExerciseView(child.getAttachedExercise()));
 			} else {
 				NodeView programNodeView = buildProgramNodeView(child);
-				initialiseChild(programNodeView);
+				addChild(programNodeView);
 			}
 		}
 
 		repCountView.setText("x" + programNode.getTotalReps());
-		setBackgroundResource(determineBgDrawableRes());
+
+		refreshBackground();
 	}
 
-	private <V extends View & DraggableView> void initialiseChild(V newView) {
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+
+		refreshBackground();
+	}
+
+	private void refreshBackground() {
+		// Setting background resource kills padding, obviously. Jesus christ is
+		// Android ever retarded sometimes.
+		int bottom = getPaddingBottom();
+		int top = getPaddingTop();
+		int right = getPaddingRight();
+		int left = getPaddingLeft();
+		setBackgroundResource(determineBgDrawableRes());
+		setPadding(left, top, right, bottom);
+	}
+
+	private <V extends View & DraggableView> void addChild(V newView) {
 		newView.setDragManager(dragManager);
 
 		newView.setId(ViewUtils.generateViewId());
+
+		// TypedArray ta = getContext().obtainStyledAttributes(
+		// new int[] { android.R.attr.paddingLeft, android.R.attr.paddingTop,
+		// android.R.attr.paddingRight,
+		// android.R.attr.paddingBottom });
+		// newView.setPadding(ta.getDimensionPixelSize(0, 0),
+		// ta.getDimensionPixelSize(1, 0), ta.getDimensionPixelSize(2, 0),
+		// ta.getDimensionPixelSize(3, 0));
+		// newView.setPadding(0, 0, 0, 50);
 
 		addView(newView);
 	}
@@ -109,8 +135,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	private int getDepth() {
-		if (parent != null) {
-			return 1 + parent.getDepth();
+		if (getParentProgramNodeView() != null) {
+			return 1 + getParentProgramNodeView().getDepth();
 		}
 		return 0;
 	}
@@ -142,7 +168,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	 */
 	private NodeView buildProgramNodeView(Node node) {
 		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
-		nodeView.init(node, this);
+		nodeView.init(node);
 
 		return nodeView;
 	}
@@ -248,7 +274,10 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public NodeView getParentProgramNodeView() {
-		return parent;
+		if (getParent() instanceof NodeView) {
+			return (NodeView) getParent();
+		}
+		return null;
 	}
 
 	@Override
@@ -276,7 +305,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	private int getLastDraggableChildIndex() {
-		return getChildCount() - 2;
+		return getChildCount() - 1;
 	}
 
 	private OnTouchListener moveListener = new OnTouchListener() {

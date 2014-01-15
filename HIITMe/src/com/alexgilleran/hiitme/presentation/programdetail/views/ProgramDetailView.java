@@ -70,7 +70,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	public void setProgramNode(Node programNode) {
-		nodeView.init(programNode, null);
+		nodeView.init(programNode);
 	}
 
 	@Override

@@ -18,14 +18,12 @@
     </style>
 
     <style name="Node" parent="@style/Draggable">
-        <item name="android:padding">50dp</item>
+        <item name="android:paddingBottom">30dp</item>
         <item name="android:layout_marginTop">10dp</item>
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
     <style name="Exercise" parent="@style/Draggable">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/card_base</item>
         <item name="android:padding">10dp</item>
     </style>
