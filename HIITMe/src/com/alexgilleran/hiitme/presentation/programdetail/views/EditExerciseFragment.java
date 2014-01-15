@@ -43,8 +43,4 @@ public class EditExerciseFragment extends RoboDialogFragment {
 
 		return builder.create();
 	}
-
-	public interface EditExerciseListener {
-		void onEditExercise(Exercise exerciseToEdit);
-	}
 }

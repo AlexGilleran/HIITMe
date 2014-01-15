@@ -7,13 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
-import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
-import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment.EditExerciseListener;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.google.inject.Inject;
@@ -23,14 +21,12 @@ import com.google.inject.Inject;
  * either contained in a {@link ProgramListActivity} in two-pane mode (on
  * tablets) or a {@link ProgramDetailActivity} on handsets.
  */
-public class ProgramDetailFragment extends RoboFragment implements EditExerciseListener {
+public class ProgramDetailFragment extends RoboFragment {
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
-
-	private LayoutInflater inflater;
 
 	private Program program;
 
@@ -42,6 +38,12 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 
 	@InjectView(R.id.root_node_view_container)
 	private FrameLayout container;
+
+	@InjectView(R.id.name_ro)
+	private TextView nameReadOnly;
+
+	@InjectView(R.id.description_ro)
+	private TextView descriptionReadOnly;
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -59,8 +61,6 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		this.inflater = inflater;
-
 		View rootView = inflater.inflate(R.layout.fragment_program_detail, container, false);
 		return rootView;
 	}
@@ -70,13 +70,9 @@ public class ProgramDetailFragment extends RoboFragment implements EditExerciseL
 		super.onViewCreated(view, savedInstanceState);
 
 		detailView.setProgramNode(program.getAssociatedNode());
-	}
 
-	@Override
-	public void onEditExercise(Exercise exerciseToEdit) {
-		EditExerciseFragment editExercise = new EditExerciseFragment();
-		editExercise.setExercise(exerciseToEdit);
-		editExercise.show(getFragmentManager(), "editexercise");
+		nameReadOnly.setText(program.getName());
+		descriptionReadOnly.setText(program.getDescription());
 	}
 
 	public boolean isBeingEdited() {

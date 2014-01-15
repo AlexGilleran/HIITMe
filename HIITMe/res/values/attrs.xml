@@ -25,14 +25,15 @@
 
     <style name="Exercise" parent="@style/Draggable">
         <item name="android:background">@drawable/card_base</item>
-        <item name="android:padding">10dp</item>
+        <item name="android:padding">15dp</item>
     </style>
 
     <style name="EditableText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">10dp</item>
         <item name="android:textSize">30sp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
     </style>
 
     <style name="SubtitleText">
