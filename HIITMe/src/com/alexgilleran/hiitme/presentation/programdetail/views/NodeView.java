@@ -1,5 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
+import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
 import static com.alexgilleran.hiitme.util.ViewUtils.getVisibilityInt;
 
 import java.util.ArrayList;
@@ -22,6 +24,8 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class NodeView extends LinearLayout implements DraggableView {
+	private static final int FIRST_DRAGGABLE_VIEW_INDEX = 1;
+
 	private LayoutInflater layoutInflater;
 	private DragManager dragManager;
 	private NodeView parent;
@@ -52,21 +56,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
 
 		moveButton.setOnTouchListener(moveListener);
-	}
-
-	private OnTouchListener moveListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			dragManager.startDrag(NodeView.this, event);
-
-			return false;
-		}
-	};
-
-	public void edit() {
-		// for (View nodeView : subViews) {
-		// nodeView.edit();
-		// }
 	}
 
 	public void init(Node programNode, NodeView parent) {
@@ -108,8 +97,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void setDragManager(DragManager dragManager) {
 		this.dragManager = dragManager;
 
-		for (int i = 1; i < getChildCount(); i++) {
-			((DraggableView) getChildAt(i)).setDragManager(dragManager);
+		for (DraggableView child : getChildren()) {
+			child.setDragManager(dragManager);
 		}
 	}
 
@@ -163,41 +152,47 @@ public class NodeView extends LinearLayout implements DraggableView {
 		super.removeView(view);
 	}
 
-	public DraggableView findNextAfter(DraggableView view) {
-		int index = 0;
-
-		// TODO: This is O(clusterfuck), improve it if we can.
-		for (int i = 1; i < getChildCount(); i++) {
-			if (getChildAt(i) == view) {
-				index = i;
+	private DraggableView getFirstChild() {
+		if (getChildCount() >= FIRST_DRAGGABLE_VIEW_INDEX + 1) {
+			View firstChild = getChildAt(FIRST_DRAGGABLE_VIEW_INDEX);
+			if (firstChild instanceof DraggableView) {
+				return (DraggableView) firstChild;
+			} else {
+				throw new IllegalStateException("Node view has a child that's not a "
+						+ DraggableView.class.getSimpleName() + ": " + firstChild.getClass().getSimpleName());
 			}
 		}
-
-		if (index + 1 < getChildCount()) {
-			return (DraggableView) getChildAt(index + 1);
-		}
-
-		if (parent == null) {
-			return null;
-		}
-
-		return parent.findNextAfter(this);
+		return null;
 	}
 
 	public InsertionPoint findViewAtTop(int top, DraggableView viewToSwapIn) {
-		if (top < getChildAt(0).getTop() + getChildAt(0).getHeight()) {
+		DraggableView firstChild = getFirstChild();
+		if (firstChild != null && top < firstChild.asView().getTop()) {
 			return new InsertionPoint(1, this, null);
 		}
 
 		// TODO: Guess the correct place instead of going top-to-bottom
-		for (int i = 1; i < getChildCount(); i++) {
+		for (int i = FIRST_DRAGGABLE_VIEW_INDEX; i <= getLastDraggableChildIndex(); i++) {
 			View childView = getChildAt(i);
-			int upperBound = i + 1 < getChildCount() ? getChildAt(i + 1).getTop() : getTop() + getHeight();
 
-			if (top >= childView.getTop() && top < upperBound) {
-				if (childView != viewToSwapIn && childView instanceof NodeView) {
-					return ((NodeView) childView).findViewAtTop(top - (childView.getTop()), viewToSwapIn);
-				} else if (childView instanceof DraggableView) {
+			if (top >= getTopIncludingMargin(childView) && top <= getBottomIncludingMargin(childView)) {
+				if (top <= childView.getTop()) {
+					// In the margin above the view.
+					return new InsertionPoint(i, this, (DraggableView) childView);
+				} else if (top <= childView.getBottom()) {
+					// In the actual view
+					if (childView != viewToSwapIn && childView instanceof NodeView) {
+						return ((NodeView) childView).findViewAtTop(top - (childView.getTop()), viewToSwapIn);
+					}
+
+					if (childView instanceof DraggableView) {
+						return new InsertionPoint(i, this, (DraggableView) childView);
+					} else {
+						throw new IllegalStateException("Non-draggable view as a child of a node view: "
+								+ childView.getClass().getName());
+					}
+				} else {
+					// in the margin below the view
 					return new InsertionPoint(i, this, (DraggableView) childView);
 				}
 			}
@@ -223,7 +218,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private List<DraggableView> getChildren() {
 		List<DraggableView> children = new ArrayList<DraggableView>();
 
-		for (int i = 1; i < getChildCount(); i++) {
+		for (int i = FIRST_DRAGGABLE_VIEW_INDEX; i <= getLastDraggableChildIndex(); i++) {
 			View child = getChildAt(i);
 			if (child instanceof DraggableView) {
 				children.add((DraggableView) child);
@@ -253,7 +248,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public NodeView getParentProgramNodeView() {
-		return (NodeView) getParent();
+		return parent;
 	}
 
 	@Override
@@ -270,6 +265,29 @@ public class NodeView extends LinearLayout implements DraggableView {
 		setBackgroundResource(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
 	}
 
+	@Override
+	public int getTopForDrag() {
+		return ViewUtils.getTopIncludingMargin(this);
+	}
+
+	@Override
+	public int getBottomForDrag() {
+		return ViewUtils.getBottomIncludingMargin(this);
+	}
+
+	private int getLastDraggableChildIndex() {
+		return getChildCount() - 2;
+	}
+
+	private OnTouchListener moveListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			dragManager.startDrag(NodeView.this, event);
+
+			return false;
+		}
+	};
+
 	public class InsertionPoint {
 		int index;
 		NodeView parent;
@@ -281,4 +299,5 @@ public class NodeView extends LinearLayout implements DraggableView {
 			this.swapWith = swapWith;
 		}
 	}
+
 }

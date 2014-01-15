@@ -3,6 +3,9 @@ package com.alexgilleran.hiitme.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 public class ViewUtils {
 	private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
@@ -34,5 +37,35 @@ public class ViewUtils {
 
 	public static int getVisibilityInt(boolean visible) {
 		return visible ? View.VISIBLE : View.GONE;
+	}
+
+	public static int getTopIncludingMargin(View view) {
+		return view.getTop() - getTopMargin(view);
+	}
+
+	public static int getTopMargin(View view) {
+		if (view.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+			return ((LinearLayout.LayoutParams) view.getLayoutParams()).topMargin;
+		} else if (view.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+			return ((RelativeLayout.LayoutParams) view.getLayoutParams()).topMargin;
+		} else if (view.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+			return ((FrameLayout.LayoutParams) view.getLayoutParams()).topMargin;
+		}
+		return 0;
+	}
+
+	public static int getBottomIncludingMargin(View view) {
+		return view.getBottom() + getBottomMargin(view);
+	}
+
+	public static int getBottomMargin(View view) {
+		if (view.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+			return ((LinearLayout.LayoutParams) view.getLayoutParams()).bottomMargin;
+		} else if (view.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+			return ((RelativeLayout.LayoutParams) view.getLayoutParams()).bottomMargin;
+		} else if (view.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+			return ((FrameLayout.LayoutParams) view.getLayoutParams()).bottomMargin;
+		}
+		return 0;
 	}
 }

@@ -18,4 +18,8 @@ public interface DraggableView {
 	void setEditable(boolean editable);
 
 	void setBeingDragged(boolean beingDragged);
+
+	int getTopForDrag();
+
+	int getBottomForDrag();
 }

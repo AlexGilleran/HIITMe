@@ -201,16 +201,14 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	private void handleCellSwitch() {
-		final int deltaY = lastEventY - downY;
-
-		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top, dragView);
+		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
 
 		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
-			insertAt(dragView, insertionPoint, deltaY);
+			insertAt(dragView, insertionPoint);
 		}
 	}
 
-	private void insertAt(final DraggableView dragView, final InsertionPoint insertionPoint, final int deltaY) {
+	private void insertAt(final DraggableView dragView, final InsertionPoint insertionPoint) {
 		NodeView dragViewParent = dragView.getParentProgramNodeView();
 
 		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {

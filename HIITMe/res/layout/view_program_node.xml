@@ -2,6 +2,8 @@
 <com.alexgilleran.hiitme.presentation.programdetail.views.NodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/program_node_view"
     style="@style/Node"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -21,5 +23,12 @@
             android:layout_centerVertical="true"
             android:visibility="gone" />
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="blah"
+        android:layout_margin="20dp"
+        android:background="@android:color/holo_green_dark" />
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.NodeView>

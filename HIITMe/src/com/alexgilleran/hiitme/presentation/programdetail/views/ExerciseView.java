@@ -1,8 +1,6 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.MotionEvent;
@@ -128,6 +126,16 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
 		setBackgroundResource(beingDragged ? R.drawable.card_dragged : R.drawable.card_base);
+	}
+
+	@Override
+	public int getTopForDrag() {
+		return ViewUtils.getTopIncludingMargin(this);
+	}
+
+	@Override
+	public int getBottomForDrag() {
+		return ViewUtils.getBottomIncludingMargin(this);
 	}
 
 }
