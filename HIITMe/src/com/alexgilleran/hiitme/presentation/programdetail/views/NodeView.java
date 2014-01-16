@@ -81,24 +81,24 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 		repCountView.setText("x" + programNode.getTotalReps());
 
-		refreshBackground();
+		setBackground(determineBgDrawableRes());
 	}
 
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
 
-		refreshBackground();
+		setBackground(determineBgDrawableRes());
 	}
 
-	private void refreshBackground() {
+	private void setBackground(int resourceId) {
 		// Setting background resource kills padding, obviously. Jesus christ is
 		// Android ever retarded sometimes.
 		int bottom = getPaddingBottom();
 		int top = getPaddingTop();
 		int right = getPaddingRight();
 		int left = getPaddingLeft();
-		setBackgroundResource(determineBgDrawableRes());
+		setBackgroundResource(resourceId);
 		setPadding(left, top, right, bottom);
 	}
 
@@ -282,7 +282,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public void setEditable(boolean editable) {
-		moveButton.setVisibility(getVisibilityInt(editable));
+		if (getDepth() > 0) {
+			moveButton.setVisibility(getVisibilityInt(editable));
+		}
 
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
