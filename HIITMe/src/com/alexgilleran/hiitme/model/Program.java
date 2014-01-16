@@ -32,6 +32,14 @@ public class Program extends DatabaseModel {
 		return description;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public Node getAssociatedNode() {
 		if (programNode == null) {
 			programNode = new Node();

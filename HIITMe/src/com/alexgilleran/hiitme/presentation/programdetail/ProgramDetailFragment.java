@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
+import com.alexgilleran.hiitme.util.ViewUtils;
 import com.google.inject.Inject;
 
 /**
@@ -45,6 +47,12 @@ public class ProgramDetailFragment extends RoboFragment {
 	@InjectView(R.id.description_ro)
 	private TextView descriptionReadOnly;
 
+	@InjectView(R.id.name_edit)
+	private EditText nameEditable;
+
+	@InjectView(R.id.description_edit)
+	private EditText descriptionEditable;
+
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
 		super();
@@ -73,6 +81,9 @@ public class ProgramDetailFragment extends RoboFragment {
 
 		nameReadOnly.setText(program.getName());
 		descriptionReadOnly.setText(program.getDescription());
+
+		nameEditable.setText(program.getName());
+		descriptionEditable.setText(program.getDescription());
 	}
 
 	public boolean isBeingEdited() {
@@ -80,15 +91,39 @@ public class ProgramDetailFragment extends RoboFragment {
 	}
 
 	public void save() {
+		program.setName(getName());
+		program.setDescription(getDescription());
 		program.setAssociatedNode(detailView.getProgramNode());
 		programDao.saveProgram(program);
 	}
 
 	public void startEditing() {
 		detailView.startEditing();
+
+		setTextEditable(true);
+	}
+
+	private void setTextEditable(boolean editable) {
+		nameReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
+		descriptionReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
+		nameEditable.setVisibility(ViewUtils.getVisibilityInt(editable));
+		descriptionEditable.setVisibility(ViewUtils.getVisibilityInt(editable));
 	}
 
 	public void stopEditing() {
 		detailView.stopEditing();
+
+		nameReadOnly.setText(nameEditable.getText());
+		descriptionReadOnly.setText(descriptionEditable.getText());
+
+		setTextEditable(false);
+	}
+
+	public String getName() {
+		return nameEditable.getText().toString();
+	}
+
+	public String getDescription() {
+		return descriptionEditable.getText().toString();
 	}
 }
