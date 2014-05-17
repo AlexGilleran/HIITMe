@@ -23,9 +23,9 @@
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
-    <style name="Exercise" parent="@style/Draggable">
+    <style name="Exercise" >
         <item name="android:background">@drawable/card_base</item>
-        <item name="android:padding">15dp</item>
+        <!-- <item name="android:padding">15dp</item> -->
     </style>
 
     <style name="EditableText">
@@ -45,8 +45,8 @@
     </style>
 
     <style name="Button">
-        <item name="android:layout_width">50dp</item>
-        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
         <item name="android:adjustViewBounds">true</item>
         <item name="android:scaleType">centerInside</item>
     </style>

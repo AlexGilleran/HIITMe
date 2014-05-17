@@ -2,6 +2,7 @@
 <com.alexgilleran.hiitme.presentation.programdetail.views.NodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/program_node_view"
     style="@style/Node"
+    android:gravity="center_horizontal"
     android:orientation="vertical" >
 
     <RelativeLayout

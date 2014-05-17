@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Exercise" >
+    style="@style/Exercise"
+    android:layout_width="165dp"
+    android:layout_height="wrap_content" >
 
     <TextView
         android:id="@+id/exercise_effort_level"
-        style="@style/EditableText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true" />
 
@@ -14,12 +17,14 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/exercise_effort_level" />
 
-    <ImageButton
+    <Button
         android:id="@+id/button_move"
-        style="@style/MoveButton"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
+        android:layout_width="20dp"
+        android:layout_height="match_parent"
+        android:layout_marginRight="2dp"
+        android:layout_toRightOf="@id/exercise_duration"
         android:adjustViewBounds="true"
-        android:visibility="gone" />
+        android:background="#F0F0F0"
+        android:visibility="invisible" />
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView>

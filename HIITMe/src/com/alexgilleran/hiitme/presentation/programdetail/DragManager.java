@@ -7,5 +7,5 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
 public interface DragManager {
 
 	void startDrag(DraggableView draggedView, MotionEvent event);
-
+	void cancelDrag();
 }

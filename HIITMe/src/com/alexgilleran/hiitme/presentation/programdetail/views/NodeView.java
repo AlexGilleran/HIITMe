@@ -311,7 +311,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private OnTouchListener moveListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
-			dragManager.startDrag(NodeView.this, event);
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				dragManager.startDrag(NodeView.this, event);
+			} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+				dragManager.cancelDrag();
+			}
 
 			return false;
 		}

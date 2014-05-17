@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -21,7 +21,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
-	private ImageButton moveButton;
+	private Button moveButton;
 	private NodeView nodeView;
 
 	public ExerciseView(Context context) {
@@ -42,7 +42,9 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 		effortLevel = (TextView) findViewById(R.id.exercise_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
-		moveButton = (ImageButton) findViewById(R.id.button_move);
+		moveButton = (Button) findViewById(R.id.button_move);
+
+		effortLevel.setRotation(270);
 
 		moveButton.setOnTouchListener(startDragListener);
 		moveButton.setOnDragListener(new OnDragListener() {
@@ -90,6 +92,8 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
 				dragManager.startDrag(ExerciseView.this, event);
+			} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+				dragManager.cancelDrag();
 			}
 
 			return false;

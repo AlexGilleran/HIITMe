@@ -162,7 +162,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			touchEventsEnded();
 			return true;
 		case MotionEvent.ACTION_CANCEL:
-			// touchEventsCancelled();
+			System.out.println("blah");
 			break;
 		case MotionEvent.ACTION_POINTER_UP:
 			/*
@@ -186,6 +186,11 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		return super.onTouchEvent(event);
 	}
 
+	@Override
+	public void cancelDrag() {
+		touchEventsEnded();
+	}
+
 	private boolean currentlyDragging() {
 		return hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null;
 	}
@@ -201,7 +206,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	private void handleCellSwitch() {
-		final InsertionPoint insertionPoint = nodeView.findViewAtTop(hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
+		final InsertionPoint insertionPoint = nodeView.findViewAtTop(
+				hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
 
 		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 			insertAt(dragView, insertionPoint);
