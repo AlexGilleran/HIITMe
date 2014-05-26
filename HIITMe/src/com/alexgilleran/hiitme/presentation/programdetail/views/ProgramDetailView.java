@@ -136,6 +136,13 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		onTouchEvent(ev);
+	
+		return super.onInterceptTouchEvent(ev);
+	}
+
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		stopScrolling();
 
