@@ -118,7 +118,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public NodeView getParentProgramNodeView() {
+	public NodeView getParentNodeView() {
 		return (NodeView) getParent();
 	}
 

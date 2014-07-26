@@ -62,11 +62,11 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	@Override
 	public void onFinishInflate() {
-		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, null);
+		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, null);
 		nodeView.setDragManager(this);
 		((ViewGroup) this.findViewById(R.id.root_node_view_container)).addView(nodeView);
 
-		getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
+		getViewTreeObserver().addOnGlobalLayoutListener(thresholdListener);
 	}
 
 	public void setProgramNode(Node programNode) {
@@ -103,7 +103,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private Runnable handlePointerMoveRunnable = new Runnable() {
 		@Override
 		public void run() {
-			handlePointerMove();
+			handleHoverCellMove();
 		}
 	};
 
@@ -138,7 +138,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
 		onTouchEvent(ev);
-	
+
 		return super.onInterceptTouchEvent(ev);
 	}
 
@@ -151,15 +151,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			if (currentlyDragging()) {
 				lastEventY = (int) event.getRawY();
 
-				if (scrollParamsSet()) {
-					if (lastEventY > dragScrollDownThreshold) {
-						startScrolling((int) (lastEventY - dragScrollDownThreshold) / 2);
-					} else if (lastEventY < dragScrollUpThreshold) {
-						startScrolling((int) (lastEventY - dragScrollUpThreshold) / 2);
-					}
-				}
+				scrollIfNecessary();
 
-				handlePointerMove();
+				handleHoverCellMove();
 
 				return true;
 			}
@@ -168,29 +162,22 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		case MotionEvent.ACTION_UP:
 			touchEventsEnded();
 			return true;
-		case MotionEvent.ACTION_CANCEL:
-			System.out.println("blah");
-			break;
-		case MotionEvent.ACTION_POINTER_UP:
-			/*
-			 * If a multitouch event took place and the original touch dictating
-			 * the movement of the hover cell has ended, then the dragging event
-			 * ends and the hover cell is animated to its corresponding position
-			 * in the listview.
-			 */
-			// pointerIndex = (event.getAction() &
-			// MotionEvent.ACTION_POINTER_INDEX_MASK) >>
-			// MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-			// final int pointerId = event.getPointerId(pointerIndex);
-			// if (pointerId == mActivePointerId) {
-			// touchEventsEnded();
-			// }
-			break;
-		default:
-			break;
 		}
 
 		return super.onTouchEvent(event);
+	}
+
+	/**
+	 * Scrolls the view up or down if the last touch was close enough to either end of the view.
+	 */
+	private void scrollIfNecessary() {
+		if (scrollParamsSet()) {
+			if (lastEventY > dragScrollDownThreshold) {
+				startScrolling((int) (lastEventY - dragScrollDownThreshold) / 2);
+			} else if (lastEventY < dragScrollUpThreshold) {
+				startScrolling((int) (lastEventY - dragScrollUpThreshold) / 2);
+			}
+		}
 	}
 
 	@Override
@@ -198,21 +185,31 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		touchEventsEnded();
 	}
 
+	/**
+	 * Are we currently dragging a view?
+	 */
 	private boolean currentlyDragging() {
 		return hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null;
 	}
 
-	private void handlePointerMove() {
+	/**
+	 * Handles a move of the touch pointer.
+	 */
+	private void handleHoverCellMove() {
 		int deltaY = lastEventY - downY + getScrollY() - downScrollY;
 
 		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
 		hoverCell.setBounds(hoverCellCurrentBounds);
 		invalidate();
 
-		handleCellSwitch();
+		moveDragViewIfNecessary();
 	}
 
-	private void handleCellSwitch() {
+	/**
+	 * Checks whether the drag view needs to be moved into another view or swapped with an existing view and if so does
+	 * it.
+	 */
+	private void moveDragViewIfNecessary() {
 		final InsertionPoint insertionPoint = nodeView.findViewAtTop(
 				hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
 
@@ -221,53 +218,73 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
-	private void insertAt(final DraggableView dragView, final InsertionPoint insertionPoint) {
-		NodeView dragViewParent = dragView.getParentProgramNodeView();
+	/**
+	 * Inserts a {@link DraggableView} at the supplied {@link InsertionPoint}.
+	 */
+	private void insertAt(final DraggableView draggedView, final InsertionPoint insertionPoint) {
+		if (canSwap(insertionPoint, draggedView)) {
+			int dragViewIndex = getChildIndex(draggedView.asView());
 
-		if (dragViewParent == insertionPoint.parent && insertionPoint.swapWith != null) {
-			int dragViewIndex = getChildIndex(dragViewParent, dragView.asView());
-
-			dragViewParent.removeViewAt(dragViewIndex);
+			draggedView.getParentNodeView().removeViewAt(dragViewIndex);
 
 			if (insertionPoint.index == -1) {
-				insertionPoint.parent.addChild(dragView);
+				insertionPoint.parent.addChild(draggedView);
 			} else {
-				insertionPoint.parent.addChild(dragView, insertionPoint.index);
+				insertionPoint.parent.addChild(draggedView, insertionPoint.index);
 			}
 
 			insertionPoint.parent.removeView(insertionPoint.swapWith.asView());
-			dragViewParent.addView(insertionPoint.swapWith.asView(), dragViewIndex);
+			draggedView.getParentNodeView().addView(insertionPoint.swapWith.asView(), dragViewIndex);
 
-			final int switchViewStartTop = insertionPoint.swapWith.asView().getTop();
+			final int animationStartTop = insertionPoint.swapWith.asView().getTop();
 
-			final ViewTreeObserver observer = getViewTreeObserver();
-			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-				public boolean onPreDraw() {
-					observer.removeOnPreDrawListener(this);
-
-					int switchViewNewTop = insertionPoint.swapWith.asView().getTop();
-					int delta = switchViewStartTop - switchViewNewTop;
-
-					insertionPoint.swapWith.asView().setTranslationY(delta);
-
-					ObjectAnimator animator = ObjectAnimator.ofFloat(insertionPoint.swapWith.asView(),
-							View.TRANSLATION_Y, 0);
-					animator.setDuration(MOVE_DURATION);
-					animator.start();
-
-					return true;
-				}
-			});
+			animateMove(insertionPoint.swapWith.asView(), animationStartTop);
 		} else {
-			dragViewParent.removeChild(dragView);
-			insertionPoint.parent.addChild(dragView, insertionPoint.index);
+			draggedView.getParentNodeView().removeChild(draggedView);
+			insertionPoint.parent.addChild(draggedView, insertionPoint.index);
 		}
 	}
 
-	private int getChildIndex(ViewGroup viewGroup, View child) {
-		for (int i = 0; i < viewGroup.getChildCount(); i++) {
-			if (viewGroup.getChildAt(i) == child) {
-				return i;
+	/**
+	 * Determines whether inserting the draggedView at this insertion point can be achieved by swapping the two views.
+	 */
+	private boolean canSwap(final InsertionPoint insertionPoint, DraggableView draggedView) {
+		return draggedView.getParentNodeView() == insertionPoint.parent && insertionPoint.swapWith != null;
+	}
+
+	/**
+	 * Animates a view from a starting top value to its current position.
+	 */
+	private void animateMove(final View swapWith, final int startingTop) {
+		final ViewTreeObserver observer = getViewTreeObserver();
+		observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+			public boolean onPreDraw() {
+				observer.removeOnPreDrawListener(this);
+
+				int endingTop = swapWith.getTop();
+				int delta = startingTop - endingTop;
+
+				swapWith.setTranslationY(delta);
+
+				ObjectAnimator animator = ObjectAnimator.ofFloat(swapWith, View.TRANSLATION_Y, 0);
+				animator.setDuration(MOVE_DURATION);
+				animator.start();
+
+				return true;
+			}
+		});
+	}
+
+	/**
+	 * Gets the index of a child {@link View} with its parent {@link ViewGroup} if possible. Returns -1 otherwise.
+	 */
+	private static int getChildIndex(View child) {
+		if (child.getParent() instanceof ViewGroup) {
+			ViewGroup viewGroup = (ViewGroup) child.getParent();
+			for (int i = 0; i < viewGroup.getChildCount(); i++) {
+				if (viewGroup.getChildAt(i) == child) {
+					return i;
+				}
 			}
 		}
 		return -1;
@@ -296,6 +313,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		invalidate();
 	}
 
+	/**
+	 * Recursively determines how far the top edge of a view is from the edge of its outermost ancestor (not its
+	 * immediate parent).
+	 */
 	private int getCompleteTop(View view, int topSoFar) {
 		topSoFar += view.getTop();
 		if (view.getParent() != null && view.getParent() instanceof View && !(view.getParent() instanceof ScrollView)) {
@@ -305,6 +326,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		}
 	}
 
+	/**
+	 * Recursively determines how far the left edge of a view is from the edge of its outermost ancestor (not its
+	 * immediate parent).
+	 */
 	private int getCompleteLeft(View view, int leftSoFar) {
 		leftSoFar += view.getLeft();
 		if (view.getParent() != null && view.getParent() instanceof View && !(view.getParent() instanceof ScrollView)) {
@@ -315,9 +340,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	/**
-	 * Creates the hover cell with the appropriate bitmap and of appropriate
-	 * size. The hover cell's BitmapDrawable is drawn on top of the bitmap every
-	 * single time an invalidate call is made.
+	 * Creates the hover cell with the appropriate bitmap and of appropriate size. The hover cell's BitmapDrawable is
+	 * drawn on top of the bitmap every single time an invalidate call is made.
 	 */
 	private BitmapDrawable getAndAddHoverView(DraggableView v) {
 		Bitmap b = getBitmapFromView(v.asView());
@@ -335,48 +359,64 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		return bitmap;
 	}
 
-	private boolean cellIsMobile() {
-		return hoverCell != null;
-	}
-
 	/**
-	 * Resets all the appropriate fields to a default state while also animating
-	 * the hover cell back to its correct location.
+	 * Resets all the appropriate fields to a default state while also animating the hover cell back to its correct
+	 * location.
 	 */
 	private void touchEventsEnded() {
-		if (cellIsMobile()) {
-			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView.asView(), 0));
-
-			ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
-					hoverCellCurrentBounds);
-			hoverViewAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-				@Override
-				public void onAnimationUpdate(ValueAnimator valueAnimator) {
-					invalidate();
-				}
-			});
-			hoverViewAnimator.addListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationStart(Animator animation) {
-					setEnabled(false);
-				}
-
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					dragView.setBeingDragged(false);
-					dragView.asView().setVisibility(VISIBLE);
-					hoverCell = null;
-					setEnabled(true);
-					ProgramDetailView.this.invalidate();
-				}
-			});
-			hoverViewAnimator.start();
-		} else {
-			// touchEventsCancelled();
+		if (currentlyDragging()) {
+			animateRestoreHoverCell();
 		}
 	}
 
-	private OnGlobalLayoutListener layoutListener = new OnGlobalLayoutListener() {
+	/**
+	 * Animates the hover cell back to the actual position of the view it represents.
+	 */
+	private void animateRestoreHoverCell() {
+		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView.asView(), 0));
+
+		ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
+				hoverCellCurrentBounds);
+		hoverViewAnimator.addUpdateListener(hoverCancelAnimatorUpdateListener);
+		hoverViewAnimator.addListener(hoverCancelAnimatorListener);
+
+		hoverViewAnimator.start();
+	}
+
+	/**
+	 * Update listener for animating the hover cell back to its original position - makes sure that each frame of the
+	 * animation is actually rendered.
+	 */
+	private ValueAnimator.AnimatorUpdateListener hoverCancelAnimatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+		@Override
+		public void onAnimationUpdate(ValueAnimator valueAnimator) {
+			invalidate();
+		}
+	};
+
+	/**
+	 * Listener for animating the hover cell back to its original position (for when a drag is ended).
+	 */
+	private AnimatorListenerAdapter hoverCancelAnimatorListener = new AnimatorListenerAdapter() {
+		@Override
+		public void onAnimationStart(Animator animation) {
+			setEnabled(false);
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			dragView.setBeingDragged(false);
+			dragView.asView().setVisibility(VISIBLE);
+			hoverCell = null;
+			setEnabled(true);
+			ProgramDetailView.this.invalidate();
+		}
+	};
+
+	/**
+	 * Determines how far from the top/bottom of the screen a touch should be before it triggers scrolling.
+	 */
+	private OnGlobalLayoutListener thresholdListener = new OnGlobalLayoutListener() {
 		@Override
 		public void onGlobalLayout() {
 			int[] location = new int[2];
@@ -387,10 +427,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 			dragScrollDownThreshold = location[1] + getHeight() - thresholdFractionPx;
 		}
 	};
+
 	/**
-	 * This TypeEvaluator is used to animate the BitmapDrawable back to its
-	 * final location when the user lifts his finger by modifying the
-	 * BitmapDrawable's bounds.
+	 * This TypeEvaluator is used to animate the BitmapDrawable back to its final location when the user lifts his
+	 * finger by modifying the BitmapDrawable's bounds.
 	 */
 	private final static TypeEvaluator<Rect> boundEvaluator = new TypeEvaluator<Rect>() {
 		public Rect evaluate(float fraction, Rect startValue, Rect endValue) {

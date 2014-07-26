@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -32,7 +32,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private Node programNode;
 
 	private TextView repCountView;
-	private ImageButton moveButton;
+	private Button moveButton;
 
 	public NodeView(Context context) {
 		super(context);
@@ -52,7 +52,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
-		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
+		this.moveButton = (Button) this.findViewById(R.id.button_move_program_group);
 
 		moveButton.setOnTouchListener(moveListener);
 	}
@@ -92,8 +92,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	private void setBackground(int resourceId) {
-		// Setting background resource kills padding, obviously. Jesus christ is
-		// Android ever retarded sometimes.
+		// Setting background resource kills padding.
 		int bottom = getPaddingBottom();
 		int top = getPaddingTop();
 		int right = getPaddingRight();
@@ -106,15 +105,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		newView.setDragManager(dragManager);
 
 		newView.setId(ViewUtils.generateViewId());
-
-		// TypedArray ta = getContext().obtainStyledAttributes(
-		// new int[] { android.R.attr.paddingLeft, android.R.attr.paddingTop,
-		// android.R.attr.paddingRight,
-		// android.R.attr.paddingBottom });
-		// newView.setPadding(ta.getDimensionPixelSize(0, 0),
-		// ta.getDimensionPixelSize(1, 0), ta.getDimensionPixelSize(2, 0),
-		// ta.getDimensionPixelSize(3, 0));
-		// newView.setPadding(0, 0, 0, 50);
 
 		addView(newView);
 	}
@@ -135,8 +125,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	private int getDepth() {
-		if (getParentProgramNodeView() != null) {
-			return 1 + getParentProgramNodeView().getDepth();
+		if (getParentNodeView() != null) {
+			return 1 + getParentNodeView().getDepth();
 		}
 		return 0;
 	}
@@ -167,7 +157,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	 *            The child node to pass to the {@link NodeView}.
 	 */
 	private NodeView buildProgramNodeView(Node node) {
-		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_program_node, this, false);
+		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, this, false);
 		nodeView.init(node);
 
 		return nodeView;
@@ -201,38 +191,44 @@ public class NodeView extends LinearLayout implements DraggableView {
 		for (int i = FIRST_DRAGGABLE_VIEW_INDEX; i <= getLastDraggableChildIndex(); i++) {
 			View childView = getChildAt(i);
 
-			if (top >= getTopIncludingMargin(childView) && top <= getBottomIncludingMargin(childView)) {
-				if (top <= childView.getTop()) {
-					// In the margin above the view.
-					return new InsertionPoint(i, this, (DraggableView) childView);
-				} else if (top <= childView.getBottom()) {
-					// In the actual view
-					if (childView != viewToSwapIn && childView instanceof NodeView) {
-						return ((NodeView) childView).findViewAtTop(top - (childView.getTop()), viewToSwapIn);
-					}
-
-					if (childView instanceof DraggableView) {
-						return new InsertionPoint(i, this, (DraggableView) childView);
-					} else {
-						throw new IllegalStateException("Non-draggable view as a child of a node view: "
-								+ childView.getClass().getName());
-					}
-				} else {
-					// in the margin below the view
-					return new InsertionPoint(i, this, (DraggableView) childView);
+			if (!topWithinViewBounds(top, childView)) {
+				continue;
+			}
+			
+			if (top <= childView.getTop()) {
+				// In the margin above the view.
+				return new InsertionPoint(i, this, (DraggableView) childView);
+			} else if (top <= childView.getBottom()) {
+				// In the actual view
+				if (childView != viewToSwapIn && childView instanceof NodeView) {
+					return ((NodeView) childView).findViewAtTop(top - (childView.getTop()), viewToSwapIn);
 				}
+
+				if (childView instanceof DraggableView) {
+					return new InsertionPoint(i, this, (DraggableView) childView);
+				} else {
+					throw new IllegalStateException("Non-draggable view as a child of a node view: "
+							+ childView.getClass().getName());
+				}
+			} else {
+				// in the margin below the view
+				return new InsertionPoint(i, this, (DraggableView) childView);
 			}
 		}
 
 		return new InsertionPoint(-1, this, null);
 	}
 
+	private static boolean topWithinViewBounds(int top, View childView) {
+		return top >= getTopIncludingMargin(childView) && top <= getBottomIncludingMargin(childView);
+	}
+
 	@Override
 	public Node getProgramNode() {
 		Node programNode = new Node();
 
-		// TODO: jesus christ.
-		programNode.setTotalReps(Integer.parseInt(repCountView.getText().toString().substring(1)));
+		// Can't change this in this view.
+		programNode.setTotalReps(this.programNode.getTotalReps());
 
 		for (DraggableView child : getChildren()) {
 			programNode.addChildNode(child.getProgramNode());
@@ -268,12 +264,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	public void removeChild(DraggableView view) {
-		// TODO: Would by index be quicker? It certainly is more perilous.
 		removeView(view.asView());
 	}
 
 	@Override
-	public NodeView getParentProgramNodeView() {
+	public NodeView getParentNodeView() {
 		if (getParent() instanceof NodeView) {
 			return (NodeView) getParent();
 		}

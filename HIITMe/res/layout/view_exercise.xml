@@ -20,11 +20,11 @@
     <Button
         android:id="@+id/button_move"
         android:layout_width="20dp"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:layout_marginRight="2dp"
         android:layout_toRightOf="@id/exercise_duration"
         android:adjustViewBounds="true"
         android:background="#F0F0F0"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView>
