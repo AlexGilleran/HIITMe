@@ -91,7 +91,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragManager.startDrag(ExerciseView.this, event);
+				dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
 			} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
 				dragManager.cancelDrag();
 			}

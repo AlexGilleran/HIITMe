@@ -2,7 +2,6 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
 import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
-import static com.alexgilleran.hiitme.util.ViewUtils.getVisibilityInt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,7 +193,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 			if (!topWithinViewBounds(top, childView)) {
 				continue;
 			}
-			
+
 			if (top <= childView.getTop()) {
 				// In the margin above the view.
 				return new InsertionPoint(i, this, (DraggableView) childView);
@@ -277,8 +276,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public void setEditable(boolean editable) {
+		int visibility = editable ? VISIBLE : INVISIBLE;
 		if (getDepth() > 0) {
-			moveButton.setVisibility(getVisibilityInt(editable));
+			moveButton.setVisibility(visibility);
 		}
 
 		for (DraggableView child : getChildren()) {
@@ -309,7 +309,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragManager.startDrag(NodeView.this, event);
+				dragManager.startDrag(NodeView.this, (int) event.getRawY());
 			} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
 				dragManager.cancelDrag();
 			}

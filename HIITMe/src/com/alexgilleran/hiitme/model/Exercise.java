@@ -8,6 +8,9 @@ public class Exercise extends DatabaseModel {
 
 	public Exercise() {
 		super();
+		
+		this.duration = 0;
+		this.effortLevel = EffortLevel.EASY;
 	}
 
 	public Exercise(int duration, EffortLevel effortLevel, Node node) {

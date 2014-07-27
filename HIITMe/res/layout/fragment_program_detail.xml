@@ -32,6 +32,25 @@
             android:layout_marginBottom="5dp"
             android:visibility="gone" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/button_add_exercise"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_exercise_add"
+                android:visibility="invisible" />
+
+            <ImageButton
+                android:id="@+id/button_add_node"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_node_add"
+                android:visibility="invisible" />
+        </LinearLayout>
+
         <FrameLayout
             android:id="@+id/root_node_view_container"
             android:layout_width="match_parent"

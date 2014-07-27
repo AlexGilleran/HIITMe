@@ -20,12 +20,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.ImageButton;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView.InsertionPoint;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final int DRAG_SCROLL_INTERVAL = 100;
@@ -38,6 +41,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
 	private DraggableView dragView;
+	private ImageButton addExerciseButton;
+	private ImageButton addNodeButton;
 
 	private int dragScrollUpThreshold = -1;
 	private int dragScrollDownThreshold = -1;
@@ -65,8 +70,12 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, null);
 		nodeView.setDragManager(this);
 		((ViewGroup) this.findViewById(R.id.root_node_view_container)).addView(nodeView);
+		addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
+		addNodeButton = (ImageButton) this.findViewById(R.id.button_add_node);
 
-		getViewTreeObserver().addOnGlobalLayoutListener(thresholdListener);
+		getViewTreeObserver().addOnGlobalLayoutListener(scrollListener);
+		addExerciseButton.setOnTouchListener(addExerciseListener);
+		addNodeButton.setOnTouchListener(addNodeListener);
 	}
 
 	public void setProgramNode(Node programNode) {
@@ -124,6 +133,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	}
 
 	private void refreshEditability() {
+		int visibility = ViewUtils.getVisibilityInt(isBeingEdited);
+		addNodeButton.setVisibility(visibility);
+		addExerciseButton.setVisibility(visibility);
+
 		nodeView.setEditable(isBeingEdited);
 	}
 
@@ -290,11 +303,10 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		return -1;
 	}
 
-	@Override
-	public void startDrag(DraggableView view, MotionEvent event) {
+	private void startDrag(DraggableView view, int downY, int startTop) {
 		view.setBeingDragged(true);
 
-		downY = (int) event.getRawY();
+		this.downY = downY;
 		downScrollY = getScrollY();
 
 		dragView = view;
@@ -302,7 +314,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 		int w = view.asView().getWidth();
 		int h = view.asView().getHeight();
-		int top = getCompleteTop(view.asView(), 0);
+		int top = startTop;
 		int left = getCompleteLeft(view.asView(), 0);
 
 		hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
@@ -311,6 +323,11 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		view.asView().setVisibility(View.INVISIBLE);
 
 		invalidate();
+	}
+
+	@Override
+	public void startDrag(DraggableView view, int downY) {
+		startDrag(view, downY, getCompleteTop(view.asView(), 0));
 	}
 
 	/**
@@ -416,7 +433,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	/**
 	 * Determines how far from the top/bottom of the screen a touch should be before it triggers scrolling.
 	 */
-	private OnGlobalLayoutListener thresholdListener = new OnGlobalLayoutListener() {
+	private OnGlobalLayoutListener scrollListener = new OnGlobalLayoutListener() {
 		@Override
 		public void onGlobalLayout() {
 			int[] location = new int[2];
@@ -441,6 +458,39 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 		public int interpolate(int start, int end, float fraction) {
 			return (int) (start + fraction * (end - start));
+		}
+	};
+
+	private OnTouchListener addExerciseListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, final MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				Exercise exercise = new Exercise();
+				exercise.setNode(getProgramNode());
+				final ExerciseView view = (ExerciseView) layoutInflater
+						.inflate(R.layout.view_exercise, nodeView, false);
+				view.setExercise(exercise);
+				view.setNodeView(nodeView);
+				view.setEditable(true);
+				nodeView.addChild(view, 1);
+
+				post(new Runnable() {
+					@Override
+					public void run() {
+						startDrag(view, (int) event.getRawY(), getCompleteTop(addExerciseButton, 0));
+					}
+				});
+
+				return false;
+			}
+			return true;
+		}
+	};
+
+	private OnTouchListener addNodeListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			return false;
 		}
 	};
 }

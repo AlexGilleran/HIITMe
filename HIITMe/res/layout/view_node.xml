@@ -17,12 +17,12 @@
 
         <Button
             android:id="@+id/button_move_program_group"
-     		android:background="#F0F0F0"
-        	android:layout_width="20dp"
-        	android:layout_height="40dp"
+            android:layout_width="20dp"
+            android:layout_height="40dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:visibility="gone" />
+            android:background="#F0F0F0"
+            android:visibility="invisible" />
     </RelativeLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.NodeView>
