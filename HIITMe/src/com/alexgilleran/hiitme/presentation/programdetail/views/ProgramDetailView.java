@@ -20,7 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
@@ -35,14 +37,17 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final int MOVE_DURATION = 150;
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
 
+	private LinearLayout editLayout;
+	private ImageButton addExerciseButton;
+	private ImageButton addNodeButton;
+	private FrameLayout recycleBinLayout;
+
 	private LayoutInflater layoutInflater;
 	private NodeView nodeView;
 	private int downY, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
 	private BitmapDrawable hoverCell;
 	private DraggableView dragView;
-	private ImageButton addExerciseButton;
-	private ImageButton addNodeButton;
 
 	private int dragScrollUpThreshold = -1;
 	private int dragScrollDownThreshold = -1;
@@ -70,8 +75,11 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, null);
 		nodeView.setDragManager(this);
 		((ViewGroup) this.findViewById(R.id.root_node_view_container)).addView(nodeView);
-		addExerciseButton = (ImageButton) this.findViewById(R.id.button_add_exercise);
-		addNodeButton = (ImageButton) this.findViewById(R.id.button_add_node);
+
+		editLayout = (LinearLayout) findViewById(R.id.layout_edit_buttons);
+		addExerciseButton = (ImageButton) findViewById(R.id.button_add_exercise);
+		addNodeButton = (ImageButton) findViewById(R.id.button_add_node);
+		recycleBinLayout = (FrameLayout) findViewById(R.id.layout_recycle_bin);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(scrollListener);
 		addExerciseButton.setOnTouchListener(addExerciseListener);
@@ -134,8 +142,8 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void refreshEditability() {
 		int visibility = ViewUtils.getVisibilityInt(isBeingEdited);
-		addNodeButton.setVisibility(visibility);
-		addExerciseButton.setVisibility(visibility);
+		editLayout.setVisibility(visibility);
+		recycleBinLayout.setVisibility(visibility);
 
 		nodeView.setEditable(isBeingEdited);
 	}
@@ -223,11 +231,18 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 * it.
 	 */
 	private void moveDragViewIfNecessary() {
-		final InsertionPoint insertionPoint = nodeView.findViewAtTop(
-				hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
+		if (hoverCellCurrentBounds.top > recycleBinLayout.getTop()
+				&& hoverCellCurrentBounds.top < recycleBinLayout.getBottom()) {
+			if (dragView.getParentNodeView() != null) {
+				dragView.getParentNodeView().removeChild(dragView);
+			}
+		} else {
+			final InsertionPoint insertionPoint = nodeView.findViewAtTop(
+					hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
 
-		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
-			insertAt(dragView, insertionPoint);
+			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
+				insertAt(dragView, insertionPoint);
+			}
 		}
 	}
 
@@ -253,7 +268,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 			animateMove(insertionPoint.swapWith.asView(), animationStartTop);
 		} else {
-			draggedView.getParentNodeView().removeChild(draggedView);
+			if (dragView.getParentNodeView() != null) {
+				draggedView.getParentNodeView().removeChild(draggedView);
+			}
 			insertionPoint.parent.addChild(draggedView, insertionPoint.index);
 		}
 	}
@@ -382,7 +399,12 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 */
 	private void touchEventsEnded() {
 		if (currentlyDragging()) {
-			animateRestoreHoverCell();
+			if (dragView.getParentNodeView() == null) {
+				// Animate removing the view.
+				cleanUpAfterDragEnd();
+			} else {
+				animateRestoreHoverCell();
+			}
 		}
 	}
 
@@ -422,13 +444,17 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 		@Override
 		public void onAnimationEnd(Animator animation) {
-			dragView.setBeingDragged(false);
 			dragView.asView().setVisibility(VISIBLE);
-			hoverCell = null;
-			setEnabled(true);
-			ProgramDetailView.this.invalidate();
+			cleanUpAfterDragEnd();
 		}
 	};
+
+	private void cleanUpAfterDragEnd() {
+		dragView.setBeingDragged(false);
+		hoverCell = null;
+		setEnabled(true);
+		ProgramDetailView.this.invalidate();
+	}
 
 	/**
 	 * Determines how far from the top/bottom of the screen a touch should be before it triggers scrolling.
@@ -472,6 +498,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 				view.setExercise(exercise);
 				view.setNodeView(nodeView);
 				view.setEditable(true);
+				view.setDragManager(ProgramDetailView.this);
 				nodeView.addChild(view, 1);
 
 				post(new Runnable() {
