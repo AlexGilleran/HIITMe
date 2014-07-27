@@ -491,6 +491,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
 				Exercise exercise = new Exercise();
 				exercise.setNode(getProgramNode());
 				final ExerciseView view = (ExerciseView) layoutInflater
@@ -507,16 +508,31 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 						startDrag(view, (int) event.getRawY(), getCompleteTop(addExerciseButton, 0));
 					}
 				});
-
-				return false;
 			}
-			return true;
+			return false;
 		}
 	};
 
 	private OnTouchListener addNodeListener = new OnTouchListener() {
 		@Override
-		public boolean onTouch(View v, MotionEvent event) {
+		public boolean onTouch(View v, final MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
+				Node node = new Node();
+				node.setParent(node);
+				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node, nodeView, false);
+				view.init(node);
+				view.setEditable(true);
+				view.setDragManager(ProgramDetailView.this);
+				nodeView.addChild(view, 1);
+
+				post(new Runnable() {
+					@Override
+					public void run() {
+						startDrag(view, (int) event.getRawY(), getCompleteTop(addNodeButton, 0));
+					}
+				});
+			}
 			return false;
 		}
 	};
