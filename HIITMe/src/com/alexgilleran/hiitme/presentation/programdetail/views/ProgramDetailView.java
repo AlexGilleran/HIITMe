@@ -237,7 +237,7 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 				dragView.getParentNodeView().removeChild(dragView);
 			}
 		} else {
-			final InsertionPoint insertionPoint = nodeView.findViewAtTop(
+			final InsertionPoint insertionPoint = nodeView.findInsertionPoint(
 					hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {

@@ -180,7 +180,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return null;
 	}
 
-	public InsertionPoint findViewAtTop(int top, DraggableView viewToSwapIn) {
+	public InsertionPoint findInsertionPoint(int top, DraggableView viewToSwapIn) {
 		DraggableView firstChild = getFirstChild();
 		if (firstChild != null && top < firstChild.asView().getTop()) {
 			return new InsertionPoint(1, this, null);
@@ -191,28 +191,28 @@ public class NodeView extends LinearLayout implements DraggableView {
 			View childView = getChildAt(i);
 
 			if (!topWithinViewBounds(top, childView)) {
+				// Go to the next one.
 				continue;
 			}
 
-			if (top <= childView.getTop()) {
-				// In the margin above the view.
-				return new InsertionPoint(i, this, (DraggableView) childView);
-			} else if (top <= childView.getBottom()) {
-				// In the actual view
-				if (childView != viewToSwapIn && childView instanceof NodeView) {
-					return ((NodeView) childView).findViewAtTop(top - (childView.getTop()), viewToSwapIn);
-				}
-
-				if (childView instanceof DraggableView) {
-					return new InsertionPoint(i, this, (DraggableView) childView);
-				} else {
-					throw new IllegalStateException("Non-draggable view as a child of a node view: "
-							+ childView.getClass().getName());
-				}
-			} else {
-				// in the margin below the view
+			if (top < childView.getTop() || top > childView.getBottom()) {
+				// in the margin above or below the view
 				return new InsertionPoint(i, this, (DraggableView) childView);
 			}
+
+			if (childView instanceof NodeView && childView != viewToSwapIn) {
+				// In the actual view
+				int topInChildView = top - childView.getTop();
+				NodeView childAsNodeView = (NodeView) childView;
+				return childAsNodeView.findInsertionPoint(topInChildView, viewToSwapIn);
+			}
+
+			if (childView instanceof DraggableView) {
+				return new InsertionPoint(i, this, (DraggableView) childView);
+			}
+
+			throw new IllegalStateException("Non-draggable view as a child of a node view: "
+					+ childView.getClass().getName());
 		}
 
 		return new InsertionPoint(-1, this, null);
