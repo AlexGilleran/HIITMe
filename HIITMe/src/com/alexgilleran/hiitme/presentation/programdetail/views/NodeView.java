@@ -195,9 +195,13 @@ public class NodeView extends LinearLayout implements DraggableView {
 				continue;
 			}
 
-			if ((top <= childView.getTop() || top >= childView.getBottom()) && viewToSwapIn.getParentNodeView() != this) {
-				// in the margin above or below the view
+			if (top <= childView.getTop() && viewToSwapIn.getParentNodeView() != this) {
+				// in the margin above  the view
 				return new InsertionPoint(i, this, (DraggableView) childView);
+			}
+			if (top >= childView.getBottom() && viewToSwapIn.getParentNodeView() != this) {
+				// in the margin below the view
+				return new InsertionPoint(Math.max(i + 1, getChildCount() - 1), this, (DraggableView) childView);
 			}
 
 			if (childView instanceof NodeView && childView != viewToSwapIn) {
