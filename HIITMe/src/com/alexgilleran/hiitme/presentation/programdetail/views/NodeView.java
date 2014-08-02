@@ -255,7 +255,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	public void addChild(DraggableView child) {
-		addView(child.asView());
+		addChild(child, 0);
 	}
 
 	public void addChild(DraggableView child, int index) {
@@ -288,7 +288,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
-		setBackgroundResource(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
+		setBackground(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
 	}
 
 	@Override
