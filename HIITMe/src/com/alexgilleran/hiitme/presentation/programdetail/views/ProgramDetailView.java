@@ -69,7 +69,6 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 		LinearLayout root = (LinearLayout) findViewById(R.id.root);
 		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, root, false);
 		getViewTreeObserver().addOnGlobalLayoutListener(scrollListener);
-		
 
 		recycleBin = (View) findViewById(R.id.layout_recycle_bin);
 

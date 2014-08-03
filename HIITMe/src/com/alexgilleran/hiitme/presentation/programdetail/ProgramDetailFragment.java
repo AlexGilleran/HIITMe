@@ -138,15 +138,15 @@ public class ProgramDetailFragment extends RoboFragment {
 				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
 				Exercise exercise = new Exercise();
 				exercise.setNode(program.getAssociatedNode());
-				final ExerciseView view = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, rootLayout,
-						false);
+				final ExerciseView view = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise,
+						detailView.getNodeView(), false);
 				view.setExercise(exercise);
 				view.setNodeView(detailView.getNodeView());
 				view.setEditable(true);
 				view.setDragManager(detailView);
 				detailView.getNodeView().addChild(view, 1);
 
-				getActivity().runOnUiThread(new Runnable() {
+				detailView.post(new Runnable() {
 					@Override
 					public void run() {
 						detailView.startDrag(view, (int) event.getRawY(), addExerciseButton.getTop());
@@ -164,13 +164,14 @@ public class ProgramDetailFragment extends RoboFragment {
 				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
 				Node node = new Node();
 				node.setParent(node);
-				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node, rootLayout, false);
+				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node, detailView.getNodeView(),
+						false);
 				view.init(node);
 				view.setEditable(true);
 				view.setDragManager(detailView);
 				detailView.getNodeView().addChild(view, 1);
 
-				getActivity().runOnUiThread(new Runnable() {
+				detailView.post(new Runnable() {
 					@Override
 					public void run() {
 						detailView.startDrag(view, (int) event.getRawY(), addNodeButton.getTop());

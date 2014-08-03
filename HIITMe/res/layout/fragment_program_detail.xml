@@ -48,7 +48,8 @@
         <LinearLayout
             android:id="@+id/root"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
             <View
                 android:id="@+id/layout_recycle_bin"
