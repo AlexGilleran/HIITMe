@@ -1,54 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="false" >
+    android:orientation="horizontal" >
 
-    <RelativeLayout
-        android:id="@+id/layout_root"
+    <TextView
+        android:id="@+id/name_ro"
+        style="@style/EditableText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp" />
+
+    <EditText
+        android:id="@+id/name_edit"
+        style="@style/EditableText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/button_add_exercise"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_exercise_add"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/button_add_node"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/button_add_exercise"
+        android:src="@drawable/ic_node_add"
+        android:visibility="gone" />
+
+    <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView
+        android:id="@+id/view_program_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal" >
+        android:layout_below="@id/name_ro"
+        android:fillViewport="false" >
 
-        <TextView
-            android:id="@+id/name_ro"
-            style="@style/EditableText"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp" />
-
-        <EditText
-            android:id="@+id/name_edit"
-            style="@style/EditableText"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
-            android:visibility="gone" />
-
-        <ImageButton
-            android:id="@+id/button_add_exercise"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/ic_exercise_add" />
-
-        <ImageButton
-            android:id="@+id/button_add_node"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@id/button_add_exercise"
-            android:src="@drawable/ic_node_add" />
-
-        <View
-            android:id="@+id/layout_recycle_bin"
+        <LinearLayout
+            android:id="@+id/root"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_below="@id/name_edit"
-            android:background="#FF0000"
-            android:visibility="gone" />
-    </RelativeLayout>
+            android:layout_height="match_parent" >
 
-</com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
+            <View
+                android:id="@+id/layout_recycle_bin"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="#FF0000"
+                android:visibility="gone" />
+        </LinearLayout>
+    </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
+
+</RelativeLayout>

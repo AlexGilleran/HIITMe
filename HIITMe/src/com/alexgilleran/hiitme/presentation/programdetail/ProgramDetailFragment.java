@@ -4,14 +4,22 @@ import roboguice.fragment.RoboFragment;
 import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
+import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.util.ViewUtils;
@@ -32,7 +40,10 @@ public class ProgramDetailFragment extends RoboFragment {
 	@Inject
 	private ProgramDAO programDao;
 
-	@InjectView(R.id.root)
+	@InjectView(R.id.layout_root)
+	private RelativeLayout rootLayout;
+
+	@InjectView(R.id.view_program_detail)
 	private ProgramDetailView detailView;
 
 	@InjectView(R.id.name_ro)
@@ -40,6 +51,13 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	@InjectView(R.id.name_edit)
 	private EditText nameEditable;
+
+	@InjectView(R.id.button_add_exercise)
+	private ImageButton addExerciseButton;
+	@InjectView(R.id.button_add_node)
+	private ImageButton addNodeButton;
+
+	private LayoutInflater layoutInflater;
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -57,6 +75,8 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		this.layoutInflater = inflater;
+
 		View rootView = inflater.inflate(R.layout.fragment_program_detail, container, false);
 		return rootView;
 	}
@@ -64,6 +84,9 @@ public class ProgramDetailFragment extends RoboFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		addExerciseButton.setOnTouchListener(addExerciseListener);
+		addNodeButton.setOnTouchListener(addNodeListener);
 
 		detailView.setProgramNode(program.getAssociatedNode());
 
@@ -90,6 +113,10 @@ public class ProgramDetailFragment extends RoboFragment {
 	private void setTextEditable(boolean editable) {
 		nameReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
 		nameEditable.setVisibility(ViewUtils.getVisibilityInt(editable));
+		addExerciseButton.setVisibility(ViewUtils.getVisibilityInt(editable));
+		addNodeButton.setVisibility(ViewUtils.getVisibilityInt(editable));
+		((RelativeLayout.LayoutParams) detailView.getLayoutParams()).addRule(RelativeLayout.BELOW,
+				editable ? R.id.name_edit : R.id.name_ro);
 	}
 
 	public void stopEditing() {
@@ -103,4 +130,54 @@ public class ProgramDetailFragment extends RoboFragment {
 	public String getName() {
 		return nameEditable.getText().toString();
 	}
+
+	private OnTouchListener addExerciseListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, final MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
+				Exercise exercise = new Exercise();
+				exercise.setNode(program.getAssociatedNode());
+				final ExerciseView view = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, rootLayout,
+						false);
+				view.setExercise(exercise);
+				view.setNodeView(detailView.getNodeView());
+				view.setEditable(true);
+				view.setDragManager(detailView);
+				detailView.getNodeView().addChild(view, 1);
+
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						detailView.startDrag(view, (int) event.getRawY(), addExerciseButton.getTop());
+					}
+				});
+			}
+			return false;
+		}
+	};
+
+	private OnTouchListener addNodeListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, final MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
+				Node node = new Node();
+				node.setParent(node);
+				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node, rootLayout, false);
+				view.init(node);
+				view.setEditable(true);
+				view.setDragManager(detailView);
+				detailView.getNodeView().addChild(view, 1);
+
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						detailView.startDrag(view, (int) event.getRawY(), addNodeButton.getTop());
+					}
+				});
+			}
+			return false;
+		}
+	};
 }
