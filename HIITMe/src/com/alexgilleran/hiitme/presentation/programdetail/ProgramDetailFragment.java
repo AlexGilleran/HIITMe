@@ -80,10 +80,7 @@ public class ProgramDetailFragment extends RoboFragment {
 		detailView.setProgramNode(program.getAssociatedNode());
 
 		nameReadOnly.setText(program.getName());
-		descriptionReadOnly.setText(program.getDescription());
-
 		nameEditable.setText(program.getName());
-		descriptionEditable.setText(program.getDescription());
 	}
 
 	public boolean isBeingEdited() {
@@ -92,7 +89,6 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	public void save() {
 		program.setName(getName());
-		program.setDescription(getDescription());
 		program.setAssociatedNode(detailView.getProgramNode());
 		programDao.saveProgram(program);
 	}

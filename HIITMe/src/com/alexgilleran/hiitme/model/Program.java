@@ -12,32 +12,19 @@ public class Program extends DatabaseModel {
 	 * Name of the program
 	 */
 	private String name;
-	/**
-	 * Description *
-	 */
-	private String description;
 
 	private Node programNode;
 
-	public Program(String name, String description) {
+	public Program(String name) {
 		this.name = name;
-		this.description = description;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public Node getAssociatedNode() {

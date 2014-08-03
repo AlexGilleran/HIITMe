@@ -40,14 +40,14 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		db.execSQL(nodeTable.getCreateSql());
 		db.execSQL(programTable.getCreateSql());
 
-		Program tabata = new Program("Tabata", "The tabata protocol");
+		Program tabata = new Program("Tabata");
 		tabata.getAssociatedNode().setTotalReps(8);
 		tabata.getAssociatedNode().addChildExercise("Hard", 2000, EffortLevel.HARD, 1);
 		tabata.getAssociatedNode().addChildExercise("Rest", 1000, EffortLevel.REST, 1);
 
 		saveProgram(tabata, db);
 
-		Program nestTest = new Program("NestTest", "A nested test program");
+		Program nestTest = new Program("NestTest");
 		nestTest.getAssociatedNode().setTotalReps(2);
 		Node nestNode1 = nestTest.getAssociatedNode().addChildNode(2);
 		Node nestNode11 = nestNode1.addChildNode(2);
@@ -77,7 +77,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 		List<Program> programs = new ArrayList<Program>(cursor.getCount());
 		while (cursor.moveToNext()) {
-			Program program = new Program(cursor.getString(1), cursor.getString(2));
+			Program program = new Program(cursor.getString(1));
 			program.setId(cursor.getLong(0));
 			programs.add(program);
 		}
@@ -101,7 +101,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		String name = cursor.getString(cursor.getColumnIndexOrThrow(ProgramTable.Columns.NAME.name));
 		String description = cursor.getString(cursor.getColumnIndexOrThrow(ProgramTable.Columns.DESCRIPTION.name));
 
-		Program program = new Program(name, description);
+		Program program = new Program(name);
 		program.setId(programId);
 
 		long associatedNodeId = cursor.getLong(cursor
@@ -207,7 +207,6 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 		ContentValues programValues = new ContentValues();
 		programValues.put(ProgramTable.Columns.NAME.name, program.getName());
-		programValues.put(ProgramTable.Columns.DESCRIPTION.name, program.getDescription());
 		programValues.put(ProgramTable.Columns.ASSOCIATED_NODE_ID.name, nodeId);
 
 		long programId;
