@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -19,14 +18,12 @@ import com.alexgilleran.hiitme.util.ViewUtils;
 import com.google.inject.Inject;
 
 /**
- * A fragment representing a single Program detail screen. This fragment is
- * either contained in a {@link ProgramListActivity} in two-pane mode (on
- * tablets) or a {@link ProgramDetailActivity} on handsets.
+ * A fragment representing a single Program detail screen. This fragment is either contained in a
+ * {@link ProgramListActivity} in two-pane mode (on tablets) or a {@link ProgramDetailActivity} on handsets.
  */
 public class ProgramDetailFragment extends RoboFragment {
 	/**
-	 * The fragment argument representing the item ID that this fragment
-	 * represents.
+	 * The fragment argument representing the item ID that this fragment represents.
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
 
@@ -38,20 +35,11 @@ public class ProgramDetailFragment extends RoboFragment {
 	@InjectView(R.id.root)
 	private ProgramDetailView detailView;
 
-	@InjectView(R.id.root_node_view_container)
-	private FrameLayout container;
-
 	@InjectView(R.id.name_ro)
 	private TextView nameReadOnly;
 
-	@InjectView(R.id.description_ro)
-	private TextView descriptionReadOnly;
-
 	@InjectView(R.id.name_edit)
 	private EditText nameEditable;
-
-	@InjectView(R.id.description_edit)
-	private EditText descriptionEditable;
 
 	/** Mandatory empty constructor */
 	public ProgramDetailFragment() {
@@ -101,25 +89,18 @@ public class ProgramDetailFragment extends RoboFragment {
 
 	private void setTextEditable(boolean editable) {
 		nameReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
-		descriptionReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
 		nameEditable.setVisibility(ViewUtils.getVisibilityInt(editable));
-		descriptionEditable.setVisibility(ViewUtils.getVisibilityInt(editable));
 	}
 
 	public void stopEditing() {
 		detailView.stopEditing();
 
 		nameReadOnly.setText(nameEditable.getText());
-		descriptionReadOnly.setText(descriptionEditable.getText());
 
 		setTextEditable(false);
 	}
 
 	public String getName() {
 		return nameEditable.getText().toString();
-	}
-
-	public String getDescription() {
-		return descriptionEditable.getText().toString();
 	}
 }

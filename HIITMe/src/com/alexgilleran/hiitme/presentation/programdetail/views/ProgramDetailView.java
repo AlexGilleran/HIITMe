@@ -22,7 +22,7 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
@@ -37,10 +37,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	private static final int MOVE_DURATION = 150;
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
 
-	private LinearLayout editLayout;
 	private ImageButton addExerciseButton;
 	private ImageButton addNodeButton;
-	private FrameLayout recycleBinLayout;
+	private View recycleBin;
 
 	private LayoutInflater layoutInflater;
 	private NodeView nodeView;
@@ -72,18 +71,25 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	@Override
 	public void onFinishInflate() {
-		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, null);
-		nodeView.setDragManager(this);
-		((ViewGroup) this.findViewById(R.id.root_node_view_container)).addView(nodeView);
+		RelativeLayout root = (RelativeLayout) this.findViewById(R.id.layout_root);
 
-		editLayout = (LinearLayout) findViewById(R.id.layout_edit_buttons);
 		addExerciseButton = (ImageButton) findViewById(R.id.button_add_exercise);
 		addNodeButton = (ImageButton) findViewById(R.id.button_add_node);
-		recycleBinLayout = (FrameLayout) findViewById(R.id.layout_recycle_bin);
+		recycleBin = (View) findViewById(R.id.layout_recycle_bin);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(scrollListener);
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
+
+		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, root, false);
+		nodeView.setDragManager(this);
+		nodeView.setId(ViewUtils.generateViewId());
+
+		RelativeLayout.LayoutParams nodeViewLayoutParams = (RelativeLayout.LayoutParams) nodeView.getLayoutParams();
+		nodeViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.name_ro);
+		nodeViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.layout_recycle_bin);
+
+		root.addView(nodeView);
 	}
 
 	public void setProgramNode(Node programNode) {
@@ -142,8 +148,9 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 
 	private void refreshEditability() {
 		int visibility = ViewUtils.getVisibilityInt(isBeingEdited);
-		editLayout.setVisibility(visibility);
-		recycleBinLayout.setVisibility(visibility);
+		addExerciseButton.setVisibility(visibility);
+		addNodeButton.setVisibility(visibility);
+		recycleBin.setVisibility(visibility);
 
 		nodeView.setEditable(isBeingEdited);
 	}
@@ -231,14 +238,13 @@ public class ProgramDetailView extends ScrollView implements DragManager {
 	 * it.
 	 */
 	private void moveDragViewIfNecessary() {
-		if (hoverCellCurrentBounds.top > recycleBinLayout.getTop()
-				&& hoverCellCurrentBounds.top < recycleBinLayout.getBottom()) {
+		if (hoverCellCurrentBounds.top > recycleBin.getTop() && hoverCellCurrentBounds.top < recycleBin.getBottom()) {
 			if (dragView.getParentNodeView() != null) {
 				dragView.getParentNodeView().removeChild(dragView);
 			}
 		} else {
-			final InsertionPoint insertionPoint = nodeView.findInsertionPoint(
-					hoverCellCurrentBounds.top - getCompleteTop(nodeView, 0), dragView);
+			final InsertionPoint insertionPoint = nodeView.findInsertionPoint(hoverCellCurrentBounds.top
+					- getCompleteTop(nodeView, 0), dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 				insertAt(dragView, insertionPoint);
