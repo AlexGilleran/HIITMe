@@ -100,13 +100,13 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
-//		onTouchEvent(ev);
 		return currentlyDragging();
-//		return super.onInterceptTouchEvent(ev);
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		scrollingView.onTouchEvent(event);
+
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_MOVE:
 			if (currentlyDragging()) {
@@ -168,7 +168,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Handles a move of the touch pointer.
 	 */
 	public void handleHoverCellMove() {
-		int deltaY = lastEventY - downY + getScrollY() - scrollingView.getDownScrollY();
+		int deltaY = lastEventY - downY;// + scrollingView.getScrollY() - scrollingView.getDownScrollY();
 
 		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
 		hoverCell.setBounds(hoverCellCurrentBounds);
@@ -188,7 +188,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			}
 		} else {
 			final InsertionPoint insertionPoint = scrollingView.findInsertionPoint(hoverCellCurrentBounds.top
-					- getCompleteTop(scrollingView, 0), dragView);
+					+ scrollingView.getScrollY() - scrollingView.getDownScrollY() - scrollingView.getTop(),
+					dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 				insertAt(dragView, insertionPoint);
@@ -303,7 +304,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 */
 	private int getCompleteTop(View view, int topSoFar) {
 		topSoFar += view.getTop();
-		if (view.getParent() != null && view.getParent() instanceof View && !(view.getParent() instanceof ScrollView)) {
+		if (view.getParent() != null && view.getParent() instanceof View && view != this) {
 			return getCompleteTop((View) view.getParent(), topSoFar);
 		} else {
 			return topSoFar;
