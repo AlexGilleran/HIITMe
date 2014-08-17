@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -39,6 +40,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private DraggableView dragView;
 	private View recycleBin;
 	private ScrollingProgramView scrollingView;
+	private int downScrollY;
 
 	private TextView nameReadOnly;
 	private EditText nameEditable;
@@ -47,6 +49,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	private Program program;
 	private boolean editable = false;
+	private int locationOnScreen;
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -77,6 +80,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
+
+		getViewTreeObserver().addOnGlobalLayoutListener(TODOListener);
 	}
 
 	public String getName() {
@@ -110,7 +115,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_MOVE:
 			if (currentlyDragging()) {
-				lastEventY = (int) event.getRawY();
+				lastEventY = (int) event.getRawY() - locationOnScreen;
 				handleHoverCellMove();
 
 				return true;
@@ -168,7 +173,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Handles a move of the touch pointer.
 	 */
 	public void handleHoverCellMove() {
-		int deltaY = lastEventY - downY;// + scrollingView.getScrollY() - scrollingView.getDownScrollY();
+		int deltaY = lastEventY - downY;
 
 		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
 		hoverCell.setBounds(hoverCellCurrentBounds);
@@ -188,8 +193,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			}
 		} else {
 			final InsertionPoint insertionPoint = scrollingView.findInsertionPoint(hoverCellCurrentBounds.top
-					+ scrollingView.getScrollY() - scrollingView.getDownScrollY() - scrollingView.getTop(),
-					dragView);
+					+ scrollingView.getScrollY() - scrollingView.getTop(), dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 				insertAt(dragView, insertionPoint);
@@ -272,17 +276,17 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	}
 
 	public void startDrag(DraggableView view, int downY, int startTop) {
-		scrollingView.startDrag();
+		downScrollY = scrollingView.getScrollY();
 		view.setBeingDragged(true);
 
-		this.downY = downY;
+		this.downY = downY - locationOnScreen;
 
 		dragView = view;
 		hoverCell = getAndAddHoverView(view);
 
 		int w = view.asView().getWidth();
 		int h = view.asView().getHeight();
-		int top = startTop;
+		int top = this.downY;
 		int left = getCompleteLeft(view.asView(), 0);
 
 		hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
@@ -304,7 +308,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 */
 	private int getCompleteTop(View view, int topSoFar) {
 		topSoFar += view.getTop();
-		if (view.getParent() != null && view.getParent() instanceof View && view != this) {
+		if (view.getParent() != null && view.getParent() instanceof View) {
 			return getCompleteTop((View) view.getParent(), topSoFar);
 		} else {
 			return topSoFar;
@@ -363,7 +367,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Animates the hover cell back to the actual position of the view it represents.
 	 */
 	private void animateRestoreHoverCell() {
-		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, getCompleteTop(dragView.asView(), 0));
+		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, ViewUtils.getYCoordOnScreen(dragView.asView()) - locationOnScreen);
 
 		ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
 				hoverCellCurrentBounds);
@@ -404,6 +408,14 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		public void onAnimationEnd(Animator animation) {
 			dragView.asView().setVisibility(VISIBLE);
 			cleanUpAfterDragEnd();
+		}
+	};
+
+	// TODO: Name this.
+	private OnGlobalLayoutListener TODOListener = new OnGlobalLayoutListener() {
+		@Override
+		public void onGlobalLayout() {
+			locationOnScreen = ViewUtils.getYCoordOnScreen(ProgramDetailView.this);
 		}
 	};
 

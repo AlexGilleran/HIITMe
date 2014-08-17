@@ -25,7 +25,6 @@ public class ScrollingProgramView extends ScrollView {
 
 	private int dragScrollUpThreshold = -1;
 	private int dragScrollDownThreshold = -1;
-	private int downScrollY;
 	private Timer scrollTimer;
 	private NodeView nodeView;
 	private DragManager dragManager;
@@ -49,7 +48,7 @@ public class ScrollingProgramView extends ScrollView {
 	public void onFinishInflate() {
 		FrameLayout root = (FrameLayout) findViewById(R.id.root);
 		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, root, false);
-		getViewTreeObserver().addOnGlobalLayoutListener(scrollListener);
+		getViewTreeObserver().addOnGlobalLayoutListener(scrollThresholdListener);
 
 		nodeView.setId(ViewUtils.generateViewId());
 
@@ -64,11 +63,6 @@ public class ScrollingProgramView extends ScrollView {
 
 	public InsertionPoint findInsertionPoint(int top, DraggableView viewToSwapIn) {
 		return nodeView.findInsertionPoint(top, viewToSwapIn);
-	}
-
-	// FIXME
-	public void startDrag() {
-		downScrollY = getScrollY();
 	}
 
 	@Override
@@ -87,10 +81,6 @@ public class ScrollingProgramView extends ScrollView {
 
 	public NodeView getNodeView() {
 		return nodeView;
-	}
-
-	public int getDownScrollY() {
-		return downScrollY;
 	}
 
 	public void setProgramNode(Node programNode) {
@@ -151,15 +141,13 @@ public class ScrollingProgramView extends ScrollView {
 	/**
 	 * Determines how far from the top/bottom of the screen a touch should be before it triggers scrolling.
 	 */
-	private OnGlobalLayoutListener scrollListener = new OnGlobalLayoutListener() {
+	private OnGlobalLayoutListener scrollThresholdListener = new OnGlobalLayoutListener() {
 		@Override
 		public void onGlobalLayout() {
-			int[] location = new int[2];
-			getLocationOnScreen(location);
-
+			int yCoordOnScreen = ViewUtils.getYCoordOnScreen(ScrollingProgramView.this);
 			int thresholdFractionPx = (int) (getHeight() * DRAG_SCROLL_THRESHOLD_FRACTION);
-			dragScrollUpThreshold = location[1] + thresholdFractionPx;
-			dragScrollDownThreshold = location[1] + getHeight() - thresholdFractionPx;
+			dragScrollUpThreshold = yCoordOnScreen + thresholdFractionPx;
+			dragScrollDownThreshold = yCoordOnScreen + getHeight() - thresholdFractionPx;
 		}
 	};
 }

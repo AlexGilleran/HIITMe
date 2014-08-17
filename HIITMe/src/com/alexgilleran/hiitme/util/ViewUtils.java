@@ -11,13 +11,11 @@ public class ViewUtils {
 	private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
 	/**
-	 * Generate a value suitable for use in {@link #setId(int)}. This value will
-	 * not collide with ID values generated at build time by aapt for R.id.
+	 * Generate a value suitable for use in {@link #setId(int)}. This value will not collide with ID values generated at
+	 * build time by aapt for R.id.
 	 * <p>
-	 * This is copied from <a href="
-	 * http://developer.android.com/reference/android/view/View
-	 * .html#generateViewId%28%29">the android code</a>, which is only present
-	 * in API > 17.
+	 * This is copied from <a href=" http://developer.android.com/reference/android/view/View
+	 * .html#generateViewId%28%29">the android code</a>, which is only present in API > 17.
 	 * 
 	 * @return a generated ID value
 	 */
@@ -67,5 +65,11 @@ public class ViewUtils {
 			return ((FrameLayout.LayoutParams) view.getLayoutParams()).bottomMargin;
 		}
 		return 0;
+	}
+
+	public static int getYCoordOnScreen(View view) {
+		int[] ints = new int[2];
+		view.getLocationOnScreen(ints);
+		return ints[1];
 	}
 }
