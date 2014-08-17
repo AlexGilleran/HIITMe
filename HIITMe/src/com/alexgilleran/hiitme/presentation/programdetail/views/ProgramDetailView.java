@@ -115,7 +115,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_MOVE:
 			if (currentlyDragging()) {
-				lastEventY = (int) event.getRawY() - locationOnScreen;
+				lastEventY = (int) event.getRawY();
 				handleHoverCellMove();
 
 				return true;
@@ -279,14 +279,14 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		downScrollY = scrollingView.getScrollY();
 		view.setBeingDragged(true);
 
-		this.downY = downY - locationOnScreen;
+		this.downY = downY;
 
 		dragView = view;
 		hoverCell = getAndAddHoverView(view);
 
 		int w = view.asView().getWidth();
 		int h = view.asView().getHeight();
-		int top = this.downY;
+		int top = startTop - locationOnScreen;
 		int left = getCompleteLeft(view.asView(), 0);
 
 		hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
@@ -299,7 +299,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public void startDrag(DraggableView view, int downY) {
-		startDrag(view, downY, getCompleteTop(view.asView(), 0));
+		startDrag(view, downY, ViewUtils.getYCoordOnScreen(view.asView()));
 	}
 
 	/**
