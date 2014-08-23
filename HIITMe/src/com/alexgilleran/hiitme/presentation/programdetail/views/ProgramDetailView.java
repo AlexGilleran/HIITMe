@@ -40,7 +40,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private DraggableView dragView;
 	private View recycleBin;
 	private ScrollingProgramView scrollingView;
-	private int downScrollY;
 
 	private TextView nameReadOnly;
 	private EditText nameEditable;
@@ -49,6 +48,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	private Program program;
 	private boolean editable = false;
+	private boolean dragging = false;
 	private int locationOnScreen;
 
 	public ProgramDetailView(Context context) {
@@ -105,6 +105,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		onTouchEvent(ev);
 		return currentlyDragging();
 	}
 
@@ -112,7 +113,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	public boolean onTouchEvent(MotionEvent event) {
 		scrollingView.onTouchEvent(event);
 
-		switch (event.getAction() & MotionEvent.ACTION_MASK) {
+		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_MOVE:
 			if (currentlyDragging()) {
 				lastEventY = (int) event.getRawY();
@@ -123,6 +124,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 			break;
 		case MotionEvent.ACTION_UP:
+			touchEventsEnded();
+			return true;
+		case MotionEvent.ACTION_CANCEL:
 			touchEventsEnded();
 			return true;
 		}
@@ -166,7 +170,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Are we currently dragging a view?
 	 */
 	public boolean currentlyDragging() {
-		return hoverCell != null && hoverCellCurrentBounds != null && hoverCellOriginalBounds != null;
+		return dragging;
 	}
 
 	/**
@@ -276,7 +280,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	}
 
 	public void startDrag(DraggableView view, int downY, int startTop) {
-		downScrollY = scrollingView.getScrollY();
+		dragging = true;
+
 		view.setBeingDragged(true);
 
 		this.downY = downY;
@@ -354,6 +359,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 */
 	private void touchEventsEnded() {
 		if (currentlyDragging()) {
+			dragging = false;
+
 			if (dragView.getParentNodeView() == null) {
 				// Animate removing the view.
 				cleanUpAfterDragEnd();
@@ -367,7 +374,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Animates the hover cell back to the actual position of the view it represents.
 	 */
 	private void animateRestoreHoverCell() {
-		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, ViewUtils.getYCoordOnScreen(dragView.asView()) - locationOnScreen);
+		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, ViewUtils.getYCoordOnScreen(dragView.asView())
+				- locationOnScreen);
 
 		ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
 				hoverCellCurrentBounds);
@@ -439,6 +447,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				dragging = true;
+
 				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
 				Exercise exercise = new Exercise();
 				exercise.setNode(program.getAssociatedNode());
@@ -453,9 +463,12 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				post(new Runnable() {
 					@Override
 					public void run() {
-						startDrag(view, (int) event.getRawY(), addExerciseButton.getTop());
+						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 					}
 				});
+			} else if (event.getActionMasked() == MotionEvent.ACTION_CANCEL
+					|| event.getActionMasked() == MotionEvent.ACTION_UP) {
+				cancelDrag();
 			}
 			return false;
 		}
@@ -465,6 +478,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				dragging = true;
+
 				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
 				Node node = new Node();
 				node.setParent(node);
@@ -478,9 +493,12 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				post(new Runnable() {
 					@Override
 					public void run() {
-						startDrag(view, (int) event.getRawY(), addNodeButton.getTop());
+						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 					}
 				});
+			} else if (event.getActionMasked() == MotionEvent.ACTION_CANCEL
+					|| event.getActionMasked() == MotionEvent.ACTION_UP) {
+				cancelDrag();
 			}
 			return false;
 		}

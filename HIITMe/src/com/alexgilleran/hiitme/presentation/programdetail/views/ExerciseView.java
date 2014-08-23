@@ -3,7 +3,6 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.DragEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -16,8 +15,6 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
-	private DragManager dragManager;
-
 	private TextView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
@@ -33,7 +30,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	public void setDragManager(DragManager dragManager) {
-		this.dragManager = dragManager;
+		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
 	}
 
 	@Override
@@ -46,7 +43,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 		effortLevel.setRotation(270);
 
-		moveButton.setOnTouchListener(startDragListener);
 		moveButton.setOnDragListener(new OnDragListener() {
 			@Override
 			public boolean onDrag(View v, DragEvent event) {
@@ -86,19 +82,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			return "0" + number;
 		}
 	}
-
-	private OnTouchListener startDragListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
-			} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-				dragManager.cancelDrag();
-			}
-
-			return false;
-		}
-	};
 
 	@Override
 	public Node getProgramNode() {

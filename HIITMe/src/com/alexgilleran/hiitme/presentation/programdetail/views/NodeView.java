@@ -9,7 +9,6 @@ import java.util.List;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -52,8 +51,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		this.moveButton = (Button) this.findViewById(R.id.button_move_program_group);
-
-		moveButton.setOnTouchListener(moveListener);
 	}
 
 	public void init(Node programNode) {
@@ -111,6 +108,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void setDragManager(DragManager dragManager) {
 		this.dragManager = dragManager;
+
+		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
 
 		for (DraggableView child : getChildren()) {
 			child.setDragManager(dragManager);
@@ -196,7 +195,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 			}
 
 			if (top <= childView.getTop() && viewToSwapIn.getParentNodeView() != this) {
-				// in the margin above  the view
+				// in the margin above the view
 				return new InsertionPoint(i, this, (DraggableView) childView);
 			}
 			if (top >= childView.getBottom() && viewToSwapIn.getParentNodeView() != this) {
@@ -308,19 +307,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private int getLastDraggableChildIndex() {
 		return getChildCount() - 1;
 	}
-
-	private OnTouchListener moveListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragManager.startDrag(NodeView.this, (int) event.getRawY());
-			} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-				dragManager.cancelDrag();
-			}
-
-			return false;
-		}
-	};
 
 	public class InsertionPoint {
 		int index;
