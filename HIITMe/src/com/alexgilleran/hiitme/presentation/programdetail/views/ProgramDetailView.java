@@ -284,6 +284,10 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	}
 
 	public void startDrag(DraggableView view, int downY, int startTop) {
+		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
+			hoverViewAnimator.end();
+		}
+
 		dragging = true;
 
 		view.setBeingDragged(true);
@@ -421,10 +425,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	private void cleanUpAfterDragEnd() {
 		dragView.setBeingDragged(false);
-		if (hoverViewAnimator.isRunning()) {
+		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
 			hoverViewAnimator.cancel();
 		}
-		hoverViewAnimator = null;
 		hoverCell = null;
 		setEnabled(true);
 		invalidate();
