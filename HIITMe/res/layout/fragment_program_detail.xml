@@ -39,9 +39,10 @@
         android:visibility="gone" />
 
     <View
-        android:id="@+id/layout_recycle_bin"
+        android:id="@+id/recycle_bin"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
         android:background="#FF0000"
         android:visibility="gone" />
 
@@ -49,7 +50,8 @@
         android:id="@+id/view_scrolling"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/layout_recycle_bin"
+        android:layout_above="@id/recycle_bin"
+        android:layout_below="@id/name_ro"
         android:fillViewport="false" >
 
         <FrameLayout

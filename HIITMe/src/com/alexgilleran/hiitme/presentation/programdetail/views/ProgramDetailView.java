@@ -40,6 +40,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private DraggableView dragView;
 	private View recycleBin;
 	private ScrollingProgramView scrollingView;
+	private ObjectAnimator hoverViewAnimator;
 
 	private TextView nameReadOnly;
 	private EditText nameEditable;
@@ -68,7 +69,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public void onFinishInflate() {
-		recycleBin = (View) findViewById(R.id.layout_recycle_bin);
+		recycleBin = (View) findViewById(R.id.recycle_bin);
 
 		scrollingView = (ScrollingProgramView) findViewById(R.id.view_scrolling);
 		scrollingView.setDragManager(this);
@@ -151,10 +152,13 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 		scrollingView.setEditable(editable);
 		nameReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
-		nameEditable.setVisibility(ViewUtils.getVisibilityInt(editable));
-		addExerciseButton.setVisibility(ViewUtils.getVisibilityInt(editable));
-		addNodeButton.setVisibility(ViewUtils.getVisibilityInt(editable));
-		((RelativeLayout.LayoutParams) recycleBin.getLayoutParams()).addRule(RelativeLayout.BELOW,
+
+		int editableVisibility = ViewUtils.getVisibilityInt(editable);
+		nameEditable.setVisibility(editableVisibility);
+		addExerciseButton.setVisibility(editableVisibility);
+		addNodeButton.setVisibility(editableVisibility);
+		recycleBin.setVisibility(editableVisibility);
+		((RelativeLayout.LayoutParams) scrollingView.getLayoutParams()).addRule(RelativeLayout.BELOW,
 				editable ? R.id.name_edit : R.id.name_ro);
 
 		if (!editable) {
@@ -362,9 +366,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			dragging = false;
 
 			if (dragView.getParentNodeView() == null) {
-				// Animate removing the view.
 				cleanUpAfterDragEnd();
 			} else {
+				// Animate removing the view.
 				animateRestoreHoverCell();
 			}
 		}
@@ -374,11 +378,14 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Animates the hover cell back to the actual position of the view it represents.
 	 */
 	private void animateRestoreHoverCell() {
+		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
+			hoverViewAnimator.end();
+		}
+
 		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, ViewUtils.getYCoordOnScreen(dragView.asView())
 				- locationOnScreen);
 
-		ObjectAnimator hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator,
-				hoverCellCurrentBounds);
+		hoverViewAnimator = ObjectAnimator.ofObject(hoverCell, "bounds", boundEvaluator, hoverCellCurrentBounds);
 		hoverViewAnimator.addUpdateListener(hoverCancelAnimatorUpdateListener);
 		hoverViewAnimator.addListener(hoverCancelAnimatorListener);
 
@@ -396,13 +403,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		}
 	};
 
-	private void cleanUpAfterDragEnd() {
-		dragView.setBeingDragged(false);
-		hoverCell = null;
-		setEnabled(true);
-		invalidate();
-	}
-
 	/**
 	 * Listener for animating the hover cell back to its original position (for when a drag is ended).
 	 */
@@ -418,6 +418,17 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			cleanUpAfterDragEnd();
 		}
 	};
+
+	private void cleanUpAfterDragEnd() {
+		dragView.setBeingDragged(false);
+		if (hoverViewAnimator.isRunning()) {
+			hoverViewAnimator.cancel();
+		}
+		hoverViewAnimator = null;
+		hoverCell = null;
+		setEnabled(true);
+		invalidate();
+	}
 
 	// TODO: Name this.
 	private OnGlobalLayoutListener TODOListener = new OnGlobalLayoutListener() {
@@ -466,9 +477,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 					}
 				});
-			} else if (event.getActionMasked() == MotionEvent.ACTION_CANCEL
-					|| event.getActionMasked() == MotionEvent.ACTION_UP) {
-				cancelDrag();
 			}
 			return false;
 		}
@@ -486,9 +494,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node,
 						scrollingView.getNodeView(), false);
 				view.init(node);
-				view.setEditable(true);
 				view.setDragManager(ProgramDetailView.this);
 				scrollingView.getNodeView().addChild(view, 1);
+				view.setEditable(true);
 
 				post(new Runnable() {
 					@Override
@@ -496,9 +504,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 					}
 				});
-			} else if (event.getActionMasked() == MotionEvent.ACTION_CANCEL
-					|| event.getActionMasked() == MotionEvent.ACTION_UP) {
-				cancelDrag();
 			}
 			return false;
 		}
