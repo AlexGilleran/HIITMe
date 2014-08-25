@@ -184,8 +184,10 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		int deltaY = lastEventY - downY;
 
 		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
-		hoverCell.setBounds(hoverCellCurrentBounds);
-		invalidate();
+		if (hoverCell != null) {
+			hoverCell.setBounds(hoverCellCurrentBounds);
+			invalidate();
+		}
 
 		moveDragViewIfNecessary();
 	}
@@ -200,13 +202,16 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				dragView.getParentNodeView().removeChild(dragView);
 			}
 		} else {
-			final InsertionPoint insertionPoint = scrollingView.findInsertionPoint(hoverCellCurrentBounds.top
-					+ scrollingView.getScrollY() - scrollingView.getTop(), dragView);
+			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 				insertAt(dragView, insertionPoint);
 			}
 		}
+	}
+
+	private InsertionPoint findInsertionPoint(int y, DraggableView viewToInsert) {
+		return scrollingView.findInsertionPoint(y + scrollingView.getScrollY() - scrollingView.getTop(), viewToInsert);
 	}
 
 	/**
@@ -231,7 +236,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 			animateMove(insertionPoint.swapWith.asView(), animationStartTop);
 		} else {
-			if (dragView.getParentNodeView() != null) {
+			if (draggedView.getParentNodeView() != null) {
 				draggedView.getParentNodeView().removeChild(draggedView);
 			}
 			insertionPoint.parent.addChild(draggedView, insertionPoint.index);
@@ -313,19 +318,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	@Override
 	public void startDrag(DraggableView view, int downY) {
 		startDrag(view, downY, ViewUtils.getYCoordOnScreen(view.asView()));
-	}
-
-	/**
-	 * Recursively determines how far the top edge of a view is from the edge of its outermost ancestor (not its
-	 * immediate parent).
-	 */
-	private int getCompleteTop(View view, int topSoFar) {
-		topSoFar += view.getTop();
-		if (view.getParent() != null && view.getParent() instanceof View) {
-			return getCompleteTop((View) view.getParent(), topSoFar);
-		} else {
-			return topSoFar;
-		}
 	}
 
 	/**
@@ -469,10 +461,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				final ExerciseView view = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise,
 						scrollingView.getNodeView(), false);
 				view.setExercise(exercise);
-				view.setNodeView(scrollingView.getNodeView());
+				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
 				view.setEditable(true);
 				view.setDragManager(ProgramDetailView.this);
-				scrollingView.getNodeView().addChild(view, 1);
 
 				post(new Runnable() {
 					@Override
@@ -498,7 +489,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 						scrollingView.getNodeView(), false);
 				view.init(node);
 				view.setDragManager(ProgramDetailView.this);
-				scrollingView.getNodeView().addChild(view, 1);
+				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
 				view.setEditable(true);
 
 				post(new Runnable() {
