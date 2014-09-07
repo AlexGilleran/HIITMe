@@ -5,12 +5,14 @@ import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.google.inject.Inject;
@@ -63,6 +65,8 @@ public class ProgramDetailFragment extends RoboFragment {
 		// The program is actually set before the view is rendered in a fragment... as opposed to a view where it'd be
 		// the other way around.
 		detailView.setProgram(program);
+		detailView.setExerciseLongClickListener(editExerciseListener);
+		detailView.setNodeLongClickListener(editNodeListener);
 	}
 
 	public boolean isBeingEdited() {
@@ -80,4 +84,22 @@ public class ProgramDetailFragment extends RoboFragment {
 	public void stopEditing() {
 		detailView.setEditable(false);
 	}
+
+	private OnLongClickListener editNodeListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View view) {
+			EditExerciseFragment dialog = new EditExerciseFragment();
+			dialog.show(getFragmentManager(), "blah");
+			return true;
+		}
+	};
+
+	private OnLongClickListener editExerciseListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View view) {
+			EditExerciseFragment dialog = new EditExerciseFragment();
+			dialog.show(getFragmentManager(), "blah");
+			return true;
+		}
+	};
 }

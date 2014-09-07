@@ -1,6 +1,10 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
+import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
+import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
+import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 
 public interface DragManager {
 
@@ -11,4 +15,8 @@ public interface DragManager {
 	boolean currentlyDragging();
 	
 	void handleHoverCellMove();
+	
+	ExerciseView buildExerciseView(Exercise exercise, NodeView parent);
+	
+	NodeView buildNodeView(Node node);
 }

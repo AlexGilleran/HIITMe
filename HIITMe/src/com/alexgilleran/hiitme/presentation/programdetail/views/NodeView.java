@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -68,9 +67,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 			Node child = programNode.getChildren().get(i);
 
 			if (child.getAttachedExercise() != null) {
-				addChild(buildExerciseView(child.getAttachedExercise()));
+				addExercise(child.getAttachedExercise());
 			} else {
-				NodeView programNodeView = buildProgramNodeView(child);
+				NodeView programNodeView = dragManager.buildNodeView(child);
 				addChild(programNodeView);
 			}
 		}
@@ -80,11 +79,33 @@ public class NodeView extends LinearLayout implements DraggableView {
 		setBackground(determineBgDrawableRes());
 	}
 
+	public void addNode(Node node) {
+		addNode(node, getChildCount() - 1);
+	}
+
+	public void addNode(Node node, int index) {
+		addChild(dragManager.buildNodeView(node), index);
+	}
+
+	public View addExercise(Exercise exercise) {
+		return addExercise(exercise, getChildCount() - 1);
+	}
+
+	public ExerciseView addExercise(Exercise exercise, int index) {
+		ExerciseView view = dragManager.buildExerciseView(exercise, this);
+		addChild(view, index);
+		return view;
+	}
+
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-
-		setBackground(determineBgDrawableRes());
+		
+		refreshBackground();
+	}
+	
+	private void refreshBackground() {
+		setBackground(determineBgDrawableRes());		
 	}
 
 	private void setBackground(int resourceId) {
@@ -123,42 +144,10 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	private int getDepth() {
-		if (getParentNodeView() != null) {
-			return 1 + getParentNodeView().getDepth();
+		if (getParentNode() != null) {
+			return 1 + getParentNode().getDepth();
 		}
 		return 0;
-	}
-
-	/**
-	 * Populates an existing row meant to contain details of an exercise.
-	 * 
-	 * @param row
-	 *            The {@link TableRow} to populate.
-	 * @param exercise
-	 *            The {@link Exercise} to source data from.
-	 */
-	private ExerciseView buildExerciseView(final Exercise exercise) {
-		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, this, false);
-
-		exerciseView.setNodeView(this);
-		exerciseView.setExercise(exercise);
-
-		return exerciseView;
-	}
-
-	/**
-	 * Populates an existing row meant to contain a {@link NodeView}.
-	 * 
-	 * @param row
-	 *            The row to populate.
-	 * @param node
-	 *            The child node to pass to the {@link NodeView}.
-	 */
-	private NodeView buildProgramNodeView(Node node) {
-		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, this, false);
-		nodeView.init(node);
-
-		return nodeView;
 	}
 
 	@Override
@@ -194,11 +183,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 				continue;
 			}
 
-			if (top <= childView.getTop() && viewToSwapIn.getParentNodeView() != this) {
+			if (top <= childView.getTop() && viewToSwapIn.getParentNode() != this) {
 				// in the margin above the view
 				return new InsertionPoint(i, this, (DraggableView) childView);
 			}
-			if (top >= childView.getBottom() && viewToSwapIn.getParentNodeView() != this) {
+			if (top >= childView.getBottom() && viewToSwapIn.getParentNode() != this) {
 				// in the margin below the view
 				return new InsertionPoint(Math.max(i + 1, getChildCount() - 1), this, (DraggableView) childView);
 			}
@@ -226,14 +215,14 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public Node getProgramNode() {
+	public Node getNode() {
 		Node programNode = new Node();
 
 		// Can't change this in this view.
 		programNode.setTotalReps(this.programNode.getTotalReps());
 
 		for (DraggableView child : getChildren()) {
-			programNode.addChildNode(child.getProgramNode());
+			programNode.addChildNode(child.getNode());
 		}
 
 		return programNode;
@@ -262,6 +251,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	public void addChild(DraggableView child, int index) {
+		child.setEditable(isEditable());
+		child.setDragManager(dragManager);
 		addView(child.asView(), index);
 	}
 
@@ -270,11 +261,15 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public NodeView getParentNodeView() {
+	public NodeView getParentNode() {
 		if (getParent() instanceof NodeView) {
 			return (NodeView) getParent();
 		}
 		return null;
+	}
+
+	private boolean isEditable() {
+		return moveButton.getVisibility() == VISIBLE;
 	}
 
 	@Override

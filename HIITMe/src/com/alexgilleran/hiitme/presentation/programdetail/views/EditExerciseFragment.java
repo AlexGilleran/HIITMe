@@ -26,9 +26,8 @@ public class EditExerciseFragment extends RoboDialogFragment {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
 		builder.setTitle("Edit Exercise");
-		EditExerciseView editView = (EditExerciseView) getActivity()
-				.getLayoutInflater().inflate(R.layout.dialog_edit_activity,
-						null);
+		EditExerciseView editView = (EditExerciseView) getActivity().getLayoutInflater().inflate(
+				R.layout.dialog_edit_activity, null);
 		editView.setExercise(exercise);
 		builder.setView(editView);
 		builder.setCancelable(true);

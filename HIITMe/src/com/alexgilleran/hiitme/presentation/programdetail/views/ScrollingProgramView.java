@@ -46,19 +46,7 @@ public class ScrollingProgramView extends ScrollView {
 
 	@Override
 	public void onFinishInflate() {
-		FrameLayout root = (FrameLayout) findViewById(R.id.root);
-		nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, root, false);
 		getViewTreeObserver().addOnGlobalLayoutListener(scrollThresholdListener);
-
-		nodeView.setId(ViewUtils.generateViewId());
-
-		root.addView(nodeView);
-	}
-
-	public void setDragManager(DragManager dragManager) {
-		this.dragManager = dragManager;
-
-		nodeView.setDragManager(dragManager);
 	}
 
 	public InsertionPoint findInsertionPoint(int top, DraggableView viewToSwapIn) {
@@ -83,8 +71,14 @@ public class ScrollingProgramView extends ScrollView {
 		return nodeView;
 	}
 
-	public void setProgramNode(Node programNode) {
+	public void init(DragManager dragManager, Node programNode) {
+		this.dragManager = dragManager;
+
+		nodeView = dragManager.buildNodeView(programNode);
 		nodeView.init(programNode);
+
+		FrameLayout root = (FrameLayout) findViewById(R.id.root);
+		root.addView(nodeView);
 	}
 
 	private void stopScrolling() {
@@ -117,8 +111,8 @@ public class ScrollingProgramView extends ScrollView {
 		nodeView.setEditable(editable);
 	}
 
-	public Node getProgramNode() {
-		return nodeView.getProgramNode();
+	public Node getNode() {
+		return nodeView.getNode();
 	}
 
 	private boolean scrollParamsSet() {

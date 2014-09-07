@@ -9,11 +9,11 @@ public interface DraggableView {
 
 	void setDragManager(DragManager dragManager);
 
-	Node getProgramNode();
+	Node getNode();
 
 	View asView();
 
-	NodeView getParentNodeView();
+	NodeView getParentNode();
 
 	void setEditable(boolean editable);
 

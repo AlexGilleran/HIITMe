@@ -84,7 +84,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public Node getProgramNode() {
+	public Node getNode() {
 		Node node = new Node();
 		node.setTotalReps(1);
 
@@ -101,7 +101,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public NodeView getParentNodeView() {
+	public NodeView getParentNode() {
 		return (NodeView) getParent();
 	}
 

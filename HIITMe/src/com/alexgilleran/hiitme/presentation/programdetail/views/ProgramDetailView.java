@@ -52,6 +52,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private boolean dragging = false;
 	private int locationOnScreen;
 
+	private OnLongClickListener exerciseLongClickListener;
+	private OnLongClickListener nodeLongClickListener;
+
 	public ProgramDetailView(Context context) {
 		super(context);
 		layoutInflater = LayoutInflater.from(context);
@@ -72,7 +75,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		recycleBin = (View) findViewById(R.id.recycle_bin);
 
 		scrollingView = (ScrollingProgramView) findViewById(R.id.view_scrolling);
-		scrollingView.setDragManager(this);
 
 		nameReadOnly = (TextView) findViewById(R.id.name_ro);
 		nameEditable = (EditText) findViewById(R.id.name_edit);
@@ -92,14 +94,14 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	public void setProgram(Program program) {
 		this.program = program;
 
-		scrollingView.setProgramNode(program.getAssociatedNode());
+		scrollingView.init(this, program.getAssociatedNode());
 		nameReadOnly.setText(program.getName());
 		nameEditable.setText(program.getName());
 	}
 
 	public Program getProgram() {
 		program.setName(nameEditable.getText().toString());
-		program.setAssociatedNode(scrollingView.getProgramNode());
+		program.setAssociatedNode(scrollingView.getNode());
 
 		return program;
 	}
@@ -198,8 +200,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 */
 	private void moveDragViewIfNecessary() {
 		if (hoverCellCurrentBounds.top > recycleBin.getTop() && hoverCellCurrentBounds.top < recycleBin.getBottom()) {
-			if (dragView.getParentNodeView() != null) {
-				dragView.getParentNodeView().removeChild(dragView);
+			if (dragView.getParentNode() != null) {
+				dragView.getParentNode().removeChild(dragView);
 			}
 		} else {
 			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
@@ -221,7 +223,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		if (canSwap(insertionPoint, draggedView)) {
 			int dragViewIndex = getChildIndex(draggedView.asView());
 
-			draggedView.getParentNodeView().removeViewAt(dragViewIndex);
+			draggedView.getParentNode().removeViewAt(dragViewIndex);
 
 			if (insertionPoint.index == -1) {
 				insertionPoint.parent.addChild(draggedView);
@@ -230,14 +232,14 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			}
 
 			insertionPoint.parent.removeView(insertionPoint.swapWith.asView());
-			draggedView.getParentNodeView().addView(insertionPoint.swapWith.asView(), dragViewIndex);
+			draggedView.getParentNode().addView(insertionPoint.swapWith.asView(), dragViewIndex);
 
 			final int animationStartTop = insertionPoint.swapWith.asView().getTop();
 
 			animateMove(insertionPoint.swapWith.asView(), animationStartTop);
 		} else {
-			if (draggedView.getParentNodeView() != null) {
-				draggedView.getParentNodeView().removeChild(draggedView);
+			if (draggedView.getParentNode() != null) {
+				draggedView.getParentNode().removeChild(draggedView);
 			}
 			insertionPoint.parent.addChild(draggedView, insertionPoint.index);
 		}
@@ -247,7 +249,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 * Determines whether inserting the draggedView at this insertion point can be achieved by swapping the two views.
 	 */
 	private boolean canSwap(final InsertionPoint insertionPoint, DraggableView draggedView) {
-		return draggedView.getParentNodeView() == insertionPoint.parent && insertionPoint.swapWith != null;
+		return draggedView.getParentNode() == insertionPoint.parent && insertionPoint.swapWith != null;
 	}
 
 	/**
@@ -361,7 +363,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		if (currentlyDragging()) {
 			dragging = false;
 
-			if (dragView.getParentNodeView() == null) {
+			if (dragView.getParentNode() == null) {
 				cleanUpAfterDragEnd();
 			} else {
 				// Animate removing the view.
@@ -449,21 +451,44 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		}
 	};
 
+	public void setExerciseLongClickListener(OnLongClickListener listener) {
+		this.exerciseLongClickListener = listener;
+	}
+
+	public void setNodeLongClickListener(OnLongClickListener listener) {
+		this.nodeLongClickListener = listener;
+	}
+
+	@Override
+	public ExerciseView buildExerciseView(Exercise exercise, NodeView parent) {
+		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, this, false);
+
+		exerciseView.setExercise(exercise);
+		exerciseView.setNodeView(parent);
+		exerciseView.setDragManager(this);
+
+		return exerciseView;
+	}
+
+	@Override
+	public NodeView buildNodeView(Node node) {
+		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, this, false);
+
+		nodeView.setDragManager(this);
+		nodeView.init(node);
+		nodeView.setId(ViewUtils.generateViewId());
+
+		return nodeView;
+	}
+
 	private OnTouchListener addExerciseListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
 				dragging = true;
 
-				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
-				Exercise exercise = new Exercise();
-				exercise.setNode(program.getAssociatedNode());
-				final ExerciseView view = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise,
-						scrollingView.getNodeView(), false);
-				view.setExercise(exercise);
-				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
-				view.setEditable(true);
-				view.setDragManager(ProgramDetailView.this);
+				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
+				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
 
 				post(new Runnable() {
 					@Override
