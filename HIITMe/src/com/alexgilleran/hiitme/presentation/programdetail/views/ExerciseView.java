@@ -65,7 +65,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		render();
 	}
 
-	private void render() {
+	public void render() {
 		effortLevel.setText(exercise.getEffortLevel().toString());
 
 		int minutes = exercise.getDuration() / 1000 / 60;
@@ -125,4 +125,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		return ViewUtils.getBottomIncludingMargin(this);
 	}
 
+	public Exercise getExercise() {
+		return exercise;
+	}
 }

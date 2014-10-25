@@ -3,47 +3,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_vertical"
-    android:orientation="horizontal" >
+    android:orientation="vertical"
+    android:padding="20dp" >
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Reps:" />
+        android:orientation="horizontal" >
 
-    <NumberPicker
-        android:id="@+id/exercise_edit_rep_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reps:"
+            android:textSize="20sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/exercise_edit_rep_count"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:selectAllOnFocus="true"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:selectAllOnFocus="true"
+            android:text="Effort: "
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/exercise_edit_effort_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Duration: " />
+        android:orientation="horizontal" >
 
-    <NumberPicker
-        android:id="@+id/exercise_edit_duration_minutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duration: "
+            android:textSize="20sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=":" />
+        <EditText
+            android:id="@+id/exercise_edit_duration_minutes"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLength="2"
+            android:inputType="number"
+            android:selectAllOnFocus="true"
+            android:textSize="25sp" />
 
-    <NumberPicker
-        android:id="@+id/exercise_edit_duration_seconds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:textSize="20sp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Effort: " />
-
-    <Spinner
-        android:id="@+id/exercise_edit_effort_level"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        <EditText
+            android:id="@+id/exercise_edit_duration_seconds"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:selectAllOnFocus="true"
+            android:textSize="25sp" />
+    </LinearLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView>

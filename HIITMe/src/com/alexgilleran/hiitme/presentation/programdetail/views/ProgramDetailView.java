@@ -466,6 +466,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		exerciseView.setExercise(exercise);
 		exerciseView.setNodeView(parent);
 		exerciseView.setDragManager(this);
+		exerciseView.setOnLongClickListener(exerciseLongClickListener);
 
 		return exerciseView;
 	}

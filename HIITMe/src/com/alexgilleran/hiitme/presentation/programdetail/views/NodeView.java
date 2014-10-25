@@ -31,6 +31,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private TextView repCountView;
 	private Button moveButton;
 
+	private boolean editable;
+
 	public NodeView(Context context) {
 		super(context);
 		layoutInflater = LayoutInflater.from(context);
@@ -58,7 +60,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 		render();
 	}
 
-	private void render() {
+	public void render() {
 		for (int i = FIRST_DRAGGABLE_VIEW_INDEX; i < getLastDraggableChildIndex(); i++) {
 			removeViewAt(i);
 		}
@@ -80,7 +82,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	public void addNode(Node node) {
-		addNode(node, getChildCount() - 1);
+		addNode(node, getChildCount());
 	}
 
 	public void addNode(Node node, int index) {
@@ -88,7 +90,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	public View addExercise(Exercise exercise) {
-		return addExercise(exercise, getChildCount() - 1);
+		return addExercise(exercise, getChildCount());
 	}
 
 	public ExerciseView addExercise(Exercise exercise, int index) {
@@ -100,12 +102,12 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		
+
 		refreshBackground();
 	}
-	
+
 	private void refreshBackground() {
-		setBackground(determineBgDrawableRes());		
+		setBackground(determineBgDrawableRes());
 	}
 
 	private void setBackground(int resourceId) {
@@ -251,7 +253,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	public void addChild(DraggableView child, int index) {
-		child.setEditable(isEditable());
+		child.setEditable(editable);
 		child.setDragManager(dragManager);
 		addView(child.asView(), index);
 	}
@@ -268,12 +270,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return null;
 	}
 
-	private boolean isEditable() {
-		return moveButton.getVisibility() == VISIBLE;
-	}
-
 	@Override
 	public void setEditable(boolean editable) {
+		this.editable = editable;
 		int visibility = editable ? VISIBLE : INVISIBLE;
 		if (getDepth() > 0) {
 			moveButton.setVisibility(visibility);

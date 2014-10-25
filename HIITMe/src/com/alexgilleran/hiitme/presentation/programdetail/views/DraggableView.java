@@ -22,4 +22,6 @@ public interface DraggableView {
 	int getTopForDrag();
 
 	int getBottomForDrag();
+
+	void render();
 }

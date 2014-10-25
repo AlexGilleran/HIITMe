@@ -9,9 +9,11 @@ import android.os.Bundle;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
 
 public class EditExerciseFragment extends RoboDialogFragment {
 	private Exercise exercise;
+	private EditDialogUpdateListener listener;
 
 	public EditExerciseFragment() {
 
@@ -21,12 +23,16 @@ public class EditExerciseFragment extends RoboDialogFragment {
 		this.exercise = exercise;
 	}
 
+	public void setDialogUpdateListener(EditDialogUpdateListener listener) {
+		this.listener = listener;
+	}
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
 		builder.setTitle("Edit Exercise");
-		EditExerciseView editView = (EditExerciseView) getActivity().getLayoutInflater().inflate(
+		final EditExerciseView editView = (EditExerciseView) getActivity().getLayoutInflater().inflate(
 				R.layout.dialog_edit_activity, null);
 		editView.setExercise(exercise);
 		builder.setView(editView);
@@ -34,9 +40,8 @@ public class EditExerciseFragment extends RoboDialogFragment {
 		builder.setPositiveButton("OK", new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				// TODO
-				// exercise.save();
-				// exercise.getParentNode().save();
+				editView.update();
+				listener.onUpdated();
 			}
 		});
 
