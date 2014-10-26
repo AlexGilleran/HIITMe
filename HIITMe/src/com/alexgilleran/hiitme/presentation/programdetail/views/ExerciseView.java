@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,10 +16,11 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
+	private TextView name;
 	private TextView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
-	private Button moveButton;
+	private ImageButton moveButton;
 	private NodeView nodeView;
 
 	public ExerciseView(Context context) {
@@ -39,9 +41,8 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 		effortLevel = (TextView) findViewById(R.id.exercise_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
-		moveButton = (Button) findViewById(R.id.button_move);
-
-		effortLevel.setRotation(270);
+		moveButton = (ImageButton) findViewById(R.id.button_move);
+		name = (TextView) findViewById(R.id.exercise_name);
 
 		moveButton.setOnDragListener(new OnDragListener() {
 			@Override
@@ -71,16 +72,11 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		int minutes = exercise.getDuration() / 1000 / 60;
 		int seconds = exercise.getDuration() / 1000 % 60;
 		duration.setText(timeToString(minutes) + "." + timeToString(seconds));
+		name.setText(exercise.getName());
 	}
 
 	private String timeToString(int number) {
-		if (number >= 10) {
-			return Integer.toString(number);
-		} else if (number == 0) {
-			return "00";
-		} else {
-			return "0" + number;
-		}
+		return String.format("%02d", number);
 	}
 
 	@Override

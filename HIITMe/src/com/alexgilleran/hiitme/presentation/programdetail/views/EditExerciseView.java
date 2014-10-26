@@ -5,18 +5,18 @@ import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
 
-public class EditExerciseView extends LinearLayout {
-	private EditText repCountPicker;
+public class EditExerciseView extends TableLayout {
 	private Spinner effortSpinner;
 	private EditText durationMinutes;
 	private EditText durationSeconds;
+	private EditText name;
 
 	private Exercise exercise;
 
@@ -28,19 +28,13 @@ public class EditExerciseView extends LinearLayout {
 		super(context, attrs);
 	}
 
-	public EditExerciseView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-	}
-
 	@Override
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 
-		repCountPicker = (EditText) findViewById(R.id.exercise_edit_rep_count);
-
 		effortSpinner = (Spinner) findViewById(R.id.exercise_edit_effort_level);
 		ArrayAdapter<EffortLevel> effortAdapter = new ArrayAdapter<EffortLevel>(getContext(),
-				android.R.layout.simple_spinner_item, EffortLevel.values());
+				R.layout.spinner_effort_level, EffortLevel.values());
 		effortSpinner.setAdapter(effortAdapter);
 
 		durationMinutes = (EditText) findViewById(R.id.exercise_edit_duration_minutes);
@@ -48,12 +42,14 @@ public class EditExerciseView extends LinearLayout {
 
 		durationMinutes.setFilters(new InputFilter[] { new InputFilterMinMax("0", "99") });
 		durationSeconds.setFilters(new InputFilter[] { new InputFilterMinMax("0", "59") });
+
+		name = (EditText) findViewById(R.id.exercise_edit_name);
 	}
 
 	public Exercise update() {
 		exercise.setDuration(getDuration());
 		exercise.setEffortLevel((EffortLevel) effortSpinner.getSelectedItem());
-		exercise.getParentNode().setTotalReps(Integer.parseInt(repCountPicker.getText().toString()));
+		exercise.setName(name.getText().toString());
 
 		return exercise;
 	}
@@ -70,8 +66,6 @@ public class EditExerciseView extends LinearLayout {
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;
 
-		repCountPicker.setText(Integer.toString(exercise.getParentNode().getTotalReps()));
-
 		effortSpinner.setSelection(exercise.getEffortLevel().ordinal());
 
 		int totalSeconds = exercise.getDuration() / 1000;
@@ -79,5 +73,7 @@ public class EditExerciseView extends LinearLayout {
 
 		durationMinutes.setText(String.format("%02d", totalMinutes));
 		durationSeconds.setText(String.format("%02d", totalSeconds));
+
+		name.setText(exercise.getName());
 	}
 }

@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -29,7 +30,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private Node programNode;
 
 	private TextView repCountView;
-	private Button moveButton;
+	private ImageButton moveButton;
 
 	private boolean editable;
 
@@ -51,7 +52,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
-		this.moveButton = (Button) this.findViewById(R.id.button_move_program_group);
+		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
 	}
 
 	public void init(Node programNode) {

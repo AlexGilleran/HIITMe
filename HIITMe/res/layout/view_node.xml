@@ -15,13 +15,13 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true" />
 
-        <Button
+        <ImageButton
             android:id="@+id/button_move_program_group"
-            android:layout_width="20dp"
-            android:layout_height="40dp"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="#F0F0F0"
+            android:src="@drawable/ic_drag"
             android:visibility="invisible" />
     </RelativeLayout>
 

@@ -4,26 +4,13 @@
     android:layout_height="match_parent"
     android:gravity="center_vertical"
     android:orientation="vertical"
-    android:padding="20dp" >
+    android:padding="20dp"
+    android:stretchColumns="1" >
 
-    <LinearLayout
+    <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reps:"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/exercise_edit_rep_count"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:selectAllOnFocus="true"
-            android:textSize="25sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -35,13 +22,13 @@
         <Spinner
             android:id="@+id/exercise_edit_effort_level"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-    </LinearLayout>
+            android:layout_height="wrap_content" />
+    </TableRow>
 
-    <LinearLayout
+    <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal" >
 
         <TextView
@@ -50,29 +37,53 @@
             android:text="Duration: "
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/exercise_edit_duration_minutes"
-            android:layout_width="60dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:maxLength="2"
-            android:inputType="number"
-            android:selectAllOnFocus="true"
-            android:textSize="25sp" />
+            android:gravity="center_vertical" >
+
+            <EditText
+                android:id="@+id/exercise_edit_duration_minutes"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="2"
+                android:selectAllOnFocus="true"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=":"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/exercise_edit_duration_seconds"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:selectAllOnFocus="true"
+                android:textSize="25sp" />
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=":"
+            android:text="Name:"
             android:textSize="20sp" />
 
         <EditText
-            android:id="@+id/exercise_edit_duration_seconds"
-            android:layout_width="60dp"
+            android:id="@+id/exercise_edit_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:selectAllOnFocus="true"
             android:textSize="25sp" />
-    </LinearLayout>
+    </TableRow>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView>
