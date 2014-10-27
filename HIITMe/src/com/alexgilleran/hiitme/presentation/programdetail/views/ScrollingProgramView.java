@@ -75,7 +75,6 @@ public class ScrollingProgramView extends ScrollView {
 		this.dragManager = dragManager;
 
 		nodeView = dragManager.buildNodeView(programNode);
-		nodeView.init(programNode);
 
 		FrameLayout root = (FrameLayout) findViewById(R.id.root);
 		root.addView(nodeView);

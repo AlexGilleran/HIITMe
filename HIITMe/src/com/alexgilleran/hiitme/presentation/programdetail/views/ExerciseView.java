@@ -72,7 +72,13 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		int minutes = exercise.getDuration() / 1000 / 60;
 		int seconds = exercise.getDuration() / 1000 % 60;
 		duration.setText(timeToString(minutes) + "." + timeToString(seconds));
-		name.setText(exercise.getName());
+
+		if (exercise.getName() != null && !exercise.getName().isEmpty()) {
+			name.setVisibility(VISIBLE);
+			name.setText(exercise.getName());
+		} else {
+			name.setVisibility(GONE);
+		}
 	}
 
 	private String timeToString(int number) {
