@@ -10,7 +10,7 @@
             <solid android:color="#c7c7c7" />
         </shape>
     </item>
-    <item android:top="1px">
+    <item android:top="1dp">
         <shape
             android:dither="true"
             android:shape="rectangle" >
@@ -22,9 +22,9 @@
     <item
         android:id="@+id/card"
         android:bottom="1.8dp"
-        android:left="1px"
-        android:right="1px"
-        android:top="1px">
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp">
         <shape
             android:dither="true"
             android:shape="rectangle" >
@@ -33,10 +33,10 @@
             <solid android:color="@color/being_dragged" />
 
             <padding
-                android:bottom="8dp"
-                android:left="8dp"
-                android:right="8dp"
-                android:top="8dp" />
+                android:bottom="1.8dp"
+                android:left="1dp"
+                android:right="1dp"
+                android:top="1dp" />
         </shape>
     </item>
 

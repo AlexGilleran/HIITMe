@@ -4,8 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,7 +18,7 @@ import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView name;
-	private TextView effortLevel;
+	private ImageView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
 	private ImageButton moveButton;
@@ -39,7 +40,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 
-		effortLevel = (TextView) findViewById(R.id.exercise_effort_level);
+		effortLevel = (ImageView) findViewById(R.id.exercise_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
 		moveButton = (ImageButton) findViewById(R.id.button_move);
 		name = (TextView) findViewById(R.id.exercise_name);
@@ -48,6 +49,14 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			@Override
 			public boolean onDrag(View v, DragEvent event) {
 				return false;
+			}
+		});
+
+		getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(effortLevel.getWidth(), ExerciseView.this
+						.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom()));
 			}
 		});
 	}
@@ -67,7 +76,8 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	public void render() {
-		effortLevel.setText(exercise.getEffortLevel().toString());
+		effortLevel.setContentDescription(exercise.getEffortLevel().toString());
+		effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
 
 		int minutes = exercise.getDuration() / 1000 / 60;
 		int seconds = exercise.getDuration() / 1000 % 60;
@@ -109,7 +119,9 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	@Override
 	public void setEditable(boolean editable) {
-		moveButton.setVisibility(ViewUtils.getVisibilityInt(editable));
+		int visibility = ViewUtils.getVisibilityInt(editable);
+
+		moveButton.setVisibility(visibility);
 	}
 
 	@Override

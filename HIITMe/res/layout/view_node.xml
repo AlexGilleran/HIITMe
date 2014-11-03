@@ -3,6 +3,7 @@
     android:id="@+id/program_node_view"
     style="@style/Node"
     android:gravity="center_horizontal"
+    android:padding="10dp"
     android:orientation="vertical" >
 
     <RelativeLayout
