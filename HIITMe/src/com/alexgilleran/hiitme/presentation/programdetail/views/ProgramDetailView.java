@@ -114,7 +114,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		scrollingView.onTouchEvent(event);
+		scrollingView.handleTouchEvent(event);
 
 		switch (event.getActionMasked()) {
 		case MotionEvent.ACTION_MOVE:
@@ -133,7 +133,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			touchEventsEnded();
 			return true;
 		}
-		return true;
+
+		return false;
 	}
 
 	@Override

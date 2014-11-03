@@ -55,6 +55,19 @@ public class ScrollingProgramView extends ScrollView {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		handleTouchEvent(event);
+
+		if (!handleTouchEvent(event)) {
+			return false;
+		} else {
+			return super.onTouchEvent(event);
+		}
+	}
+
+	/**
+	 * Handles scrolling for a drag without processing it as an actual touch event on the scroll.
+	 */
+	public boolean handleTouchEvent(MotionEvent event) {
 		stopScrolling();
 
 		if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_MOVE) {
@@ -64,7 +77,7 @@ public class ScrollingProgramView extends ScrollView {
 			}
 		}
 
-		return super.onTouchEvent(event);
+		return true;
 	}
 
 	public NodeView getNodeView() {
