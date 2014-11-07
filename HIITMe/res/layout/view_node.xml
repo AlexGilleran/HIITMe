@@ -3,8 +3,11 @@
     android:id="@+id/program_node_view"
     style="@style/Node"
     android:gravity="center_horizontal"
-    android:padding="10dp"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="20dp" >
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -13,7 +13,9 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
+import com.alexgilleran.hiitme.presentation.programdetail.views.EditNodeFragment;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
+import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.google.inject.Inject;
@@ -89,8 +91,18 @@ public class ProgramDetailFragment extends RoboFragment {
 	private OnLongClickListener editNodeListener = new OnLongClickListener() {
 		@Override
 		public boolean onLongClick(View view) {
-			EditExerciseFragment dialog = new EditExerciseFragment();
-			dialog.show(getFragmentManager(), "blah");
+			final NodeView nodeView = (NodeView) view;
+			EditNodeFragment dialog = new EditNodeFragment();
+			dialog.setNode(nodeView.getCurrentNode());
+
+			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+				@Override
+				public void onUpdated() {
+					nodeView.updateRepCount();
+				}
+			});
+
+			dialog.show(getFragmentManager(), "edit_node");
 			return true;
 		}
 	};
@@ -109,7 +121,7 @@ public class ProgramDetailFragment extends RoboFragment {
 				}
 			});
 
-			dialog.show(getFragmentManager(), "blah");
+			dialog.show(getFragmentManager(), "edit_exercise");
 			return true;
 		}
 	};

@@ -10,7 +10,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -77,9 +76,13 @@ public class NodeView extends LinearLayout implements DraggableView {
 			}
 		}
 
-		repCountView.setText("x" + programNode.getTotalReps());
+		updateRepCount();
 
 		setBackground(determineBgDrawableRes());
+	}
+
+	public void updateRepCount() {
+		repCountView.setText("x" + programNode.getTotalReps());
 	}
 
 	public void addNode(Node node) {
@@ -218,16 +221,20 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public Node getNode() {
+	public Node getRebuiltNode() {
 		Node programNode = new Node();
 
 		// Can't change this in this view.
 		programNode.setTotalReps(this.programNode.getTotalReps());
 
 		for (DraggableView child : getChildren()) {
-			programNode.addChildNode(child.getNode());
+			programNode.addChildNode(child.getRebuiltNode());
 		}
 
+		return programNode;
+	}
+
+	public Node getCurrentNode() {
 		return programNode;
 	}
 

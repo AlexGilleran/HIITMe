@@ -96,7 +96,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public Node getNode() {
+	public Node getRebuiltNode() {
 		Node node = new Node();
 		node.setTotalReps(1);
 

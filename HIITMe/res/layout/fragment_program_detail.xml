@@ -38,28 +38,26 @@
         android:src="@drawable/ic_node_add"
         android:visibility="gone" />
 
-    <View
-        android:id="@+id/recycle_bin"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:background="#FF0000"
-        android:visibility="gone" />
-
     <com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView
         android:id="@+id/view_scrolling"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/recycle_bin"
         android:layout_below="@id/name_ro"
         android:fillViewport="false" >
 
-        <FrameLayout
+        <LinearLayout
             android:id="@+id/root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-        </FrameLayout>
+
+            <View
+                android:id="@+id/recycle_bin"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="#FF0000"
+                android:visibility="gone" />
+        </LinearLayout>
     </com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>

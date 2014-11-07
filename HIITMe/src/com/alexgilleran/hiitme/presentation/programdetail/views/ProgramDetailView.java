@@ -479,6 +479,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		nodeView.setDragManager(this);
 		nodeView.init(node);
 		nodeView.setId(ViewUtils.generateViewId());
+		nodeView.setOnLongClickListener(nodeLongClickListener);
 
 		return nodeView;
 	}

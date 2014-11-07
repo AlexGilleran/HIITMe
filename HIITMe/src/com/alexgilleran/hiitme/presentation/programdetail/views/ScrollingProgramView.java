@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import com.alexgilleran.hiitme.R;
@@ -89,7 +89,7 @@ public class ScrollingProgramView extends ScrollView {
 
 		nodeView = dragManager.buildNodeView(programNode);
 
-		FrameLayout root = (FrameLayout) findViewById(R.id.root);
+		LinearLayout root = (LinearLayout) findViewById(R.id.root);
 		root.addView(nodeView);
 	}
 
@@ -124,7 +124,7 @@ public class ScrollingProgramView extends ScrollView {
 	}
 
 	public Node getNode() {
-		return nodeView.getNode();
+		return nodeView.getRebuiltNode();
 	}
 
 	private boolean scrollParamsSet() {
