@@ -92,6 +92,11 @@ public class ProgramDetailFragment extends RoboFragment {
 		@Override
 		public boolean onLongClick(View view) {
 			final NodeView nodeView = (NodeView) view;
+
+			if (!nodeView.isEditable()) {
+				return false;
+			}
+
 			EditNodeFragment dialog = new EditNodeFragment();
 			dialog.setNode(nodeView.getCurrentNode());
 
@@ -111,6 +116,11 @@ public class ProgramDetailFragment extends RoboFragment {
 		@Override
 		public boolean onLongClick(View view) {
 			final ExerciseView exerciseView = (ExerciseView) view;
+
+			if (!exerciseView.isEditable()) {
+				return false;
+			}
+
 			EditExerciseFragment dialog = new EditExerciseFragment();
 			dialog.setExercise(exerciseView.getExercise());
 

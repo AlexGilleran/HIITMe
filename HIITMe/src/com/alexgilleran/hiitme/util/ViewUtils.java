@@ -2,10 +2,12 @@ package com.alexgilleran.hiitme.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import roboguice.util.Strings;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class ViewUtils {
 	private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
@@ -71,5 +73,13 @@ public class ViewUtils {
 		int[] ints = new int[2];
 		view.getLocationOnScreen(ints);
 		return ints[1];
+	}
+
+	public static int getIntFromTextViewSafe(TextView view) {
+		if (view.getText() == null || Strings.isEmpty(view.getText().toString())) {
+			return 0;
+		}
+
+		return Integer.parseInt(view.getText().toString());
 	}
 }

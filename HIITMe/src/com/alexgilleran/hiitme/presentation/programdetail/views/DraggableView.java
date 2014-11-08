@@ -24,4 +24,6 @@ public interface DraggableView {
 	int getBottomForDrag();
 
 	void render();
+
+	public abstract boolean isEditable();
 }

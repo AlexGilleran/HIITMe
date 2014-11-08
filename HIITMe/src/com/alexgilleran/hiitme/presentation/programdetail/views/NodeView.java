@@ -292,6 +292,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
+	public boolean isEditable() {
+		return editable;
+	}
+
+	@Override
 	public void setBeingDragged(boolean beingDragged) {
 		setBackground(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
 	}

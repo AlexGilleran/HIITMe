@@ -7,6 +7,7 @@ import android.widget.TableLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Node;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class EditNodeView extends TableLayout {
 	private EditText repCount;
@@ -29,7 +30,7 @@ public class EditNodeView extends TableLayout {
 	}
 
 	public Node update() {
-		node.setTotalReps(Integer.parseInt(repCount.getText().toString()));
+		node.setTotalReps(ViewUtils.getIntFromTextViewSafe(repCount));
 
 		return node;
 	}

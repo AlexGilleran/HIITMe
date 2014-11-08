@@ -461,7 +461,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	}
 
 	@Override
-	public ExerciseView buildExerciseView(Exercise exercise, NodeView parent) {
+	public ExerciseView buildExerciseView(Exercise exercise, DraggableView parent) {
 		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, this, false);
 
 		exerciseView.setExercise(exercise);

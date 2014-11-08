@@ -22,7 +22,9 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView duration;
 	private Exercise exercise;
 	private ImageButton moveButton;
-	private NodeView nodeView;
+	private DraggableView nodeView;
+
+	private boolean editable;
 
 	public ExerciseView(Context context) {
 		super(context);
@@ -61,11 +63,11 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		});
 	}
 
-	public NodeView getNodeView() {
+	public DraggableView getNodeView() {
 		return nodeView;
 	}
 
-	public void setNodeView(NodeView nodeView) {
+	public void setNodeView(DraggableView nodeView) {
 		this.nodeView = nodeView;
 	}
 
@@ -119,9 +121,14 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	@Override
 	public void setEditable(boolean editable) {
-		int visibility = ViewUtils.getVisibilityInt(editable);
+		this.editable = editable;
 
-		moveButton.setVisibility(visibility);
+		moveButton.setVisibility(ViewUtils.getVisibilityInt(editable));
+	}
+
+	@Override
+	public boolean isEditable() {
+		return editable;
 	}
 
 	@Override

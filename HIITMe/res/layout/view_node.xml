@@ -7,7 +7,7 @@
     android:paddingBottom="20dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:paddingTop="20dp" >
+    android:paddingTop="5dp" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,7 +17,8 @@
             android:id="@+id/textview_repcount"
             style="@style/EditableText"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:textSize="35sp" />
 
         <ImageButton
             android:id="@+id/button_move_program_group"

@@ -11,6 +11,7 @@ import android.widget.TableLayout;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class EditExerciseView extends TableLayout {
 	private Spinner effortSpinner;
@@ -56,8 +57,8 @@ public class EditExerciseView extends TableLayout {
 
 	private int getDuration() {
 		int totalDuration = 0;
-		totalDuration += Integer.parseInt(durationMinutes.getText().toString()) * 60;
-		totalDuration += Integer.parseInt(durationSeconds.getText().toString());
+		totalDuration += ViewUtils.getIntFromTextViewSafe(durationMinutes) * 60;
+		totalDuration += ViewUtils.getIntFromTextViewSafe(durationSeconds);
 		totalDuration = totalDuration * 1000;
 
 		return totalDuration;

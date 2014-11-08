@@ -16,7 +16,7 @@ public interface DragManager {
 	
 	void handleHoverCellMove();
 	
-	ExerciseView buildExerciseView(Exercise exercise, NodeView parent);
+	ExerciseView buildExerciseView(Exercise exercise, DraggableView parent);
 	
 	NodeView buildNodeView(Node node);
 }
