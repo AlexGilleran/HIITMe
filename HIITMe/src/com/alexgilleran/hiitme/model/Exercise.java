@@ -1,6 +1,6 @@
 package com.alexgilleran.hiitme.model;
 
-public class Exercise extends DatabaseModel {
+public class Exercise extends DatabaseModel implements Cloneable {
 	private String name;
 	private int duration;
 	private EffortLevel effortLevel;
@@ -8,7 +8,7 @@ public class Exercise extends DatabaseModel {
 
 	public Exercise() {
 		super();
-		
+
 		this.duration = 0;
 		this.effortLevel = EffortLevel.EASY;
 	}
@@ -55,5 +55,15 @@ public class Exercise extends DatabaseModel {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Override
+	public Exercise clone() {
+		Exercise clone = new Exercise();
+		clone.setDuration(duration);
+		clone.setEffortLevel(effortLevel);
+		clone.setName(name);
+
+		return clone;
 	}
 }

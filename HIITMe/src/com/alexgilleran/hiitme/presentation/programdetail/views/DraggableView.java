@@ -9,7 +9,7 @@ public interface DraggableView {
 
 	void setDragManager(DragManager dragManager);
 
-	Node getRebuiltNode();
+	Node rebuildNode();
 
 	View asView();
 

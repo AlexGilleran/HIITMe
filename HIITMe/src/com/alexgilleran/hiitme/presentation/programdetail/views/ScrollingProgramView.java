@@ -123,8 +123,8 @@ public class ScrollingProgramView extends ScrollView {
 		nodeView.setEditable(editable);
 	}
 
-	public Node getNode() {
-		return nodeView.getRebuiltNode();
+	public Node rebuildNode() {
+		return nodeView.rebuildNode();
 	}
 
 	private boolean scrollParamsSet() {

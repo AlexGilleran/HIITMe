@@ -3,6 +3,8 @@ package com.alexgilleran.hiitme.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import roboguice.util.Strings;
+import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -81,5 +83,10 @@ public class ViewUtils {
 		}
 
 		return Integer.parseInt(view.getText().toString());
+	}
+
+	public static int getPxForDp(Context ctx, int dp) {
+		DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
+		return (int) (dp * (displayMetrics.densityDpi / 160));
 	}
 }

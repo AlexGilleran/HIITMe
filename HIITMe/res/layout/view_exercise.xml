@@ -36,7 +36,6 @@
         android:layout_toRightOf="@id/exercise_effort_level"
         android:maxLines="1"
         android:paddingBottom="3dp"
-        android:text="Ay"
         android:textSize="25sp" />
 
     <ImageButton

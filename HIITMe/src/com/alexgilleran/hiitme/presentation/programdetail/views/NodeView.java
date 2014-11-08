@@ -221,14 +221,14 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public Node getRebuiltNode() {
+	public Node rebuildNode() {
 		Node programNode = new Node();
 
 		// Can't change this in this view.
 		programNode.setTotalReps(this.programNode.getTotalReps());
 
 		for (DraggableView child : getChildren()) {
-			programNode.addChildNode(child.getRebuiltNode());
+			programNode.addChildNode(child.rebuildNode());
 		}
 
 		return programNode;

@@ -99,9 +99,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		nameEditable.setText(program.getName());
 	}
 
-	public Program getProgram() {
+	public Program rebuildProgram() {
 		program.setName(nameEditable.getText().toString());
-		program.setAssociatedNode(scrollingView.getNode());
+		program.setAssociatedNode(scrollingView.rebuildNode());
 
 		return program;
 	}

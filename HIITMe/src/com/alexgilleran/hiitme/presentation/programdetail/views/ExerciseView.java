@@ -85,10 +85,12 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		int seconds = exercise.getDuration() / 1000 % 60;
 		duration.setText(timeToString(minutes) + "." + timeToString(seconds));
 
-		if (exercise.getName() != null && !exercise.getName().isEmpty()) {
+		if (exercise.getName() != null && !exercise.getName().trim().isEmpty()) {
 			name.setVisibility(VISIBLE);
 			name.setText(exercise.getName());
 		} else {
+			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(ViewUtils.getPxForDp(getContext(), 24),
+					effortLevel.getHeight() - name.getHeight()));
 			name.setVisibility(GONE);
 		}
 	}
@@ -98,12 +100,13 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public Node getRebuiltNode() {
+	public Node rebuildNode() {
 		Node node = new Node();
 		node.setTotalReps(1);
 
-		// TODO: Create a whole new exercise.
-		// Exercise exercise = new Exercise();
+		Exercise exercise = this.exercise.clone();
+		exercise.setNode(node);
+
 		node.setAttachedExercise(exercise);
 
 		return node;

@@ -77,7 +77,7 @@ public class ProgramDetailFragment extends RoboFragment {
 	}
 
 	public void save() {
-		programDao.saveProgram(detailView.getProgram());
+		programDao.saveProgram(detailView.rebuildProgram());
 	}
 
 	public void startEditing() {
