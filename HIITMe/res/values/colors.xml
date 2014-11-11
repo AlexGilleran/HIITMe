@@ -4,4 +4,7 @@
     <color name="darker_blue">#FFE2F4FB</color>
     <color name="being_dragged">#FFFFC488</color>
     <color name="base_background">#FFFFFFFF</color>
+    <color name="effort_level_rest">#afb42b</color>
+    <color name="effort_level_easy">#f57c00</color>
+    <color name="effort_level_hard">#d32f2f</color>
 </resources>

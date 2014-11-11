@@ -7,6 +7,6 @@
         android:bottomLeftRadius="3dp"
         android:topLeftRadius="3dp" />
 
-    <solid android:color="#FF0000" />
+    <solid android:color="@color/effort_level_rest" />
 
 </shape>

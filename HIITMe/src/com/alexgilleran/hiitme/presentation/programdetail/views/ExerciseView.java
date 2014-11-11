@@ -1,5 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.DragEvent;
@@ -80,6 +82,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	public void render() {
 		effortLevel.setContentDescription(exercise.getEffortLevel().toString());
 		effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
+		effortLevel.setBackgroundResource(exercise.getEffortLevel().getBackgroundId());
 
 		int minutes = exercise.getDuration() / 1000 / 60;
 		int seconds = exercise.getDuration() / 1000 % 60;
@@ -96,7 +99,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	private String timeToString(int number) {
-		return String.format("%02d", number);
+		return String.format(Locale.ENGLISH, "%02d", number);
 	}
 
 	@Override
