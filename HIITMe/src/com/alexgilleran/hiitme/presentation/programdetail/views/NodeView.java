@@ -177,7 +177,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public InsertionPoint findInsertionPoint(int top, DraggableView viewToSwapIn) {
 		DraggableView firstChild = getFirstChild();
 		if (firstChild != null && top < firstChild.asView().getTop()) {
-			return new InsertionPoint(1, this, null);
+			return new InsertionPoint(1, this, null, top);
 		}
 
 		// TODO: Guess the correct place instead of going top-to-bottom
@@ -191,11 +191,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 			if (top <= childView.getTop() && viewToSwapIn.getParentNode() != this) {
 				// in the margin above the view
-				return new InsertionPoint(i, this, (DraggableView) childView);
+				return new InsertionPoint(i, this, (DraggableView) childView, top);
 			}
 			if (top >= childView.getBottom() && viewToSwapIn.getParentNode() != this) {
 				// in the margin below the view
-				return new InsertionPoint(Math.max(i + 1, getChildCount() - 1), this, (DraggableView) childView);
+				return new InsertionPoint(Math.max(i + 1, getChildCount() - 1), this, (DraggableView) childView, top);
 			}
 
 			if (childView instanceof NodeView && childView != viewToSwapIn) {
@@ -206,18 +206,18 @@ public class NodeView extends LinearLayout implements DraggableView {
 			}
 
 			if (childView instanceof DraggableView) {
-				return new InsertionPoint(i, this, (DraggableView) childView);
+				return new InsertionPoint(i, this, (DraggableView) childView, top);
 			}
 
 			throw new IllegalStateException("Non-draggable view as a child of a node view: "
 					+ childView.getClass().getName());
 		}
 
-		return new InsertionPoint(-1, this, null);
+		return new InsertionPoint(-1, this, null, top);
 	}
 
 	private static boolean topWithinViewBounds(int top, View childView) {
-		return top >= getTopIncludingMargin(childView) && top <= getBottomIncludingMargin(childView);
+		return top >= getTopIncludingMargin(childView) && top < getBottomIncludingMargin(childView);
 	}
 
 	@Override
@@ -319,11 +319,13 @@ public class NodeView extends LinearLayout implements DraggableView {
 		int index;
 		NodeView parent;
 		DraggableView swapWith;
+		int topInView;
 
-		public InsertionPoint(int index, NodeView parent, DraggableView swapWith) {
+		public InsertionPoint(int index, NodeView parent, DraggableView swapWith, int topInView) {
 			this.index = index;
 			this.parent = parent;
 			this.swapWith = swapWith;
+			this.topInView = topInView;
 		}
 	}
 

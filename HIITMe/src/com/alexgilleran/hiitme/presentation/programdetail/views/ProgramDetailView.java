@@ -205,7 +205,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				dragView.getParentNode().removeChild(dragView);
 			}
 		} else {
-			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
+			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top
+					+ hoverCellCurrentBounds.height() / 2, dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 				insertAt(dragView, insertionPoint);
@@ -222,6 +223,15 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 */
 	private void insertAt(final DraggableView draggedView, final InsertionPoint insertionPoint) {
 		if (canSwap(insertionPoint, draggedView)) {
+			// If the difference between where the user's finger is and the top of the view it's hovering over is
+			// greater than the height of the view we're inserting into that space, it'll mean that even after we swap
+			// the views, insertionPoint.swapWith is *still* going to be under the user's finger which will cause a swap
+			// every time a touch event comes in, which means flickering. Hence just do nothing if this is the case.
+			int insertionPointDiff = insertionPoint.topInView - insertionPoint.swapWith.asView().getTop();
+			if (insertionPointDiff > draggedView.asView().getHeight()) {
+				return;
+			}
+
 			int dragViewIndex = getChildIndex(draggedView.asView());
 
 			draggedView.getParentNode().removeViewAt(dragViewIndex);

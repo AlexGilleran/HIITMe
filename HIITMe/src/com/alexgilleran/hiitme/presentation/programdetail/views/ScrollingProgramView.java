@@ -50,7 +50,7 @@ public class ScrollingProgramView extends ScrollView {
 	}
 
 	public InsertionPoint findInsertionPoint(int top, DraggableView viewToSwapIn) {
-		return nodeView.findInsertionPoint(top, viewToSwapIn);
+		return nodeView.findInsertionPoint(top - nodeView.getTop(), viewToSwapIn);
 	}
 
 	@Override
