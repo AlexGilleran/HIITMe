@@ -375,10 +375,21 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			dragging = false;
 
 			if (dragView.getParentNode() == null) {
+				// Animate removing the view.
 				cleanUpAfterDragEnd();
 			} else {
-				// Animate removing the view.
 				animateRestoreHoverCell();
+
+				if (dragView.isNewlyCreated()) {
+					// FIXME: Eh, instanceofs.
+					if (dragView.asView() instanceof ExerciseView) {
+						exerciseLongClickListener.onLongClick(dragView.asView());
+					} else {
+						nodeLongClickListener.onLongClick(dragView.asView());
+					}
+
+					dragView.setNewlyCreated(false);
+				}
 			}
 		}
 	}
@@ -502,6 +513,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
 				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
+				view.setNewlyCreated(true);
 
 				post(new Runnable() {
 					@Override
@@ -529,6 +541,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				view.setDragManager(ProgramDetailView.this);
 				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
 				view.setEditable(true);
+				view.setNewlyCreated(true);
 
 				post(new Runnable() {
 					@Override

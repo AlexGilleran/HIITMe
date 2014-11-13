@@ -27,6 +27,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private DraggableView nodeView;
 
 	private boolean editable;
+	private boolean newlyCreated = false;
 
 	public ExerciseView(Context context) {
 		super(context);
@@ -92,7 +93,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			name.setVisibility(VISIBLE);
 			name.setText(exercise.getName());
 		} else {
-			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(ViewUtils.getPxForDp(getContext(), 24),
+			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(ViewUtils.getPxForDp(getContext(), 32),
 					effortLevel.getHeight() - name.getHeight()));
 			name.setVisibility(GONE);
 		}
@@ -154,5 +155,14 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	public Exercise getExercise() {
 		return exercise;
+	}
+
+	public void setNewlyCreated(boolean placed) {
+		this.newlyCreated = placed;
+	}
+
+	@Override
+	public boolean isNewlyCreated() {
+		return newlyCreated;
 	}
 }

@@ -32,6 +32,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private ImageButton moveButton;
 
 	private boolean editable;
+	private boolean newlyCreated = false;
 
 	public NodeView(Context context) {
 		super(context);
@@ -313,6 +314,15 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	private int getLastDraggableChildIndex() {
 		return getChildCount() - 1;
+	}
+
+	public void setNewlyCreated(boolean placed) {
+		this.newlyCreated = placed;
+	}
+
+	@Override
+	public boolean isNewlyCreated() {
+		return newlyCreated;
 	}
 
 	public class InsertionPoint {

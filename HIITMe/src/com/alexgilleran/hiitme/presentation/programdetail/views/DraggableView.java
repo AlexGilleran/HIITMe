@@ -26,4 +26,8 @@ public interface DraggableView {
 	void render();
 
 	public abstract boolean isEditable();
+
+	boolean isNewlyCreated();
+
+	void setNewlyCreated(boolean newlyCreated);
 }
