@@ -69,11 +69,8 @@ public class EditExerciseView extends TableLayout {
 
 		effortSpinner.setSelection(exercise.getEffortLevel().ordinal());
 
-		int totalSeconds = exercise.getDuration() / 1000;
-		int totalMinutes = totalSeconds / 60;
-
-		durationMinutes.setText(String.format("%02d", totalMinutes));
-		durationSeconds.setText(String.format("%02d", totalSeconds));
+		durationMinutes.setText(String.format("%02d", exercise.getMinutes()));
+		durationSeconds.setText(String.format("%02d", exercise.getSeconds()));
 
 		name.setText(exercise.getName());
 	}

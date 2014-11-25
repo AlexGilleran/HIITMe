@@ -5,10 +5,11 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="15"
         android:targetSdkVersion="17" />
-    
-    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
 
     <application
         android:name="HIITMeApplication"
@@ -22,11 +23,13 @@
         <meta-data
             android:name="AA_DB_VERSION"
             android:value="20" />
+
         <activity
             android:name=".presentation.programlist.ProgramListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -36,9 +39,10 @@
         </activity>
 
         <service android:name="com.alexgilleran.hiitme.programrunner.ProgramRunService" >
-            
         </service>
-        <activity android:name=".presentation.run.RunActivity"></activity>
+
+        <activity android:name=".presentation.run.RunActivity" >
+        </activity>
     </application>
 
 </manifest>

@@ -57,6 +57,20 @@ public class Exercise extends DatabaseModel implements Cloneable {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the number of minutes this exercise lasts, rounded down.
+	 */
+	public int getMinutes() {
+		return duration / 1000 / 60;
+	}
+
+	/**
+	 * Gets the number of seconds this exercise lasts, not including minutes.
+	 */
+	public int getSeconds() {
+		return duration / 1000 % 60;
+	}
+
 	@Override
 	public Exercise clone() {
 		Exercise clone = new Exercise();

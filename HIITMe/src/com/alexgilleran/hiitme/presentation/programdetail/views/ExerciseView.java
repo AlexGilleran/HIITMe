@@ -85,9 +85,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
 		effortLevel.setBackgroundResource(exercise.getEffortLevel().getBackgroundId());
 
-		int minutes = exercise.getDuration() / 1000 / 60;
-		int seconds = exercise.getDuration() / 1000 % 60;
-		duration.setText(timeToString(minutes) + "." + timeToString(seconds));
+		duration.setText(timeToString(exercise.getMinutes()) + "." + timeToString(exercise.getSeconds()));
 
 		if (exercise.getName() != null && !exercise.getName().trim().isEmpty()) {
 			name.setVisibility(VISIBLE);
