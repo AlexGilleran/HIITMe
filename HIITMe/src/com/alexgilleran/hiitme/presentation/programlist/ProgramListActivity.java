@@ -1,6 +1,6 @@
 package com.alexgilleran.hiitme.presentation.programlist;
 
-import roboguice.activity.RoboFragmentActivity;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -10,26 +10,21 @@ import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailActivity;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 
 /**
- * An activity representing a list of Programs. This activity has different
- * presentations for handset and tablet-size devices. On handsets, the activity
- * presents a list of items, which when touched, lead to a
- * {@link ProgramDetailActivity} representing item details. On tablets, the
- * activity presents the list of items and item details side-by-side using two
- * vertical panes.
+ * An activity representing a list of Programs. This activity has different presentations for handset and tablet-size
+ * devices. On handsets, the activity presents a list of items, which when touched, lead to a
+ * {@link ProgramDetailActivity} representing item details. On tablets, the activity presents the list of items and item
+ * details side-by-side using two vertical panes.
  * <p>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link ProgramListFragment} and the item details (if present) is a
- * {@link ProgramDetailFragment}.
+ * The activity makes heavy use of fragments. The list of items is a {@link ProgramListFragment} and the item details
+ * (if present) is a {@link ProgramDetailFragment}.
  * <p>
- * This activity also implements the required
- * {@link ProgramListFragment.Callbacks} interface to listen for item
+ * This activity also implements the required {@link ProgramListFragment.Callbacks} interface to listen for item
  * selections.
  */
-public class ProgramListActivity extends RoboFragmentActivity implements ProgramListFragment.Callbacks {
+public class ProgramListActivity extends Activity implements ProgramListFragment.Callbacks {
 
 	/**
-	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-	 * device.
+	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
 	 */
 	private boolean mTwoPane;
 
@@ -47,7 +42,7 @@ public class ProgramListActivity extends RoboFragmentActivity implements Program
 
 			// In two-pane mode, list items should be given the
 			// 'activated' state when touched.
-			((ProgramListFragment) this.getSupportFragmentManager().findFragmentById(R.id.program_list))
+			((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
 					.setActivateOnItemClick(true);
 		}
 
@@ -55,8 +50,8 @@ public class ProgramListActivity extends RoboFragmentActivity implements Program
 	}
 
 	/**
-	 * Callback method from {@link ProgramListFragment.Callbacks} indicating
-	 * that the item with the given ID was selected.
+	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the item with the given ID was
+	 * selected.
 	 */
 	@Override
 	public void onItemSelected(long id) {
@@ -68,7 +63,7 @@ public class ProgramListActivity extends RoboFragmentActivity implements Program
 			arguments.putLong(Program.PROGRAM_ID_NAME, id);
 			ProgramDetailFragment fragment = new ProgramDetailFragment();
 			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction().replace(R.id.program_detail_container, fragment).commit();
+			getFragmentManager().beginTransaction().replace(R.id.program_detail_container, fragment).commit();
 
 		} else {
 			// In single-pane mode, simply start the detail activity

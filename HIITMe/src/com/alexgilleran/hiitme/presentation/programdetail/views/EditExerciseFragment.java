@@ -1,8 +1,8 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import roboguice.fragment.RoboDialogFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
 
-public class EditExerciseFragment extends RoboDialogFragment {
+public class EditExerciseFragment extends DialogFragment {
 	private Exercise exercise;
 	private EditDialogUpdateListener listener;
 

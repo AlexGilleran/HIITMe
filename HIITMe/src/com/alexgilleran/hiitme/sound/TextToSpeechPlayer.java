@@ -10,14 +10,12 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
 
 import com.alexgilleran.hiitme.model.Exercise;
-import com.google.inject.Inject;
 
 public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 	private HashMap<String, String> speechParams = new HashMap<String, String>();
 	private TextToSpeech textToSpeech;
 	private AudioManager audioManager;
 
-	@Inject
 	public TextToSpeechPlayer(Context context, AudioManager audioManager) {
 		this.audioManager = audioManager;
 

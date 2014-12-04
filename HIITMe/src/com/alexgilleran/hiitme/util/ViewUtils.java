@@ -2,7 +2,6 @@ package com.alexgilleran.hiitme.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import roboguice.util.Strings;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -78,7 +77,7 @@ public class ViewUtils {
 	}
 
 	public static int getIntFromTextViewSafe(TextView view) {
-		if (view.getText() == null || Strings.isEmpty(view.getText().toString())) {
+		if (view.getText() == null || view.getText().toString().isEmpty()) {
 			return 0;
 		}
 

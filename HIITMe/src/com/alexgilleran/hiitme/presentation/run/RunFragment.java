@@ -1,7 +1,6 @@
 package com.alexgilleran.hiitme.presentation.run;
 
-import roboguice.fragment.RoboFragment;
-import roboguice.inject.InjectView;
+import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,30 +23,18 @@ import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.todddavies.components.progressbar.ProgressWheel;
 
-public class RunFragment extends RoboFragment {
+public class RunFragment extends Fragment {
 	/**
-	 * The number of degrees at which the exercise wheel starts - leaving this
-	 * above 0 gives the illusion that the wheel is turning from one exercise to
-	 * the next instead of stopping and starting
+	 * The number of degrees at which the exercise wheel starts - leaving this above 0 gives the illusion that the wheel
+	 * is turning from one exercise to the next instead of stopping and starting
 	 */
 	private static final int EXERCISE_WHEEL_START_DEGREES = 5;
 
-	@InjectView(R.id.progressbar_program)
 	private ProgressWheel programProgressBar;
-
-	@InjectView(R.id.progressbar_exercise)
 	private ProgressWheel exerciseProgressBar;
-
-	@InjectView(R.id.rep_button_play_pause)
 	private ImageButton playButton;
-
-	@InjectView(R.id.rep_button_play_stop)
 	private ImageButton stopButton;
-
-	@InjectView(R.id.textview_current_exercise)
 	private TextView currentExerciseName;
-
-	@InjectView(R.id.textview_next_exercise)
 	private TextView nextExerciseName;
 
 	private ProgramBinder programBinder;
@@ -76,6 +63,13 @@ public class RunFragment extends RoboFragment {
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		programProgressBar = (ProgressWheel) getView().findViewById(R.id.progressbar_program);
+		exerciseProgressBar = (ProgressWheel) getView().findViewById(R.id.progressbar_exercise);
+		playButton = (ImageButton) getView().findViewById(R.id.rep_button_play_pause);
+		stopButton = (ImageButton) getView().findViewById(R.id.rep_button_play_stop);
+		currentExerciseName = (TextView) getView().findViewById(R.id.textview_current_exercise);
+		nextExerciseName = (TextView) getView().findViewById(R.id.textview_next_exercise);
 
 		playButton.setOnClickListener(playButtonListener);
 		stopButton.setOnClickListener(stopButtonListener);

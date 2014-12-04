@@ -5,10 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import roboguice.service.RoboIntentService;
+import android.app.IntentService;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -16,23 +17,16 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Node;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.alexgilleran.hiitme.sound.SoundPlayer;
-import com.google.inject.Inject;
+import com.alexgilleran.hiitme.sound.TextToSpeechPlayer;
 
-public class ProgramRunService extends RoboIntentService {
-
-	@Inject
-	private ProgramDAO programDao;
-
-	@Inject
-	private SoundPlayer soundPlayer;
-
+public class ProgramRunService extends IntentService {
 	private Program program;
 
 	private ProgramRunner programRunner;
@@ -84,7 +78,7 @@ public class ProgramRunService extends RoboIntentService {
 		notification = builder.getNotification();
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 
-		program = programDao.getProgram(programId);
+		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId);
 
 		while (!programCallbacks.isEmpty()) {
 			programCallbacks.poll().onProgramReady(program);
@@ -104,7 +98,9 @@ public class ProgramRunService extends RoboIntentService {
 			if (programRunner == null || programRunner.isStopped()) {
 				startForeground(1, notification);
 
-				programRunner = new ProgramRunnerImpl(program, observerProxy);
+				programRunner = new ProgramRunnerImpl(program, new MasterCountDownObserver(observers,
+						new TextToSpeechPlayer(getApplicationContext(), (AudioManager) getApplicationContext()
+								.getSystemService(Context.AUDIO_SERVICE))));
 
 				programRunner.start();
 			} else if (programRunner.isPaused()) {
@@ -187,17 +183,16 @@ public class ProgramRunService extends RoboIntentService {
 		}
 	}
 
-	private final CountDownObserver observerProxy = new MasterCountDownObserver(observers);
-
 	/**
-	 * Listens for count down events and proxies them to a number of other
-	 * {@link CountDownObserver}s.
+	 * Listens for count down events and proxies them to a number of other {@link CountDownObserver}s.
 	 */
 	private class MasterCountDownObserver implements CountDownObserver {
 		private final List<CountDownObserver> observers;
+		private final SoundPlayer soundPlayer;
 
-		public MasterCountDownObserver(List<CountDownObserver> observers) {
+		public MasterCountDownObserver(List<CountDownObserver> observers, SoundPlayer soundPlayer) {
 			this.observers = observers;
+			this.soundPlayer = soundPlayer;
 		}
 
 		@Override

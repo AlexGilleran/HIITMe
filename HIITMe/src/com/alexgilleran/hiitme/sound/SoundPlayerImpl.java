@@ -11,14 +11,12 @@ import android.media.MediaPlayer.OnCompletionListener;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.google.inject.Inject;
 
 public class SoundPlayerImpl implements SoundPlayer {
 	private AudioManager audioManager;
 	private MediaPlayer mediaPlayer;
 	private Context context;
 
-	@Inject
 	public SoundPlayerImpl(Context context, AudioManager audioManager) {
 		this.context = context;
 		this.audioManager = audioManager;

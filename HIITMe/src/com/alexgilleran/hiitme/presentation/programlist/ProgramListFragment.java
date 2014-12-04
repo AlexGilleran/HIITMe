@@ -2,8 +2,8 @@ package com.alexgilleran.hiitme.presentation.programlist;
 
 import java.util.List;
 
-import roboguice.fragment.RoboListFragment;
 import android.app.Activity;
+import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,31 +13,27 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
-import com.google.inject.Inject;
 
 /**
- * A list fragment representing a list of Programs. This fragment also supports
- * tablet devices by allowing list items to be given an 'activated' state upon
- * selection. This helps indicate which item is currently being viewed in a
+ * A list fragment representing a list of Programs. This fragment also supports tablet devices by allowing list items to
+ * be given an 'activated' state upon selection. This helps indicate which item is currently being viewed in a
  * {@link ProgramDetailFragment}.
  * <p>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
+ * Activities containing this fragment MUST implement the {@link Callbacks} interface.
  */
-public class ProgramListFragment extends RoboListFragment {
+public class ProgramListFragment extends ListFragment {
 
 	/**
-	 * The serialization (saved instance state) Bundle key representing the
-	 * activated item position. Only used on tablets.
+	 * The serialization (saved instance state) Bundle key representing the activated item position. Only used on
+	 * tablets.
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	/**
-	 * The fragment's current callback object, which is notified of list item
-	 * clicks.
+	 * The fragment's current callback object, which is notified of list item clicks.
 	 */
 	private Callbacks mCallbacks = sDummyCallbacks;
 
@@ -46,13 +42,9 @@ public class ProgramListFragment extends RoboListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 
-	@Inject
-	private ProgramDAO ProgramDAO;
-
 	/**
-	 * A callback interface that all activities containing this fragment must
-	 * implement. This mechanism allows activities to be notified of item
-	 * selections.
+	 * A callback interface that all activities containing this fragment must implement. This mechanism allows
+	 * activities to be notified of item selections.
 	 */
 	public interface Callbacks {
 		/**
@@ -62,8 +54,8 @@ public class ProgramListFragment extends RoboListFragment {
 	}
 
 	/**
-	 * A dummy implementation of the {@link Callbacks} interface that does
-	 * nothing. Used only when this fragment is not attached to an activity.
+	 * A dummy implementation of the {@link Callbacks} interface that does nothing. Used only when this fragment is not
+	 * attached to an activity.
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
@@ -72,8 +64,8 @@ public class ProgramListFragment extends RoboListFragment {
 	};
 
 	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
+	 * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
+	 * changes).
 	 */
 	public ProgramListFragment() {
 	}
@@ -82,7 +74,7 @@ public class ProgramListFragment extends RoboListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setListAdapter(new ProgramAdapter(ProgramDAO.getProgramList()));
+		setListAdapter(new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity()).getProgramList()));
 	}
 
 	@Override
@@ -90,10 +82,8 @@ public class ProgramListFragment extends RoboListFragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		// Restore the previously serialized activated item position.
-		if (savedInstanceState != null
-				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-			setActivatedPosition(savedInstanceState
-					.getInt(STATE_ACTIVATED_POSITION));
+		if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
+			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
 	}
 
@@ -103,8 +93,7 @@ public class ProgramListFragment extends RoboListFragment {
 
 		// Activities containing this fragment must implement its callbacks.
 		if (!(activity instanceof Callbacks)) {
-			throw new IllegalStateException(
-					"Activity must implement fragment's callbacks.");
+			throw new IllegalStateException("Activity must implement fragment's callbacks.");
 		}
 
 		mCallbacks = (Callbacks) activity;
@@ -119,8 +108,7 @@ public class ProgramListFragment extends RoboListFragment {
 	}
 
 	@Override
-	public void onListItemClick(ListView listView, View view, int position,
-			long id) {
+	public void onListItemClick(ListView listView, View view, int position, long id) {
 		super.onListItemClick(listView, view, position, id);
 
 		// Notify the active callbacks interface (the activity, if the
@@ -138,15 +126,13 @@ public class ProgramListFragment extends RoboListFragment {
 	}
 
 	/**
-	 * Turns on activate-on-click mode. When this mode is on, list items will be
-	 * given the 'activated' state when touched.
+	 * Turns on activate-on-click mode. When this mode is on, list items will be given the 'activated' state when
+	 * touched.
 	 */
 	public void setActivateOnItemClick(boolean activateOnItemClick) {
 		// When setting CHOICE_MODE_SINGLE, ListView will automatically
 		// give items the 'activated' state when touched.
-		getListView().setChoiceMode(
-				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
-						: ListView.CHOICE_MODE_NONE);
+		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 	}
 
 	private void setActivatedPosition(int position) {
@@ -160,8 +146,8 @@ public class ProgramListFragment extends RoboListFragment {
 	}
 
 	private class ProgramAdapter extends BaseAdapter {
-		private final LayoutInflater inflater = (LayoutInflater) getActivity()
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+				Context.LAYOUT_INFLATER_SERVICE);
 		private final List<Program> programList;
 
 		private ProgramAdapter(List<Program> programList) {
@@ -186,13 +172,10 @@ public class ProgramListFragment extends RoboListFragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(
-						android.R.layout.simple_list_item_activated_1, parent,
-						false);
+				convertView = inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
 			}
 
-			TextView textView = (TextView) convertView
-					.findViewById(android.R.id.text1);
+			TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
 			textView.setText(programList.get(position).getName());
 
 			return convertView;

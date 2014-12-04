@@ -1,7 +1,6 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
-import roboguice.fragment.RoboFragment;
-import roboguice.inject.InjectView;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.RelativeLayout;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditNodeFragment;
@@ -18,27 +18,18 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
-import com.google.inject.Inject;
 
 /**
  * A fragment representing a single Program detail screen. This fragment is either contained in a
  * {@link ProgramListActivity} in two-pane mode (on tablets) or a {@link ProgramDetailActivity} on handsets.
  */
-public class ProgramDetailFragment extends RoboFragment {
+public class ProgramDetailFragment extends Fragment {
 	/**
 	 * The fragment argument representing the item ID that this fragment represents.
 	 */
 	public static final String ARG_ITEM_ID = "item_id";
 
 	private Program program;
-
-	@Inject
-	private ProgramDAO programDao;
-
-	@InjectView(R.id.layout_root)
-	private RelativeLayout rootLayout;
-
-	@InjectView(R.id.layout_root)
 	private ProgramDetailView detailView;
 
 	/** Mandatory empty constructor */
@@ -65,6 +56,8 @@ public class ProgramDetailFragment extends RoboFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		detailView = (ProgramDetailView) getView().findViewById(R.id.layout_root);
+
 		// The program is actually set before the view is rendered in a fragment... as opposed to a view where it'd be
 		// the other way around.
 		detailView.setExerciseLongClickListener(editExerciseListener);
@@ -77,7 +70,7 @@ public class ProgramDetailFragment extends RoboFragment {
 	}
 
 	public void save() {
-		programDao.saveProgram(detailView.rebuildProgram());
+		ProgramDAOSqlite.getInstance(getActivity()).saveProgram(detailView.rebuildProgram());
 	}
 
 	public void startEditing() {

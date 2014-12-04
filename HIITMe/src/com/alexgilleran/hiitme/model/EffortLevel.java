@@ -3,16 +3,12 @@ package com.alexgilleran.hiitme.model;
 import android.content.Context;
 
 import com.alexgilleran.hiitme.R;
-import com.google.inject.Inject;
 
 /** A simple representation of the effort level of the set */
 public enum EffortLevel {
 	HARD(R.string.effort_hard, R.drawable.ic_run_small, R.drawable.effort_icon_bg_hard, R.color.effort_level_hard), //
 	EASY(R.string.effort_easy, R.drawable.ic_walk_small, R.drawable.effort_icon_bg_easy, R.color.effort_level_easy), //
 	REST(R.string.effort_rest, R.drawable.ic_bench_small, R.drawable.effort_icon_bg_rest, R.color.effort_level_rest);//
-
-	@Inject
-	private static Context context;
 
 	private int stringId;
 	private int iconId;
@@ -38,8 +34,7 @@ public enum EffortLevel {
 		return colorId;
 	}
 
-	@Override
-	public String toString() {
+	public String getString(Context context) {
 		return context.getString(stringId);
 	}
 }

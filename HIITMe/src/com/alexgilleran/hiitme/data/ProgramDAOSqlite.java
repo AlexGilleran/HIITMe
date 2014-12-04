@@ -17,15 +17,23 @@ import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
-import com.google.inject.Inject;
 
 public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
+	private static ProgramDAOSqlite INSTANCE;
+
 	private ExerciseTable exerciseTable = new ExerciseTable();
 	private NodeTable nodeTable = new NodeTable();
 	private ProgramTable programTable = new ProgramTable();
 
-	@Inject
-	public ProgramDAOSqlite(Context context) {
+	public static ProgramDAO getInstance(Context context) {
+		if (INSTANCE == null) {
+			INSTANCE = new ProgramDAOSqlite(context);
+		}
+
+		return INSTANCE;
+	}
+
+	private ProgramDAOSqlite(Context context) {
 		super(context, "hiitme.db", null, 1);
 	}
 

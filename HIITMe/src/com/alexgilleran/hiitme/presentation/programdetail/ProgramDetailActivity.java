@@ -1,39 +1,28 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
-import javax.annotation.Nullable;
-
-import roboguice.activity.RoboFragmentActivity;
-import roboguice.inject.InjectFragment;
+import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAO;
+import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
 import com.alexgilleran.hiitme.presentation.run.RunActivity;
 import com.alexgilleran.hiitme.presentation.run.RunFragment;
-import com.google.inject.Inject;
 
 /**
- * An activity representing a single Program detail screen. This activity is
- * only used on handset devices. On tablet-size devices, item details are
- * presented side-by-side with a list of items in a {@link ProgramListActivity}.
+ * An activity representing a single Program detail screen. This activity is only used on handset devices. On
+ * tablet-size devices, item details are presented side-by-side with a list of items in a {@link ProgramListActivity}.
  * <p>
- * This activity is mostly just a 'shell' activity containing nothing more than
- * a {@link ProgramDetailFragment}.
+ * This activity is mostly just a 'shell' activity containing nothing more than a {@link ProgramDetailFragment}.
  */
-public class ProgramDetailActivity extends RoboFragmentActivity {
-	@Inject
-	private ProgramDAO programDao;
-
-	@InjectFragment(R.id.run_fragment_run)
-	@Nullable
+public class ProgramDetailActivity extends Activity {
 	private RunFragment runFragment;
 
 	private Program program;
@@ -50,9 +39,12 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		if (savedInstanceState == null) {
-			FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+			runFragment = (RunFragment) getFragmentManager().findFragmentById(R.id.run_fragment_run);
 
-			program = programDao.getProgram(getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
+			FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+			program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(
+					getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
 
 			detailFragment = new ProgramDetailFragment();
 			detailFragment.setProgram(program);
@@ -71,7 +63,7 @@ public class ProgramDetailActivity extends RoboFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			NavUtils.navigateUpTo(this, new Intent(this, ProgramListActivity.class));
+			navigateUpTo(new Intent(this, ProgramListActivity.class));
 			return true;
 		case R.id.actionbar_icon_run:
 			if (runFragment == null) {
