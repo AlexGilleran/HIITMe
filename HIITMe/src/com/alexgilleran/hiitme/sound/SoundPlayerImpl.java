@@ -31,6 +31,12 @@ public class SoundPlayerImpl implements SoundPlayer {
 		requestFocusAndPlay();
 	}
 
+	@Override
+	public void playEnd() {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void requestFocusAndPlay() {
 		int result = audioManager.requestAudioFocus(afChangeListener, AudioManager.STREAM_NOTIFICATION,
 				AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
@@ -75,5 +81,4 @@ public class SoundPlayerImpl implements SoundPlayer {
 			mp.reset();
 		}
 	};
-
 }

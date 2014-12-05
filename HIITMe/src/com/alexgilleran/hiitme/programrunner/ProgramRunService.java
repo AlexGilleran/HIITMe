@@ -203,23 +203,29 @@ public class ProgramRunService extends IntentService {
 		}
 
 		@Override
-		public void onExerciseFinish() {
+		public void onExerciseStart() {
 			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
+			
 			for (CountDownObserver observer : observers) {
-				observer.onExerciseFinish();
+				observer.onExerciseStart();
 			}
 		}
 
 		@Override
 		public void onProgramFinish() {
+			soundPlayer.playEnd();
+			
 			for (CountDownObserver observer : observers) {
 				observer.onProgramFinish();
 			}
+			
 			stopRun();
 		}
 
 		@Override
 		public void onStart() {
+			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
+			
 			for (CountDownObserver observer : observers) {
 				observer.onStart();
 			}

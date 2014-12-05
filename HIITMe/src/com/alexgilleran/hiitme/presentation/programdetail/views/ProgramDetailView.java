@@ -85,6 +85,10 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		addNodeButton.setOnTouchListener(addNodeListener);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(TODOListener);
+		
+		if (program != null) {
+			render();
+		}
 	}
 
 	public String getName() {
@@ -94,6 +98,12 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	public void setProgram(Program program) {
 		this.program = program;
 
+		if (scrollingView != null) {
+			render();
+		}
+	}
+	
+	private void render() {
 		scrollingView.init(this, program.getAssociatedNode());
 		nameReadOnly.setText(program.getName());
 		nameEditable.setText(program.getName());

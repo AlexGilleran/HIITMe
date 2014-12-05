@@ -200,7 +200,7 @@ public class RunFragment extends Fragment {
 		}
 
 		@Override
-		public void onExerciseFinish() {
+		public void onExerciseStart() {
 			currentExerciseName.setText(programBinder.getCurrentExercise().getEffortLevel().toString());
 
 			Exercise nextExercise = programBinder.getNextExercise();

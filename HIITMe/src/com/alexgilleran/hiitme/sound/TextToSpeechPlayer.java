@@ -1,6 +1,8 @@
 package com.alexgilleran.hiitme.sound;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -14,12 +16,15 @@ import com.alexgilleran.hiitme.model.Exercise;
 public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 	private HashMap<String, String> speechParams = new HashMap<String, String>();
 	private TextToSpeech textToSpeech;
+	private boolean init = false;
+	private String missedExText = null;
 	private AudioManager audioManager;
 
 	public TextToSpeechPlayer(Context context, AudioManager audioManager) {
 		this.audioManager = audioManager;
 
 		textToSpeech = new TextToSpeech(context, this);
+		textToSpeech.setSpeechRate(1.4f);
 
 		speechParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_NOTIFICATION));
 		speechParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id"); // mandatory to listen to utterances even
@@ -29,18 +34,43 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 	@Override
 	public void playExerciseStart(Exercise exercise) {
 		StringBuilder exText = new StringBuilder();
-		exText.append(exercise.getName()).append(", ");
-		exText.append(exercise.getEffortLevel()).append(", ");
-		exText.append(exercise.getMinutes()).append(" minutes ");
-		exText.append(exercise.getSeconds()).append(" seconds");
 
-		textToSpeech.speak(exText.toString(), TextToSpeech.QUEUE_FLUSH, speechParams);
+		if (exercise.getName() != null && !exercise.getName().isEmpty()) {
+			exText.append(exercise.getName()).append(", ");
+		}
+		exText.append(exercise.getEffortLevel()).append(", ");
+
+		if (exercise.getMinutes() > 0) {
+			exText.append(exercise.getMinutes()).append(" minutes ");
+		}
+
+		if (exercise.getSeconds() > 0) {
+			exText.append(exercise.getSeconds()).append(" seconds");
+		}
+
+		if (init) {
+			speak(exText.toString());
+		} else {
+			missedExText = exText.toString();
+		}
+	}
+
+	private void speak(String message) {
+		textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, speechParams);
+	}
+
+	@Override
+	public void playEnd() {
+		textToSpeech.speak("Program finished, well done!", TextToSpeech.QUEUE_FLUSH, speechParams);
 	}
 
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
-
+			init = true;
+			if (missedExText != null) {
+				speak(missedExText);
+			}
 		} else {
 
 		}

@@ -51,7 +51,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 		stopped = true;
 		paused = false;
 
-		observer.onExerciseFinish();
+		observer.onExerciseStart();
 		observer.onProgramFinish();
 
 		countDown.cancel();
@@ -132,13 +132,14 @@ public class ProgramRunnerImpl implements ProgramRunner {
 			exerciseMsRemaining -= msSinceLastTick;
 
 			if (exerciseMsRemaining <= 0) {
-				observer.onExerciseFinish();
 				nodeQueue.remove();
 
 				// Adding rather than assigning the next exercise duration means
 				// that any time leftover from the first exercise is subtracted
 				// from the next one.
 				exerciseMsRemaining += getCurrentExercise().getDuration();
+				
+				observer.onExerciseStart();
 			}
 
 			observer.onTick(exerciseMsRemaining, millisUntilFinished);
@@ -150,7 +151,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 		void onTick(long exerciseMsRemaining, long programMsRemaining);
 
-		void onExerciseFinish();
+		void onExerciseStart();
 
 		void onProgramFinish();
 	}
