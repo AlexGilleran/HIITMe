@@ -72,6 +72,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public void onFinishInflate() {
+		super.onFinishInflate();
+
 		recycleBin = (View) findViewById(R.id.recycle_bin);
 
 		scrollingView = (ScrollingProgramView) findViewById(R.id.view_scrolling);

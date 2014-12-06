@@ -6,10 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
@@ -58,11 +56,13 @@ public class ProgramDetailFragment extends Fragment {
 
 		detailView = (ProgramDetailView) getView().findViewById(R.id.layout_root);
 
-		// The program is actually set before the view is rendered in a fragment... as opposed to a view where it'd be
-		// the other way around.
-		detailView.setExerciseLongClickListener(editExerciseListener);
-		detailView.setNodeLongClickListener(editNodeListener);
-		detailView.setProgram(program);
+		if (savedInstanceState == null) {
+			// The program is actually set before the view is rendered in a fragment... as opposed to a view where it'd be
+			// the other way around.
+			detailView.setExerciseLongClickListener(editExerciseListener);
+			detailView.setNodeLongClickListener(editNodeListener);
+			detailView.setProgram(program);
+		}
 	}
 
 	public boolean isBeingEdited() {
@@ -78,6 +78,7 @@ public class ProgramDetailFragment extends Fragment {
 	}
 
 	public void stopEditing() {
+		save();
 		detailView.setEditable(false);
 	}
 

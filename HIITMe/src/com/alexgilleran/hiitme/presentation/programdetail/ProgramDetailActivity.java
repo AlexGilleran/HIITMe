@@ -5,11 +5,9 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.alexgilleran.hiitme.R;
-import com.alexgilleran.hiitme.data.ProgramDAO;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programlist.ProgramListActivity;
@@ -38,25 +36,27 @@ public class ProgramDetailActivity extends Activity {
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		if (savedInstanceState == null) {
-			runFragment = (RunFragment) getFragmentManager().findFragmentById(R.id.run_fragment_run);
+		// if (savedInstanceState == null) {
+		runFragment = (RunFragment) getFragmentManager().findFragmentById(R.id.run_fragment_run);
 
-			FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-			program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(
-					getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
+		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(
+				getIntent().getLongExtra(Program.PROGRAM_ID_NAME, -1));
 
-			detailFragment = new ProgramDetailFragment();
-			detailFragment.setProgram(program);
-			transaction.add(R.id.program_detail_container, detailFragment);
+		detailFragment = new ProgramDetailFragment();
+		detailFragment.setProgram(program);
+		transaction.add(R.id.program_detail_container, detailFragment);
 
-			transaction.commit();
-		}
+		transaction.commit();
+		// }
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
+
+		detailFragment.save();
 	}
 
 	@Override
@@ -67,6 +67,7 @@ public class ProgramDetailActivity extends Activity {
 			return true;
 		case R.id.actionbar_icon_run:
 			if (runFragment == null) {
+				detailFragment.save();
 				startActivity(buildRunIntent(program.getId()));
 			} else {
 				// TODO: Make the run fragment run?
@@ -74,9 +75,7 @@ public class ProgramDetailActivity extends Activity {
 			}
 			return true;
 		case R.id.actionbar_icon_save:
-			detailFragment.save();
-			detailFragment.stopEditing();
-			invalidateOptionsMenu();
+			stopEditing();
 			return true;
 		case R.id.actionbar_icon_edit:
 			detailFragment.startEditing();
@@ -87,6 +86,20 @@ public class ProgramDetailActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public void onBackPressed() {
+		if (detailFragment.isBeingEdited()) {
+			stopEditing();
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	private void stopEditing() {
+		detailFragment.stopEditing();
+		invalidateOptionsMenu();
+	}
+
 	private Intent buildRunIntent(long programId) {
 		Intent intent = new Intent(this, RunActivity.class);
 		intent.putExtra(Program.PROGRAM_ID_NAME, programId);
@@ -95,8 +108,7 @@ public class ProgramDetailActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.run_menu, menu);
+		getMenuInflater().inflate(R.menu.run_menu, menu);
 
 		menu.findItem(R.id.actionbar_icon_save).setVisible(detailFragment.isBeingEdited());
 		menu.findItem(R.id.actionbar_icon_edit).setVisible(!detailFragment.isBeingEdited());
