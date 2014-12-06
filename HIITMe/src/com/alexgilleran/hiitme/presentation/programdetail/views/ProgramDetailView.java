@@ -85,7 +85,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		addNodeButton.setOnTouchListener(addNodeListener);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(TODOListener);
-		
+
 		if (program != null) {
 			render();
 		}
@@ -102,7 +102,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			render();
 		}
 	}
-	
+
 	private void render() {
 		scrollingView.init(this, program.getAssociatedNode());
 		nameReadOnly.setText(program.getName());
@@ -311,31 +311,34 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		return -1;
 	}
 
-	public void startDrag(DraggableView view, int downY, int startTop) {
-		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
-			hoverViewAnimator.end();
-		}
-
+	public void startDrag(final DraggableView view, int downY, final int startTop) {
+		dragView = view;
+		this.downY = downY;
 		dragging = true;
 
-		view.setBeingDragged(true);
+		post(new Runnable() {
+			@Override
+			public void run() {
+				if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
+					hoverViewAnimator.end();
+				}
 
-		this.downY = downY;
+				dragView.setBeingDragged(true);
+				hoverCell = getAndAddHoverView(dragView);
 
-		dragView = view;
-		hoverCell = getAndAddHoverView(view);
+				int w = dragView.asView().getWidth();
+				int h = dragView.asView().getHeight();
+				int top = startTop - locationOnScreen;
+				int left = getCompleteLeft(dragView.asView(), 0);
 
-		int w = view.asView().getWidth();
-		int h = view.asView().getHeight();
-		int top = startTop - locationOnScreen;
-		int left = getCompleteLeft(view.asView(), 0);
+				hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
+				hoverCellOriginalBounds = new Rect(hoverCellCurrentBounds);
+				hoverCell.setBounds(hoverCellCurrentBounds);
+				dragView.asView().setVisibility(View.INVISIBLE);
 
-		hoverCellCurrentBounds = new Rect(left, top, left + w, top + h);
-		hoverCellOriginalBounds = new Rect(hoverCellCurrentBounds);
-		hoverCell.setBounds(hoverCellCurrentBounds);
-		view.asView().setVisibility(View.INVISIBLE);
-
-		invalidate();
+				invalidate();
+			}
+		});
 	}
 
 	@Override
@@ -519,8 +522,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragging = true;
-
 				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
 				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
 				view.setNewlyCreated(true);
@@ -540,9 +541,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				dragging = true;
-
-				// FIXME: This is a copy of a lot of the stuff that happens in NodeView...
 				Node node = new Node();
 				node.setParent(node);
 				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node,
@@ -552,13 +550,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
 				view.setEditable(true);
 				view.setNewlyCreated(true);
-
-				post(new Runnable() {
-					@Override
-					public void run() {
-						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
-					}
-				});
+				startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 			}
 			return false;
 		}

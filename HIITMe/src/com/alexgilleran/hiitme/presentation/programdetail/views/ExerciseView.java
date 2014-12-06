@@ -45,7 +45,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 
-		effortLevel = (ImageView) findViewById(R.id.exercise_effort_level);
+		effortLevel = (ImageView) findViewById(R.id.imageview_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
 		moveButton = (ImageButton) findViewById(R.id.button_move);
 		name = (TextView) findViewById(R.id.exercise_name);

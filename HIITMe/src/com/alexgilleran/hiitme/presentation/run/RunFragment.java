@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -34,8 +35,8 @@ public class RunFragment extends Fragment {
 	private ProgressWheel exerciseProgressBar;
 	private ImageButton playButton;
 	private ImageButton stopButton;
-	private TextView currentExerciseName;
-	private TextView nextExerciseName;
+	private TextView exerciseName;
+	private ImageView effortLevelIcon;
 
 	private ProgramBinder programBinder;
 
@@ -68,8 +69,8 @@ public class RunFragment extends Fragment {
 		exerciseProgressBar = (ProgressWheel) getView().findViewById(R.id.progressbar_exercise);
 		playButton = (ImageButton) getView().findViewById(R.id.rep_button_play_pause);
 		stopButton = (ImageButton) getView().findViewById(R.id.rep_button_play_stop);
-		currentExerciseName = (TextView) getView().findViewById(R.id.textview_current_exercise);
-		nextExerciseName = (TextView) getView().findViewById(R.id.textview_next_exercise);
+		exerciseName = (TextView) getView().findViewById(R.id.textview_exercise_name);
+		effortLevelIcon = (ImageView) getView().findViewById(R.id.imageview_effort_level);
 
 		playButton.setOnClickListener(playButtonListener);
 		stopButton.setOnClickListener(stopButtonListener);
@@ -153,6 +154,12 @@ public class RunFragment extends Fragment {
 		}
 	};
 
+	private void updateExercise() {
+		Exercise currentExercise = programBinder.getCurrentExercise();
+		exerciseName.setText(currentExercise.getName());
+		effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+	}
+
 	private OnClickListener playButtonListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -201,12 +208,7 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onExerciseStart() {
-			currentExerciseName.setText(programBinder.getCurrentExercise().getEffortLevel().toString());
-
-			Exercise nextExercise = programBinder.getNextExercise();
-			if (nextExercise != null) {
-				nextExerciseName.setText(nextExercise.getEffortLevel().toString());
-			}
+			updateExercise();
 		}
 
 		@Override
@@ -222,6 +224,7 @@ public class RunFragment extends Fragment {
 		@Override
 		public void onStart() {
 			refreshPauseState();
+			updateExercise();
 		}
 	};
 }

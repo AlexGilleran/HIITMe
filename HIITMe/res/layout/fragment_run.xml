@@ -40,15 +40,16 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/textview_current_exercise"
+        android:id="@+id/textview_exercise_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
 
-    <TextView
-        android:id="@+id/textview_next_exercise"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/imageview_effort_level"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#000"
         android:layout_gravity="center_horizontal" />
 
     <LinearLayout

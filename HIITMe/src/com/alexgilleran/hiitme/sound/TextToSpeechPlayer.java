@@ -1,8 +1,6 @@
 package com.alexgilleran.hiitme.sound;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -25,10 +23,11 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 
 		textToSpeech = new TextToSpeech(context, this);
 		textToSpeech.setSpeechRate(1.4f);
+		textToSpeech.setOnUtteranceProgressListener(utteranceListener);
 
 		speechParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_NOTIFICATION));
-		speechParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id"); // mandatory to listen to utterances even
-																			// though we don't care about the ID.
+		// mandatory to listen to utterances even though we don't care about the ID.
+		speechParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id");
 	}
 
 	@Override

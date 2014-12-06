@@ -6,7 +6,7 @@
     android:layout_margin="10dp" >
 
     <ImageView
-        android:id="@+id/exercise_effort_level"
+        android:id="@+id/imageview_effort_level"
         android:layout_width="32dp"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
@@ -20,7 +20,7 @@
         style="@style/EditableText"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="6dp"
-        android:layout_toRightOf="@id/exercise_effort_level"
+        android:layout_toRightOf="@id/imageview_effort_level"
         android:includeFontPadding="false"
         android:paddingTop="3dp"
         android:textSize="38sp" />
@@ -33,7 +33,7 @@
         android:layout_below="@id/exercise_duration"
         android:layout_marginLeft="6dp"
         android:layout_marginTop="-8dp"
-        android:layout_toRightOf="@id/exercise_effort_level"
+        android:layout_toRightOf="@id/imageview_effort_level"
         android:maxLines="1"
         android:paddingBottom="3dp"
         android:textSize="25sp" />
