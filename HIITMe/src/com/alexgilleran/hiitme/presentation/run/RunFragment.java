@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
@@ -158,6 +159,7 @@ public class RunFragment extends Fragment {
 		Exercise currentExercise = programBinder.getCurrentExercise();
 		exerciseName.setText(currentExercise.getName());
 		effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+		exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getActivity()));
 	}
 
 	private OnClickListener playButtonListener = new OnClickListener() {
@@ -191,15 +193,15 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
-
+			Toast.makeText(getActivity(), "Lost connection to run service", Toast.LENGTH_SHORT).show();
 		}
 	};
 
 	private final CountDownObserver countDownObserver = new CountDownObserver() {
 		@Override
 		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
-			exerciseProgressBar.setTextLine1(formatTime(exerciseMsRemaining));
-			exerciseProgressBar.setTextLine2(formatTime(programMsRemaining));
+			programProgressBar.setTextLine1(formatTime(exerciseMsRemaining));
+			programProgressBar.setTextLine2(formatTime(programMsRemaining));
 
 			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, programBinder.getCurrentExercise()
 					.getDuration(), EXERCISE_WHEEL_START_DEGREES));
@@ -216,8 +218,8 @@ public class RunFragment extends Fragment {
 			refreshPauseState();
 			programProgressBar.setProgress(ProgressWheel.getMax());
 			exerciseProgressBar.setProgress(ProgressWheel.getMax());
-			exerciseProgressBar.setTextLine1(formatTime(0));
-			exerciseProgressBar.setTextLine2(formatTime(0));
+			programProgressBar.setTextLine1(formatTime(0));
+			programProgressBar.setTextLine2(formatTime(0));
 			exerciseProgressBar.invalidate();
 		}
 

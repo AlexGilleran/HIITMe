@@ -15,17 +15,14 @@ import android.view.View;
 import com.alexgilleran.hiitme.R;
 
 /**
- * An indicator of progress, similar to Android's ProgressBar. Can be used in
- * 'spin mode' or 'increment mode'
+ * An indicator of progress, similar to Android's ProgressBar. Can be used in 'spin mode' or 'increment mode'
  * 
- * This has been modified to allow for two independently-styled lines of text in
- * the middle.
+ * This has been modified to allow for two independently-styled lines of text in the middle.
  * 
  * @author Todd Davies
  * @author Alex Gilleran
  * 
- *         Licensed under the Creative Commons Attribution 3.0 license see:
- *         http://creativecommons.org/licenses/by/3.0/
+ *         Licensed under the Creative Commons Attribution 3.0 license see: http://creativecommons.org/licenses/by/3.0/
  */
 public class ProgressWheel extends View {
 
@@ -74,8 +71,7 @@ public class ProgressWheel extends View {
 	private int delayMillis = 0;
 	private Handler spinHandler = new Handler() {
 		/**
-		 * This is the code that will increment the progress variable and so
-		 * spin the wheel
+		 * This is the code that will increment the progress variable and so spin the wheel
 		 */
 		@Override
 		public void handleMessage(Message msg) {
@@ -114,9 +110,8 @@ public class ProgressWheel extends View {
 	// ----------------------------------
 
 	/**
-	 * Use onSizeChanged instead of onAttachedToWindow to get the dimensions of
-	 * the view, because this method is called after measuring the dimensions of
-	 * MATCH_PARENT & WRAP_CONTENT. Use this dimensions to setup the bounds and
+	 * Use onSizeChanged instead of onAttachedToWindow to get the dimensions of the view, because this method is called
+	 * after measuring the dimensions of MATCH_PARENT & WRAP_CONTENT. Use this dimensions to setup the bounds and
 	 * paints.
 	 */
 	@Override
@@ -250,7 +245,7 @@ public class ProgressWheel extends View {
 		canvas.drawCircle((circleBounds.width() / 2) + rimWidth + paddingLeft, (circleBounds.height() / 2) + rimWidth
 				+ paddingTop, circleRadius, circlePaint);
 		// Draw the text (attempts to center it horizontally and vertically)
-		int heightOffset = (this.getHeight() / 2) ;
+		int heightOffset = (this.getHeight() / 2);
 
 		paintText(canvas, heightOffset, textLine1Paint, textLine1, textSizeLine1);
 		paintText(canvas, heightOffset + textSizeLine1, textLine2Paint, textLine2, textSizeLine2);
@@ -402,6 +397,7 @@ public class ProgressWheel extends View {
 
 	public void setBarColor(int barColor) {
 		this.barColor = barColor;
+		barPaint.setColor(barColor);
 	}
 
 	public int getCircleColor() {
@@ -410,6 +406,7 @@ public class ProgressWheel extends View {
 
 	public void setCircleColor(int circleColor) {
 		this.circleColor = circleColor;
+		circlePaint.setColor(circleColor);
 	}
 
 	public int getRimColor() {
@@ -418,6 +415,7 @@ public class ProgressWheel extends View {
 
 	public void setRimColor(int rimColor) {
 		this.rimColor = rimColor;
+		rimPaint.setColor(rimColor);
 	}
 
 	public Shader getRimShader() {

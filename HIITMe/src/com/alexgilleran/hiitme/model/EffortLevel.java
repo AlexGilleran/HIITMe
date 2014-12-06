@@ -30,8 +30,8 @@ public enum EffortLevel {
 		return backgroundId;
 	}
 
-	public int getColorId() {
-		return colorId;
+	public int getColorId(Context context) {
+		return context.getResources().getColor(colorId);
 	}
 
 	public String getString(Context context) {
