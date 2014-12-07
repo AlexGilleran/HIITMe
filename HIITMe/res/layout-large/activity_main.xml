@@ -7,21 +7,26 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context=".ProgramListActivity" >
+    tools:context=".MainActivity" >
 
     <fragment
         android:id="@+id/program_list"
-        android:name="com.alexgilleran.hiitme.presentation.programlist.ProgramListFragment"
+        android:name="com.alexgilleran.hiitme.activity.ProgramListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_weight="0.33"
         tools:layout="@android:layout/list_content" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/program_detail_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3"
-        android:orientation="vertical" />
+        android:layout_weight="0.33" />
+
+    <FrameLayout
+        android:id="@+id/program_run_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.33" />
 
 </LinearLayout>

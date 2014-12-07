@@ -1,4 +1,4 @@
-package com.alexgilleran.hiitme.presentation.programlist;
+package com.alexgilleran.hiitme.activity;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class ProgramListFragment extends ListFragment {
 	/**
 	 * The fragment's current callback object, which is notified of list item clicks.
 	 */
-	private Callbacks mCallbacks = sDummyCallbacks;
+	private Callbacks hostingActivity = sDummyCallbacks;
 
 	/**
 	 * The current activated item position. Only used on tablets.
@@ -50,7 +50,7 @@ public class ProgramListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(long id);
+		public void onProgramSelected(long id);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class ProgramListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(long id) {
+		public void onProgramSelected(long id) {
 		}
 	};
 
@@ -96,7 +96,7 @@ public class ProgramListFragment extends ListFragment {
 			throw new IllegalStateException("Activity must implement fragment's callbacks.");
 		}
 
-		mCallbacks = (Callbacks) activity;
+		hostingActivity = (Callbacks) activity;
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class ProgramListFragment extends ListFragment {
 		super.onDetach();
 
 		// Reset the active callbacks interface to the dummy implementation.
-		mCallbacks = sDummyCallbacks;
+		hostingActivity = sDummyCallbacks;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class ProgramListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(id);
+		hostingActivity.onProgramSelected(id);
 	}
 
 	@Override

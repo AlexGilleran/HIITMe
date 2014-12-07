@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
@@ -47,12 +48,10 @@ public class RunFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	}
 
-	public void setProgramId(long programId) {
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
-		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, programId);
+		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, getArguments().getLong(MainActivity.ARG_PROGRAM_ID));
 		getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 		getActivity().startService(serviceIntent);
 	}
@@ -83,7 +82,7 @@ public class RunFragment extends Fragment {
 	public void onStop() {
 		super.onStop();
 
-		if (!programBinder.isActive()) {
+		if (programBinder != null && !programBinder.isActive()) {
 			getActivity().stopService(serviceIntent);
 			getActivity().unbindService(connection);
 		}

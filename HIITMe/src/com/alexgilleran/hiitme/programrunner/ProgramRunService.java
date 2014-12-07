@@ -75,7 +75,7 @@ public class ProgramRunService extends IntentService {
 		Notification.Builder builder = new Notification.Builder(this.getBaseContext());
 		builder.setContentTitle("HIIT Me");
 		builder.setSmallIcon(R.drawable.ic_launcher);
-		notification = builder.getNotification();
+		notification = builder.build();
 		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
 
 		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId);
@@ -205,7 +205,7 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void onExerciseStart() {
 			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
-			
+
 			for (CountDownObserver observer : observers) {
 				observer.onExerciseStart();
 			}
@@ -214,18 +214,18 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void onProgramFinish() {
 			soundPlayer.playEnd();
-			
+
 			for (CountDownObserver observer : observers) {
 				observer.onProgramFinish();
 			}
-			
+
 			stopRun();
 		}
 
 		@Override
 		public void onStart() {
 			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
-			
+
 			for (CountDownObserver observer : observers) {
 				observer.onStart();
 			}
