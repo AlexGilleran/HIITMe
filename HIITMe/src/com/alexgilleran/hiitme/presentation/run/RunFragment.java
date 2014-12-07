@@ -1,5 +1,6 @@
 package com.alexgilleran.hiitme.presentation.run;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,6 +41,7 @@ public class RunFragment extends Fragment {
 	private TextView exerciseName;
 	private ImageView effortLevelIcon;
 
+	private Callbacks hostingActivity;
 	private ProgramBinder programBinder;
 
 	private int duration;
@@ -54,6 +56,13 @@ public class RunFragment extends Fragment {
 		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, getArguments().getLong(MainActivity.ARG_PROGRAM_ID));
 		getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 		getActivity().startService(serviceIntent);
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		hostingActivity = (Callbacks) activity;
 	}
 
 	@Override
@@ -82,10 +91,41 @@ public class RunFragment extends Fragment {
 	public void onStop() {
 		super.onStop();
 
-		if (programBinder != null && !programBinder.isActive()) {
+		if (programBinder != null) {
 			getActivity().stopService(serviceIntent);
 			getActivity().unbindService(connection);
 		}
+	}
+
+	public void stop() {
+		programBinder.stop();
+	}
+
+	private void updateExercise() {
+		Exercise currentExercise = programBinder.getCurrentExercise();
+		exerciseName.setText(currentExercise.getName());
+		effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+		exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getActivity()));
+	}
+
+	public boolean isRunning() {
+		return programBinder != null && programBinder.isRunning();
+	}
+
+	private boolean isStopped() {
+		return programBinder != null && programBinder.isStopped();
+	}
+
+	public void preventRun() {
+		if (isRunning()) {
+			stop();
+		}
+
+		playButton.setEnabled(false);
+	}
+
+	public void allowRun() {
+		playButton.setEnabled(true);
 	}
 
 	private void refreshPauseState() {
@@ -113,9 +153,9 @@ public class RunFragment extends Fragment {
 
 	private int getPlayButtonResource() {
 		if (programBinder != null) {
-			if (programBinder.isRunning()) {
+			if (isRunning()) {
 				return R.drawable.ic_action_pause;
-			} else if (programBinder.isStopped()) {
+			} else if (isStopped()) {
 				return R.drawable.ic_action_repeat;
 			}
 		}
@@ -150,20 +190,17 @@ public class RunFragment extends Fragment {
 	private OnClickListener stopButtonListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			programBinder.stop();
+			stop();
 		}
 	};
-
-	private void updateExercise() {
-		Exercise currentExercise = programBinder.getCurrentExercise();
-		exerciseName.setText(currentExercise.getName());
-		effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
-		exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getActivity()));
-	}
 
 	private OnClickListener playButtonListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
+			if (!playButton.isEnabled()) {
+				return;
+			}
+
 			if (programBinder.isRunning()) {
 				programBinder.pause();
 			} else {
@@ -214,6 +251,7 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onProgramFinish() {
+			hostingActivity.onProgramRunStopped();
 			refreshPauseState();
 			programProgressBar.setProgress(ProgressWheel.getMax());
 			exerciseProgressBar.setProgress(ProgressWheel.getMax());
@@ -224,8 +262,15 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onStart() {
+			hostingActivity.onProgramRunStarted();
 			refreshPauseState();
 			updateExercise();
 		}
 	};
+
+	public interface Callbacks {
+		void onProgramRunStarted();
+
+		void onProgramRunStopped();
+	}
 }

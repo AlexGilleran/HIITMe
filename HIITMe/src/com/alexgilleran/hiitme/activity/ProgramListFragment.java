@@ -35,7 +35,7 @@ public class ProgramListFragment extends ListFragment {
 	/**
 	 * The fragment's current callback object, which is notified of list item clicks.
 	 */
-	private Callbacks hostingActivity = sDummyCallbacks;
+	private Callbacks hostingActivity;
 
 	/**
 	 * The current activated item position. Only used on tablets.
@@ -52,16 +52,6 @@ public class ProgramListFragment extends ListFragment {
 		 */
 		public void onProgramSelected(long id);
 	}
-
-	/**
-	 * A dummy implementation of the {@link Callbacks} interface that does nothing. Used only when this fragment is not
-	 * attached to an activity.
-	 */
-	private static Callbacks sDummyCallbacks = new Callbacks() {
-		@Override
-		public void onProgramSelected(long id) {
-		}
-	};
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
@@ -104,7 +94,7 @@ public class ProgramListFragment extends ListFragment {
 		super.onDetach();
 
 		// Reset the active callbacks interface to the dummy implementation.
-		hostingActivity = sDummyCallbacks;
+		hostingActivity = null;
 	}
 
 	@Override

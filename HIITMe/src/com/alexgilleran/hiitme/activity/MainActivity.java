@@ -2,6 +2,7 @@ package com.alexgilleran.hiitme.activity;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.app.FragmentManager.OnBackStackChangedListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -23,7 +24,7 @@ import com.alexgilleran.hiitme.presentation.run.RunFragment;
  * This activity also implements the required {@link ProgramListFragment.Callbacks} interface to listen for item
  * selections.
  */
-public class MainActivity extends Activity implements ProgramListFragment.Callbacks {
+public class MainActivity extends Activity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
 
 	private RunFragment runFragment;
@@ -39,6 +40,8 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		getFragmentManager().addOnBackStackChangedListener(backStackListener);
 
 		if (findViewById(R.id.program_detail_container) != null) {
 			tabletLayout = true;
@@ -99,6 +102,16 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		tran.addToBackStack(null).commit();
 	}
 
+	@Override
+	public void onProgramRunStarted() {
+		invalidateOptionsMenu();
+	}
+
+	@Override
+	public void onProgramRunStopped() {
+		invalidateOptionsMenu();
+	}
+
 	private Bundle buildProgramIdBundle() {
 		Bundle arguments = new Bundle();
 		arguments.putLong(ARG_PROGRAM_ID, currentProgramId);
@@ -109,40 +122,66 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			navigateUpTo(new Intent(this, MainActivity.class));
+			if (getFragmentManager().getBackStackEntryCount() > 0) {
+				getFragmentManager().popBackStack();
+			} else {
+				navigateUpTo(new Intent(this, MainActivity.class));
+			}
 			return true;
 		case R.id.actionbar_icon_run:
-			if (tabletLayout) {
-				throw new IllegalStateException(
-						"Somehow the run button on the Action Bar got pressed in tablet mode wtf?");
-			}
-			detailFragment.save();
-
-			FragmentTransaction tran = getFragmentManager().beginTransaction();
-			if (runFragment != null) {
-				tran.remove(runFragment);
-			}
-			runFragment = new RunFragment();
-			runFragment.setArguments(buildProgramIdBundle());
-			tran.replace(R.id.single_activity_container, runFragment);
-			tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit();
-
+			run();
 			return true;
 		case R.id.actionbar_icon_save:
 			stopEditing();
 			return true;
 		case R.id.actionbar_icon_edit:
-			detailFragment.startEditing();
-			invalidateOptionsMenu();
+			startEditing();
 			return true;
 		}
 
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void run() {
+		if (tabletLayout) {
+			throw new IllegalStateException("Somehow the run button on the Action Bar got pressed in tablet mode wtf?");
+		}
+
+		FragmentTransaction tran = getFragmentManager().beginTransaction();
+		if (runFragment != null) {
+			tran.remove(runFragment);
+		}
+		runFragment = new RunFragment();
+		runFragment.setArguments(buildProgramIdBundle());
+		tran.replace(R.id.single_activity_container, runFragment);
+		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit();
+	}
+
+	private void startEditing() {
+		detailFragment.startEditing();
+
+		if (runFragment != null) {
+			runFragment.preventRun();
+		}
+
+		invalidateOptionsMenu();
+	}
+
+	private void stopEditing() {
+		detailFragment.stopEditing();
+
+		if (runFragment != null) {
+			runFragment.allowRun();
+		}
+
+		invalidateOptionsMenu();
+	}
+
 	@Override
 	public void onBackPressed() {
-		if (isEditing()) {
+		if (isRunning()) {
+			runFragment.stop();
+		} else if (isEditing()) {
 			stopEditing();
 		} else {
 			super.onBackPressed();
@@ -154,18 +193,36 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		getMenuInflater().inflate(R.menu.run_menu, menu);
 
 		menu.findItem(R.id.actionbar_icon_save).setVisible(isEditing());
-		menu.findItem(R.id.actionbar_icon_edit).setVisible(!isEditing());
-		menu.findItem(R.id.actionbar_icon_run).setVisible(!tabletLayout);
+		menu.findItem(R.id.actionbar_icon_edit).setVisible(shouldShowEditButton());
+		menu.findItem(R.id.actionbar_icon_run).setVisible(shouldShowRunButton());
 
 		return true;
+	}
+
+	private boolean shouldShowEditButton() {
+		return !isEditing() && !isRunning() && isDetailFragmentVisible();
+	}
+
+	private boolean shouldShowRunButton() {
+		return !tabletLayout && !isEditing() && isDetailFragmentVisible();
+	}
+
+	private boolean isDetailFragmentVisible() {
+		return detailFragment != null && detailFragment.isVisible();
+	}
+
+	private boolean isRunning() {
+		return runFragment != null && runFragment.isRunning();
 	}
 
 	private boolean isEditing() {
 		return detailFragment != null && detailFragment.isBeingEdited();
 	}
 
-	private void stopEditing() {
-		detailFragment.stopEditing();
-		invalidateOptionsMenu();
-	}
+	private OnBackStackChangedListener backStackListener = new OnBackStackChangedListener() {
+		@Override
+		public void onBackStackChanged() {
+			invalidateOptionsMenu();
+		}
+	};
 }
