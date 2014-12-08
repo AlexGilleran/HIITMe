@@ -1,12 +1,16 @@
 package com.alexgilleran.hiitme.activity;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.FragmentManager.OnBackStackChangedListener;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
@@ -27,6 +31,9 @@ import com.alexgilleran.hiitme.presentation.run.RunFragment;
 public class MainActivity extends Activity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
 
+	private static final String RUN_FRAGMENT_TAG = "RUN_FRAGMENT_TAG";
+	private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
+
 	private RunFragment runFragment;
 	private ProgramDetailFragment detailFragment;
 	private long currentProgramId;
@@ -39,19 +46,26 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_main);
 
+		tabletLayout = findViewById(R.id.program_detail_container) != null;
 		getFragmentManager().addOnBackStackChangedListener(backStackListener);
 
-		if (findViewById(R.id.program_detail_container) != null) {
-			tabletLayout = true;
+		if (savedInstanceState == null) {
 
-			// In two-pane mode, list items should be given the 'activated' state when touched.
-			((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
-					.setActivateOnItemClick(true);
+			if (tabletLayout) {
+				((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
+						.setActivateOnItemClick(true);
+			} else {
+				getFragmentManager().beginTransaction()
+						.replace(R.id.single_activity_container, new ProgramListFragment()).commit();
+			}
 		} else {
-			getFragmentManager().beginTransaction().replace(R.id.single_activity_container, new ProgramListFragment())
-					.commit();
+			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
+
+			detailFragment = (ProgramDetailFragment) getFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
+			runFragment = (RunFragment) getFragmentManager().findFragmentByTag(RUN_FRAGMENT_TAG);
 		}
 
 		// Show the Up button in the action bar.
@@ -59,11 +73,35 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	}
 
 	@Override
+	public View onCreateView(String name, Context context, AttributeSet attrs) {
+		// TODO Auto-generated method stub
+		return super.onCreateView(name, context, attrs);
+	}
+
+	@Override
+	public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+		// TODO Auto-generated method stub
+		return super.onCreateView(parent, name, context, attrs);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putLong(ARG_PROGRAM_ID, currentProgramId);
+
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public void onStop() {
 		super.onStop();
-
-		detailFragment.save();
 	}
+
+	// @Override
+	// public void onAttachFragment(Fragment fragment) {
+	// super.onAttachFragment(fragment);
+	//
+	// invalidateOptionsMenu();
+	// }
 
 	/**
 	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the item with the given ID was
@@ -88,14 +126,14 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		detailFragment.setArguments(arguments);
 
 		if (tabletLayout) {
-			tran.replace(R.id.program_detail_container, detailFragment);
+			tran.replace(R.id.program_detail_container, detailFragment, DETAIL_FRAGMENT_TAG);
 
 			runFragment = new RunFragment();
 			runFragment.setArguments(arguments);
 
-			tran.replace(R.id.program_run_container, runFragment);
+			tran.replace(R.id.program_run_container, runFragment, RUN_FRAGMENT_TAG);
 		} else {
-			tran.replace(R.id.single_activity_container, detailFragment);
+			tran.replace(R.id.single_activity_container, detailFragment, DETAIL_FRAGMENT_TAG);
 			tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		}
 
@@ -153,7 +191,7 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		}
 		runFragment = new RunFragment();
 		runFragment.setArguments(buildProgramIdBundle());
-		tran.replace(R.id.single_activity_container, runFragment);
+		tran.replace(R.id.single_activity_container, runFragment, RUN_FRAGMENT_TAG);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit();
 	}
 
@@ -216,7 +254,7 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	}
 
 	private boolean isEditing() {
-		return detailFragment != null && detailFragment.isBeingEdited();
+		return isDetailFragmentVisible() && detailFragment.isBeingEdited();
 	}
 
 	private OnBackStackChangedListener backStackListener = new OnBackStackChangedListener() {

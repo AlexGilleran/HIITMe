@@ -49,16 +49,13 @@ public class ProgramDetailFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		detailView = (ProgramDetailView) getView().findViewById(R.id.layout_root);
+		if (program != null) {
+			detailView.setProgram(program);
+		}
 
 		if (savedInstanceState == null) {
-			// The program is actually set before the view is rendered in a fragment... as opposed to a view where it'd
-			// be the other way around.
 			detailView.setExerciseLongClickListener(editExerciseListener);
 			detailView.setNodeLongClickListener(editNodeListener);
-
-			if (program != null) {
-				detailView.setProgram(program);
-			}
 		}
 	}
 

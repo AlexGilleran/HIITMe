@@ -91,8 +91,7 @@ public class RunFragment extends Fragment {
 	public void onStop() {
 		super.onStop();
 
-		if (programBinder != null) {
-			getActivity().stopService(serviceIntent);
+		if (programBinder != null && !getActivity().isChangingConfigurations()) {
 			getActivity().unbindService(connection);
 		}
 	}
@@ -102,10 +101,12 @@ public class RunFragment extends Fragment {
 	}
 
 	private void updateExercise() {
-		Exercise currentExercise = programBinder.getCurrentExercise();
-		exerciseName.setText(currentExercise.getName());
-		effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
-		exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getActivity()));
+		if (getView() != null) { // Can happen if we're mid way through an orientation switch
+			Exercise currentExercise = programBinder.getCurrentExercise();
+			exerciseName.setText(currentExercise.getName());
+			effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+			exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getView().getContext()));
+		}
 	}
 
 	public boolean isRunning() {

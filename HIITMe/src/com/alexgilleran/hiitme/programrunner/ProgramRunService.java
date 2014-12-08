@@ -53,9 +53,9 @@ public class ProgramRunService extends IntentService {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-
 		stopRun();
+
+		super.onDestroy();
 	}
 
 	private void stopRun() {
