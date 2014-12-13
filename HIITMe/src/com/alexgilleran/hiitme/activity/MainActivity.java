@@ -1,9 +1,8 @@
 package com.alexgilleran.hiitme.activity;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.FragmentManager.OnBackStackChangedListener;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 import com.alexgilleran.hiitme.presentation.run.RunFragment;
 
@@ -31,9 +32,11 @@ import com.alexgilleran.hiitme.presentation.run.RunFragment;
 public class MainActivity extends Activity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
 
+	private static final String LIST_FRAGMENT_TAG = "LIST_FRAGMENT_TAG";
 	private static final String RUN_FRAGMENT_TAG = "RUN_FRAGMENT_TAG";
 	private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
 
+	private ProgramListFragment listFragment;
 	private RunFragment runFragment;
 	private ProgramDetailFragment detailFragment;
 	private long currentProgramId;
@@ -53,17 +56,18 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		getFragmentManager().addOnBackStackChangedListener(backStackListener);
 
 		if (savedInstanceState == null) {
-
+			listFragment = new ProgramListFragment();
 			if (tabletLayout) {
 				((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
 						.setActivateOnItemClick(true);
 			} else {
 				getFragmentManager().beginTransaction()
-						.replace(R.id.single_activity_container, new ProgramListFragment()).commit();
+						.replace(R.id.single_activity_container, listFragment, LIST_FRAGMENT_TAG).commit();
 			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
 
+			listFragment = (ProgramListFragment) getFragmentManager().findFragmentByTag(LIST_FRAGMENT_TAG);
 			detailFragment = (ProgramDetailFragment) getFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
 			runFragment = (RunFragment) getFragmentManager().findFragmentByTag(RUN_FRAGMENT_TAG);
 		}
@@ -95,13 +99,6 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	public void onStop() {
 		super.onStop();
 	}
-
-	// @Override
-	// public void onAttachFragment(Fragment fragment) {
-	// super.onAttachFragment(fragment);
-	//
-	// invalidateOptionsMenu();
-	// }
 
 	/**
 	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the item with the given ID was
@@ -166,6 +163,9 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 				navigateUpTo(new Intent(this, MainActivity.class));
 			}
 			return true;
+		case R.id.actionbar_icon_new_program:
+			openNewProgram();
+			return true;
 		case R.id.actionbar_icon_run:
 			run();
 			return true;
@@ -178,6 +178,13 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void openNewProgram() {
+		Program program = new Program("New Program");
+
+		long id = ProgramDAOSqlite.getInstance(getApplicationContext()).saveProgram(program);
+		onProgramSelected(id);
 	}
 
 	private void run() {
@@ -230,11 +237,16 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.run_menu, menu);
 
+		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowNewButton());
 		menu.findItem(R.id.actionbar_icon_save).setVisible(isEditing());
 		menu.findItem(R.id.actionbar_icon_edit).setVisible(shouldShowEditButton());
 		menu.findItem(R.id.actionbar_icon_run).setVisible(shouldShowRunButton());
 
 		return true;
+	}
+
+	private boolean shouldShowNewButton() {
+		return listFragment != null && listFragment.isVisible();
 	}
 
 	private boolean shouldShowEditButton() {

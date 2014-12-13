@@ -3,8 +3,8 @@ package com.alexgilleran.hiitme.programrunner;
 import android.os.CountDownTimer;
 
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Node;
+import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.util.PeekaheadQueue;
 
 public class ProgramRunnerImpl implements ProgramRunner {
@@ -138,7 +138,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 				// that any time leftover from the first exercise is subtracted
 				// from the next one.
 				exerciseMsRemaining += getCurrentExercise().getDuration();
-				
+
 				observer.onExerciseStart();
 			}
 
@@ -146,13 +146,4 @@ public class ProgramRunnerImpl implements ProgramRunner {
 		}
 	}
 
-	public interface CountDownObserver {
-		void onStart();
-
-		void onTick(long exerciseMsRemaining, long programMsRemaining);
-
-		void onExerciseStart();
-
-		void onProgramFinish();
-	}
 }

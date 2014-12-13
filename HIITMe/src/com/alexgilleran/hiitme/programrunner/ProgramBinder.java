@@ -3,7 +3,6 @@ package com.alexgilleran.hiitme.programrunner;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.Node;
-import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 
 public interface ProgramBinder {
 

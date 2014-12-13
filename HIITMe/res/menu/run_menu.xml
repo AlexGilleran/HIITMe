@@ -4,20 +4,25 @@
     <item
         android:id="@+id/actionbar_icon_edit"
         android:icon="@drawable/ic_menu_edit"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/caption_actionbar_edit">
     </item>
     <item
         android:id="@+id/actionbar_icon_save"
         android:icon="@drawable/ic_action_save"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/caption_actionbar_play">
     </item>
     <item
         android:id="@+id/actionbar_icon_run"
         android:icon="@drawable/ic_action_play"
-        android:showAsAction="always"
+        android:showAsAction="ifRoom"
         android:title="@string/caption_actionbar_play">
     </item>
-
-</menu>
+    <item
+        android:id="@+id/actionbar_icon_new_program"
+        android:icon="@drawable/ic_menu_add"
+        android:showAsAction="ifRoom"
+        android:title="@string/caption_actionbar_play">
+    </item>
+</menu>

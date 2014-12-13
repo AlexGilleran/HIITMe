@@ -1,9 +1,11 @@
 package com.alexgilleran.hiitme.presentation.run;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -21,10 +23,10 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.programrunner.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
-import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.todddavies.components.progressbar.ProgressWheel;
 
 public class RunFragment extends Fragment {
@@ -42,6 +44,7 @@ public class RunFragment extends Fragment {
 	private ImageView effortLevelIcon;
 
 	private Callbacks hostingActivity;
+	private RunnerServiceConnection connection;
 	private ProgramBinder programBinder;
 
 	private int duration;
@@ -50,6 +53,8 @@ public class RunFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		connection = new RunnerServiceConnection();
 
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
@@ -93,6 +98,10 @@ public class RunFragment extends Fragment {
 
 		if (programBinder != null && !getActivity().isChangingConfigurations()) {
 			getActivity().unbindService(connection);
+
+			if (!programBinder.isActive()) {
+				getActivity().stopService(serviceIntent);
+			}
 		}
 	}
 
@@ -188,6 +197,15 @@ public class RunFragment extends Fragment {
 		}
 	}
 
+	private void showAlertThenGoBack(String message) {
+		new AlertDialog.Builder(getActivity()).setMessage(message)
+				.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).setCancelable(false).show();
+	}
+
 	private OnClickListener stopButtonListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -212,10 +230,11 @@ public class RunFragment extends Fragment {
 		}
 	};
 
-	private final ServiceConnection connection = new ServiceConnection() {
+	private class RunnerServiceConnection implements ServiceConnection {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
+
 			programBinder.getProgram(new ProgramCallback() {
 				@Override
 				public void onProgramReady(Program program) {
@@ -225,7 +244,6 @@ public class RunFragment extends Fragment {
 					duration = program.getAssociatedNode().getDuration();
 				}
 			});
-
 		}
 
 		@Override
@@ -266,6 +284,11 @@ public class RunFragment extends Fragment {
 			hostingActivity.onProgramRunStarted();
 			refreshPauseState();
 			updateExercise();
+		}
+
+		@Override
+		public void onError(ProgramError error) {
+			showAlertThenGoBack("This program runs for 0 seconds! Add some exercises to it first!");
 		}
 	};
 

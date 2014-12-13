@@ -21,8 +21,8 @@ import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.programrunner.CountDownObserver.ProgramError;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
-import com.alexgilleran.hiitme.programrunner.ProgramRunnerImpl.CountDownObserver;
 import com.alexgilleran.hiitme.sound.SoundPlayer;
 import com.alexgilleran.hiitme.sound.TextToSpeechPlayer;
 
@@ -49,6 +49,10 @@ public class ProgramRunService extends IntentService {
 
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+
+		AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+		SoundPlayer soundPlayer = new TextToSpeechPlayer(getApplicationContext(), audioManager);
+		observers.add(new SoundObserver(soundPlayer));
 	}
 
 	@Override
@@ -93,14 +97,19 @@ public class ProgramRunService extends IntentService {
 	public class ProgramBinderImpl extends Binder implements ProgramBinder {
 		@Override
 		public void start() {
+			MasterCountDownObserver masterObserver = new MasterCountDownObserver(observers);
+
+			if (program.getAssociatedNode().getDuration() <= 0) {
+				masterObserver.onError(ProgramError.ZERO_DURATION);
+				return;
+			}
+
 			wakeLock.acquire();
 
 			if (programRunner == null || programRunner.isStopped()) {
 				startForeground(1, notification);
 
-				programRunner = new ProgramRunnerImpl(program, new MasterCountDownObserver(observers,
-						new TextToSpeechPlayer(getApplicationContext(), (AudioManager) getApplicationContext()
-								.getSystemService(Context.AUDIO_SERVICE))));
+				programRunner = new ProgramRunnerImpl(program, masterObserver);
 
 				programRunner.start();
 			} else if (programRunner.isPaused()) {
@@ -159,12 +168,12 @@ public class ProgramRunService extends IntentService {
 
 		@Override
 		public boolean isStopped() {
-			return programRunner.isStopped();
+			return programRunner != null && programRunner.isStopped();
 		}
 
 		@Override
 		public boolean isPaused() {
-			return programRunner.isPaused();
+			return programRunner != null && programRunner.isPaused();
 		}
 
 		@Override
@@ -183,16 +192,45 @@ public class ProgramRunService extends IntentService {
 		}
 	}
 
+	private class SoundObserver implements CountDownObserver {
+		private final SoundPlayer soundPlayer;
+
+		public SoundObserver(SoundPlayer soundPlayer) {
+			this.soundPlayer = soundPlayer;
+		}
+
+		@Override
+		public void onStart() {
+		}
+
+		@Override
+		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
+		}
+
+		@Override
+		public void onExerciseStart() {
+			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
+		}
+
+		@Override
+		public void onProgramFinish() {
+			soundPlayer.playEnd();
+		}
+
+		@Override
+		public void onError(ProgramError error) {
+		}
+
+	}
+
 	/**
 	 * Listens for count down events and proxies them to a number of other {@link CountDownObserver}s.
 	 */
 	private class MasterCountDownObserver implements CountDownObserver {
 		private final List<CountDownObserver> observers;
-		private final SoundPlayer soundPlayer;
 
-		public MasterCountDownObserver(List<CountDownObserver> observers, SoundPlayer soundPlayer) {
+		public MasterCountDownObserver(List<CountDownObserver> observers) {
 			this.observers = observers;
-			this.soundPlayer = soundPlayer;
 		}
 
 		@Override
@@ -204,8 +242,6 @@ public class ProgramRunService extends IntentService {
 
 		@Override
 		public void onExerciseStart() {
-			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
-
 			for (CountDownObserver observer : observers) {
 				observer.onExerciseStart();
 			}
@@ -213,8 +249,6 @@ public class ProgramRunService extends IntentService {
 
 		@Override
 		public void onProgramFinish() {
-			soundPlayer.playEnd();
-
 			for (CountDownObserver observer : observers) {
 				observer.onProgramFinish();
 			}
@@ -224,10 +258,15 @@ public class ProgramRunService extends IntentService {
 
 		@Override
 		public void onStart() {
-			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
-
 			for (CountDownObserver observer : observers) {
 				observer.onStart();
+			}
+		}
+
+		@Override
+		public void onError(ProgramError error) {
+			for (CountDownObserver observer : observers) {
+				observer.onError(error);
 			}
 		}
 	}
