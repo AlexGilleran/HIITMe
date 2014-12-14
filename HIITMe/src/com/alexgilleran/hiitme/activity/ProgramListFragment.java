@@ -42,6 +42,8 @@ public class ProgramListFragment extends ListFragment {
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 
+	private ProgramAdapter adapter;
+
 	/**
 	 * A callback interface that all activities containing this fragment must implement. This mechanism allows
 	 * activities to be notified of item selections.
@@ -64,7 +66,9 @@ public class ProgramListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setListAdapter(new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity()).getProgramList()));
+		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext())
+			.getProgramList());
+		setListAdapter(adapter);
 	}
 
 	@Override
@@ -87,6 +91,10 @@ public class ProgramListFragment extends ListFragment {
 		}
 
 		hostingActivity = (Callbacks) activity;
+	}
+
+	public void refresh() {
+		adapter.setProgramList(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext()).getProgramList());
 	}
 
 	@Override
@@ -137,10 +145,14 @@ public class ProgramListFragment extends ListFragment {
 
 	private class ProgramAdapter extends BaseAdapter {
 		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
-				Context.LAYOUT_INFLATER_SERVICE);
-		private final List<Program> programList;
+			Context.LAYOUT_INFLATER_SERVICE);
+		private List<Program> programList;
 
 		private ProgramAdapter(List<Program> programList) {
+			this.programList = programList;
+		}
+
+		protected void setProgramList(List<Program> programList) {
 			this.programList = programList;
 		}
 

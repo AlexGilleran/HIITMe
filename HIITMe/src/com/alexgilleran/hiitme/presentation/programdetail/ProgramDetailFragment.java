@@ -34,6 +34,10 @@ public class ProgramDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		refreshProgram();
+	}
+
+	private void refreshProgram() {
 		long programId = getArguments().getLong(MainActivity.ARG_PROGRAM_ID);
 		program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(programId);
 	}
@@ -71,9 +75,15 @@ public class ProgramDetailFragment extends Fragment {
 		detailView.setEditable(true);
 	}
 
-	public void stopEditing() {
-		save();
+	public void stopEditing(boolean save) {
 		detailView.setEditable(false);
+
+		if (save) {
+			save();
+		} else {
+			refreshProgram();
+			detailView.setProgram(program);
+		}
 	}
 
 	private OnLongClickListener editNodeListener = new OnLongClickListener() {

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <!-- program list  -->
+    <!-- program list -->
     <item
         android:id="@+id/actionbar_icon_new_program"
         android:icon="@drawable/ic_action_new"
         android:showAsAction="ifRoom"
         android:title="@string/caption_actionbar_add">
     </item>
-    
+
     <!-- view program -->
     <item
         android:id="@+id/actionbar_icon_delete_program"
@@ -28,18 +28,19 @@
         android:showAsAction="ifRoom"
         android:title="@string/caption_actionbar_run">
     </item>
-    
+
     <!-- editing program -->
-    <item
-        android:id="@+id/actionbar_icon_save"
-        android:icon="@drawable/ic_action_save"
-        android:showAsAction="ifRoom"
-        android:title="@string/caption_actionbar_run">
-    </item>
     <item
         android:id="@+id/actionbar_icon_discard_changes"
         android:icon="@drawable/ic_action_remove"
         android:showAsAction="ifRoom"
         android:title="@string/caption_actionbar_discard_changes">
     </item>
+    <item
+        android:id="@+id/actionbar_icon_save"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="ifRoom"
+        android:title="@string/caption_actionbar_run">
+    </item>
+
 </menu>

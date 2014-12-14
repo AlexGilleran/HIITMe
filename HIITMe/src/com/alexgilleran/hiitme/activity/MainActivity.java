@@ -1,9 +1,12 @@
 package com.alexgilleran.hiitme.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -59,10 +62,10 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 			listFragment = new ProgramListFragment();
 			if (tabletLayout) {
 				((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
-						.setActivateOnItemClick(true);
+					.setActivateOnItemClick(true);
 			} else {
 				getFragmentManager().beginTransaction()
-						.replace(R.id.single_activity_container, listFragment, LIST_FRAGMENT_TAG).commit();
+					.replace(R.id.single_activity_container, listFragment, LIST_FRAGMENT_TAG).commit();
 			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
@@ -74,18 +77,6 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-
-	@Override
-	public View onCreateView(String name, Context context, AttributeSet attrs) {
-		// TODO Auto-generated method stub
-		return super.onCreateView(name, context, attrs);
-	}
-
-	@Override
-	public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-		// TODO Auto-generated method stub
-		return super.onCreateView(parent, name, context, attrs);
 	}
 
 	@Override
@@ -169,11 +160,17 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		case R.id.actionbar_icon_run:
 			run();
 			return true;
-		case R.id.actionbar_icon_save:
-			stopEditing();
-			return true;
 		case R.id.actionbar_icon_edit:
 			startEditing();
+			return true;
+		case R.id.actionbar_icon_delete_program:
+			deleteCurrentProgram();
+			return true;
+		case R.id.actionbar_icon_save:
+			stopEditing(true);
+			return true;
+		case R.id.actionbar_icon_discard_changes:
+			stopEditing(false);
 			return true;
 		}
 
@@ -185,6 +182,8 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 
 		long id = ProgramDAOSqlite.getInstance(getApplicationContext()).saveProgram(program);
 		onProgramSelected(id);
+
+		listFragment.refresh();
 	}
 
 	private void run() {
@@ -202,6 +201,31 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit();
 	}
 
+	private void deleteCurrentProgram() {
+		if (!isViewingProgram() && currentProgramId > 0) {
+			throw new IllegalStateException(
+				"Attempted to delete program when there was no current program being viewed");
+		}
+
+		new AlertDialog.Builder(this) //
+			.setMessage("Are you sure you want to delete this program?")//
+			.setPositiveButton(android.R.string.yes, new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					getFragmentManager().popBackStack();
+					ProgramDAOSqlite.getInstance(getApplicationContext()).deleteProgram(currentProgramId);
+					listFragment.refresh();
+					dialog.dismiss();
+				}
+			})//
+			.setNegativeButton(android.R.string.no, new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			}).show();
+	}
+
 	private void startEditing() {
 		detailFragment.startEditing();
 
@@ -212,8 +236,8 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		invalidateOptionsMenu();
 	}
 
-	private void stopEditing() {
-		detailFragment.stopEditing();
+	private void stopEditing(boolean save) {
+		detailFragment.stopEditing(save);
 
 		if (runFragment != null) {
 			runFragment.allowRun();
@@ -227,7 +251,7 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		if (isRunning()) {
 			runFragment.stop();
 		} else if (isEditing()) {
-			stopEditing();
+			stopEditing(true);
 		} else {
 			super.onBackPressed();
 		}
@@ -245,7 +269,7 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 
 		menu.findItem(R.id.actionbar_icon_save).setVisible(isEditing());
 		menu.findItem(R.id.actionbar_icon_discard_changes).setVisible(isEditing());
-		
+
 		return true;
 	}
 

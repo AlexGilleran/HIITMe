@@ -232,7 +232,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 	}
 
 	private long getStoredAssociatedNodeId(Program program, SQLiteDatabase db) {
-		Cursor cursor = db.query(programTable.NAME, new String[] { ProgramTable.Columns.ASSOCIATED_NODE_ID.name },
+		Cursor cursor = db.query(ProgramTable.NAME, new String[] { ProgramTable.Columns.ASSOCIATED_NODE_ID.name },
 				programTable.getSingleQuery(program.getId()), null, null, null, null);
 		if (!cursor.moveToFirst()) {
 			return 0;
@@ -281,9 +281,9 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		return node.getId();
 	}
 
-	private long saveExercise(Exercise exercise) {
-		return saveExercise(exercise, getWritableDatabase());
-	}
+	// private long saveExercise(Exercise exercise) {
+	// return saveExercise(exercise, getWritableDatabase());
+	// }
 
 	private long saveExercise(Exercise exercise, SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
@@ -292,7 +292,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		values.put(ExerciseTable.Columns.EFFORT_LEVEL_ORDINAL.name, exercise.getEffortLevel().ordinal());
 
 		if (exercise.isAlreadyPersisted()) {
-			db.update(exerciseTable.NAME, values, exerciseTable.getSingleQuery(exercise.getId()), null);
+			db.update(ExerciseTable.NAME, values, exerciseTable.getSingleQuery(exercise.getId()), null);
 			return exercise.getId();
 		} else {
 			return insert(exerciseTable, exercise, values, db);
@@ -305,30 +305,29 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		return id;
 	}
 
-	private void deleteNode(Node node) {
-		delete(nodeTable, node);
-
-		for (Node child : node.getChildren()) {
-			child.setId(0);
-		}
-
-		if (node.getAttachedExercise() != null) {
-			node.getAttachedExercise().setId(0);
-		}
-	}
-
-	private void deleteExercise(Exercise exercise) {
-		delete(exerciseTable, exercise);
-	}
+	// private void deleteNode(Node node) {
+	// delete(nodeTable, node.getId());
+	//
+	// for (Node child : node.getChildren()) {
+	// child.setId(0);
+	// }
+	//
+	// if (node.getAttachedExercise() != null) {
+	// node.getAttachedExercise().setId(0);
+	// }
+	// }
+	//
+	// private void deleteExercise(Exercise exercise) {
+	// delete(exerciseTable, exercise.getId());
+	// }
 
 	@Override
-	public void deleteProgram(Program program) {
-		delete(programTable, program);
+	public void deleteProgram(long programId) {
+		delete(programTable, programId);
 	}
 
-	private void delete(Table table, DatabaseModel model) {
-		deleteById(table, model.getId());
-		model.setId(0);
+	private void delete(Table table, long id) {
+		deleteById(table, id);
 	}
 
 	private void deleteById(Table table, long id) {
