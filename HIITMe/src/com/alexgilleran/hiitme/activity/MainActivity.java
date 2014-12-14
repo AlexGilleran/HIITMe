@@ -31,6 +31,7 @@ import com.alexgilleran.hiitme.presentation.run.RunFragment;
  */
 public class MainActivity extends Activity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
+	public static final String ARG_PROGRAM_NAME = "PROGRAM_NAME";
 
 	private static final String LIST_FRAGMENT_TAG = "LIST_FRAGMENT_TAG";
 	private static final String RUN_FRAGMENT_TAG = "RUN_FRAGMENT_TAG";
@@ -39,7 +40,9 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	private ProgramListFragment listFragment;
 	private RunFragment runFragment;
 	private ProgramDetailFragment detailFragment;
+
 	private long currentProgramId;
+	private String currentProgramName;
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
@@ -66,6 +69,11 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
+			currentProgramName = savedInstanceState.getString(ARG_PROGRAM_NAME, null);
+
+			if (currentProgramName != null) {
+				setTitle(currentProgramName);
+			}
 
 			listFragment = (ProgramListFragment) getFragmentManager().findFragmentByTag(LIST_FRAGMENT_TAG);
 			detailFragment = (ProgramDetailFragment) getFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
@@ -78,7 +86,10 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		outState.putLong(ARG_PROGRAM_ID, currentProgramId);
+		if (currentProgramId > 0) {
+			outState.putLong(ARG_PROGRAM_ID, currentProgramId);
+			outState.putString(ARG_PROGRAM_NAME, currentProgramName);
+		}
 
 		super.onSaveInstanceState(outState);
 	}
@@ -93,8 +104,11 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	 * selected.
 	 */
 	@Override
-	public void onProgramSelected(long id) {
+	public void onProgramSelected(long id, String name) {
 		this.currentProgramId = id;
+		this.currentProgramName = name;
+
+		// this.setTitle(name);
 
 		FragmentTransaction tran = getFragmentManager().beginTransaction();
 
@@ -115,6 +129,8 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 
 			runFragment = new RunFragment();
 			runFragment.setArguments(arguments);
+
+			tran.setBreadCrumbShortTitle(currentProgramName);
 
 			tran.replace(R.id.program_run_container, runFragment, RUN_FRAGMENT_TAG);
 		} else {
@@ -178,7 +194,7 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		Program program = new Program("New Program");
 
 		long id = ProgramDAOSqlite.getInstance(getApplicationContext()).saveProgram(program);
-		onProgramSelected(id);
+		onProgramSelected(id, null);
 
 		listFragment.refresh();
 	}
@@ -189,9 +205,6 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		}
 
 		FragmentTransaction tran = getFragmentManager().beginTransaction();
-		if (runFragment != null) {
-			tran.remove(runFragment);
-		}
 		runFragment = new RunFragment();
 		runFragment.setArguments(buildProgramIdBundle());
 		tran.replace(R.id.single_activity_container, runFragment, RUN_FRAGMENT_TAG);
@@ -286,6 +299,10 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		return detailFragment != null && detailFragment.isVisible();
 	}
 
+	private boolean isRunFragmentVisible() {
+		return runFragment != null && runFragment.isVisible();
+	}
+
 	private boolean isRunning() {
 		return runFragment != null && runFragment.isRunning();
 	}
@@ -298,6 +315,14 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		@Override
 		public void onBackStackChanged() {
 			invalidateOptionsMenu();
+
+			if (!isDetailFragmentVisible() && !isRunFragmentVisible()) {
+				currentProgramId = 0;
+				currentProgramName = null;
+				setTitle("Select Program");
+			} else {
+				setTitle(currentProgramName);
+			}
 		}
 	};
 }

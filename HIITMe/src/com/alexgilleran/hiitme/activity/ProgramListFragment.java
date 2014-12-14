@@ -51,8 +51,11 @@ public class ProgramListFragment extends ListFragment {
 	public interface Callbacks {
 		/**
 		 * Callback for when an item has been selected.
+		 * 
+		 * @param name
+		 *            TODO
 		 */
-		public void onProgramSelected(long id);
+		public void onProgramSelected(long id, String name);
 	}
 
 	/**
@@ -111,7 +114,7 @@ public class ProgramListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		hostingActivity.onProgramSelected(id);
+		hostingActivity.onProgramSelected(id, adapter.getItem(position).getName());
 	}
 
 	@Override
@@ -162,7 +165,7 @@ public class ProgramListFragment extends ListFragment {
 		}
 
 		@Override
-		public Object getItem(int location) {
+		public ProgramMetaData getItem(int location) {
 			return programList.get(location);
 		}
 

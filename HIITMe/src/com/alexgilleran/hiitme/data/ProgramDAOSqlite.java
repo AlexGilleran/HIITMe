@@ -89,7 +89,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		while (cursor.moveToNext()) {
 			Program program = new Program(cursor.getString(1));
 			program.setId(cursor.getLong(0));
-			program.setId(cursor.getLong(1));
+			program.setDescription(cursor.getString(2));
 			programs.add(program);
 		}
 
