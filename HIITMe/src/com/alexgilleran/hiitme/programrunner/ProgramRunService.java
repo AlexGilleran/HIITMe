@@ -19,6 +19,7 @@ import android.util.Log;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.CountDownObserver.ProgramError;
@@ -80,7 +81,7 @@ public class ProgramRunService extends IntentService {
 		builder.setContentTitle("HIIT Me");
 		builder.setSmallIcon(R.drawable.ic_launcher);
 		notification = builder.build();
-		long programId = intent.getLongExtra(Program.PROGRAM_ID_NAME, -1);
+		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
 
 		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId);
 

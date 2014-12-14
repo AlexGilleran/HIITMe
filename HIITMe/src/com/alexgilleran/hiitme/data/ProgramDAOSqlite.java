@@ -11,10 +11,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import com.alexgilleran.hiitme.model.DatabaseModel;
 import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
 
@@ -24,6 +26,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 	private ExerciseTable exerciseTable = new ExerciseTable();
 	private NodeTable nodeTable = new NodeTable();
 	private ProgramTable programTable = new ProgramTable();
+	private LongSparseArray<Program> cache = new LongSparseArray<Program>();
 
 	public static ProgramDAO getInstance(Context context) {
 		if (INSTANCE == null) {
@@ -41,7 +44,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 	public void onCreate(SQLiteDatabase db) {
 		programTable.addForeignKey(ProgramTable.Columns.ASSOCIATED_NODE_ID, nodeTable, Table.FKOption.CASCADE_DELETE);
 		programTable.addForeignKey(NodeTable.Columns.ID, nodeTable, NodeTable.Columns.PARENT_NODE_ID,
-				Table.FKOption.CASCADE_DELETE);
+			Table.FKOption.CASCADE_DELETE);
 		nodeTable.addForeignKey(NodeTable.Columns.EXERCISE_ID, exerciseTable, Table.FKOption.CASCADE_DELETE);
 
 		db.execSQL(exerciseTable.getCreateSql());
@@ -76,17 +79,17 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 	}
 
 	@Override
-	public List<Program> getProgramList() {
-		Cursor cursor = getReadableDatabase()
-				.query(ProgramTable.NAME,
-						new String[] { ProgramTable.Columns.ID.name, ProgramTable.Columns.NAME.name,
-								ProgramTable.Columns.DESCRIPTION.name }, null, null, null, null,
-						ProgramTable.Columns.NAME.name);
+	public List<ProgramMetaData> getProgramList() {
+		Cursor cursor = getReadableDatabase().query(
+			ProgramTable.NAME,
+			new String[] { ProgramTable.Columns.ID.name, ProgramTable.Columns.NAME.name,
+					ProgramTable.Columns.DESCRIPTION.name }, null, null, null, null, ProgramTable.Columns.NAME.name);
 
-		List<Program> programs = new ArrayList<Program>(cursor.getCount());
+		List<ProgramMetaData> programs = new ArrayList<ProgramMetaData>(cursor.getCount());
 		while (cursor.moveToNext()) {
 			Program program = new Program(cursor.getString(1));
 			program.setId(cursor.getLong(0));
+			program.setId(cursor.getLong(1));
 			programs.add(program);
 		}
 
@@ -95,12 +98,18 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 	@Override
 	public Program getProgram(long programId) {
-		return getProgram(programId, getReadableDatabase());
+		Program program = cache.get(programId);
+		if (program == null) {
+			program = getProgram(programId, getReadableDatabase());
+			cache.put(programId, program);
+		}
+
+		return program;
 	}
 
 	private Program getProgram(long programId, SQLiteDatabase db) {
 		Cursor cursor = db.query(ProgramTable.NAME, null, programTable.getSingleQuery(programId), null, null, null,
-				null);
+			null);
 
 		if (!cursor.moveToFirst()) {
 			return null;
@@ -110,10 +119,11 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		String description = cursor.getString(cursor.getColumnIndexOrThrow(ProgramTable.Columns.DESCRIPTION.name));
 
 		Program program = new Program(name);
+		program.setDescription(description);
 		program.setId(programId);
 
 		long associatedNodeId = cursor.getLong(cursor
-				.getColumnIndexOrThrow(ProgramTable.Columns.ASSOCIATED_NODE_ID.name));
+			.getColumnIndexOrThrow(ProgramTable.Columns.ASSOCIATED_NODE_ID.name));
 
 		program.setAssociatedNode(getNode(associatedNodeId, db));
 
@@ -154,7 +164,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 	private List<Node> getChildrenOfNode(Node parent, SQLiteDatabase db) {
 		Cursor cursor = db.query(NodeTable.NAME, null, NodeTable.Columns.PARENT_NODE_ID.name + " = ?",
-				new String[] { Long.toString(parent.getId()) }, null, null, NodeTable.Columns.ORDER.name);
+			new String[] { Long.toString(parent.getId()) }, null, null, NodeTable.Columns.ORDER.name);
 
 		List<Node> children = new ArrayList<Node>(cursor.getCount());
 
@@ -181,18 +191,19 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		exercise.setName(cursor.getString(cursor.getColumnIndexOrThrow(ExerciseTable.Columns.NAME.name)));
 		exercise.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow(ExerciseTable.Columns.DURATION.name)));
 		exercise.setEffortLevel(EffortLevel.values()[cursor.getInt(cursor
-				.getColumnIndexOrThrow(ExerciseTable.Columns.EFFORT_LEVEL_ORDINAL.name))]);
+			.getColumnIndexOrThrow(ExerciseTable.Columns.EFFORT_LEVEL_ORDINAL.name))]);
 
 		return exercise;
 	}
 
 	@Override
-	public void replaceProgramNode(Program program, Node programNode) {
+	public void replaceProgramNode(ProgramMetaData program, Node programNode) {
 
 	}
 
 	@Override
 	public long saveProgram(Program program) {
+		cache.delete(program.getId());
 		return this.saveProgram(program, getWritableDatabase());
 	}
 
@@ -201,7 +212,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 		if (program.getAssociatedNode() == null) {
 			throw new IllegalArgumentException(
-					"You're trying to save a program with no associated node man, what the hell!?");
+				"You're trying to save a program with no associated node man, what the hell!?");
 		}
 
 		// Easiest way to get the new node tree right is to just cascade-delete
@@ -231,9 +242,9 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		return programId;
 	}
 
-	private long getStoredAssociatedNodeId(Program program, SQLiteDatabase db) {
+	private long getStoredAssociatedNodeId(ProgramMetaData program, SQLiteDatabase db) {
 		Cursor cursor = db.query(ProgramTable.NAME, new String[] { ProgramTable.Columns.ASSOCIATED_NODE_ID.name },
-				programTable.getSingleQuery(program.getId()), null, null, null, null);
+			programTable.getSingleQuery(program.getId()), null, null, null, null);
 		if (!cursor.moveToFirst()) {
 			return 0;
 		}
@@ -245,7 +256,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		int result = db.update(table.name, values, table.getSingleQuery(model.getId()), null);
 		if (result > 1) {
 			throw new IllegalStateException(
-					"Somehow more than one row was updated by an update intended for a single row");
+				"Somehow more than one row was updated by an update intended for a single row");
 		}
 	}
 
@@ -260,7 +271,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		if (node.getParent() != null) {
 			if (!node.getParent().isAlreadyPersisted()) {
 				throw new IllegalArgumentException(
-						"You're trying to insert a node whose parent isn't inserted yet. Are you high??");
+					"You're trying to insert a node whose parent isn't inserted yet. Are you high??");
 			}
 
 			nodeValues.put(NodeTable.Columns.PARENT_NODE_ID.name, node.getParent().getId());
@@ -305,24 +316,9 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		return id;
 	}
 
-	// private void deleteNode(Node node) {
-	// delete(nodeTable, node.getId());
-	//
-	// for (Node child : node.getChildren()) {
-	// child.setId(0);
-	// }
-	//
-	// if (node.getAttachedExercise() != null) {
-	// node.getAttachedExercise().setId(0);
-	// }
-	// }
-	//
-	// private void deleteExercise(Exercise exercise) {
-	// delete(exerciseTable, exercise.getId());
-	// }
-
 	@Override
 	public void deleteProgram(long programId) {
+		cache.delete(programId);
 		delete(programTable, programId);
 	}
 
@@ -332,7 +328,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 	private void deleteById(Table table, long id) {
 		getWritableDatabase().delete(table.name, Table.BaseColumns.ID.getWhereClause(),
-				new String[] { Long.toString(id) });
+			new String[] { Long.toString(id) });
 	}
 
 	private static class ProgramTable extends Table {
@@ -413,7 +409,7 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 			while (keyIterator.hasNext()) {
 				ForeignKey foreignKey = keyIterator.next();
 				builder.append("  FOREIGN KEY(").append(foreignKey.from.name).append(") REFERENCES ")
-						.append(foreignKey.toTable.name).append("(").append(foreignKey.toColumn.name).append(")");
+					.append(foreignKey.toTable.name).append("(").append(foreignKey.toColumn.name).append(")");
 				if (foreignKey.options.contains(FKOption.CASCADE_DELETE)) {
 					builder.append("ON DELETE CASCADE");
 				}

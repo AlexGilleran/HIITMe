@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
-import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 
 /**
@@ -146,13 +146,13 @@ public class ProgramListFragment extends ListFragment {
 	private class ProgramAdapter extends BaseAdapter {
 		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
 			Context.LAYOUT_INFLATER_SERVICE);
-		private List<Program> programList;
+		private List<ProgramMetaData> programList;
 
-		private ProgramAdapter(List<Program> programList) {
+		private ProgramAdapter(List<ProgramMetaData> programList) {
 			this.programList = programList;
 		}
 
-		protected void setProgramList(List<Program> programList) {
+		protected void setProgramList(List<ProgramMetaData> programList) {
 			this.programList = programList;
 		}
 

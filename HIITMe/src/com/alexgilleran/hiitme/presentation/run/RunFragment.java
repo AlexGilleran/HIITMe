@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.model.Exercise;
+import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.programrunner.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
@@ -58,7 +59,7 @@ public class RunFragment extends Fragment {
 
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
-		serviceIntent.putExtra(Program.PROGRAM_ID_NAME, getArguments().getLong(MainActivity.ARG_PROGRAM_ID));
+		serviceIntent.putExtra(ProgramMetaData.PROGRAM_ID_NAME, getArguments().getLong(MainActivity.ARG_PROGRAM_ID));
 		getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
 		getActivity().startService(serviceIntent);
 	}
