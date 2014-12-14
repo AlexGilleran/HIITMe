@@ -3,8 +3,10 @@
     <string name="app_name">HIIT Me</string>
     <string name="title_program_detail">Program Detail</string>
     <string name="caption_actionbar_edit">Edit</string>
-    <string name="caption_actionbar_play">Play</string>
-    <string name="caption_actionbar_add">Add</string>
+    <string name="caption_actionbar_run">Run</string>
+    <string name="caption_actionbar_discard_changes">Discard Changes</string>
+    <string name="caption_actionbar_add">Create New Program</string>
+    <string name="caption_actionbar_delete">Delete Program</string>
     <string name="effort_hard">Hard</string>
     <string name="effort_easy">Easy</string>
     <string name="effort_rest">Rest</string>

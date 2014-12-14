@@ -235,13 +235,17 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.run_menu, menu);
+		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
 
 		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowNewButton());
-		menu.findItem(R.id.actionbar_icon_save).setVisible(isEditing());
-		menu.findItem(R.id.actionbar_icon_edit).setVisible(shouldShowEditButton());
+
+		menu.findItem(R.id.actionbar_icon_delete_program).setVisible(isViewingProgram());
+		menu.findItem(R.id.actionbar_icon_edit).setVisible(isViewingProgram());
 		menu.findItem(R.id.actionbar_icon_run).setVisible(shouldShowRunButton());
 
+		menu.findItem(R.id.actionbar_icon_save).setVisible(isEditing());
+		menu.findItem(R.id.actionbar_icon_discard_changes).setVisible(isEditing());
+		
 		return true;
 	}
 
@@ -249,12 +253,12 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		return listFragment != null && listFragment.isVisible();
 	}
 
-	private boolean shouldShowEditButton() {
+	private boolean isViewingProgram() {
 		return !isEditing() && !isRunning() && isDetailFragmentVisible();
 	}
 
 	private boolean shouldShowRunButton() {
-		return !tabletLayout && !isEditing() && isDetailFragmentVisible();
+		return !tabletLayout && isViewingProgram();
 	}
 
 	private boolean isDetailFragmentVisible() {
