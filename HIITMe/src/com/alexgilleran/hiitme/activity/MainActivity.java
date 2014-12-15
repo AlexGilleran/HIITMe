@@ -33,6 +33,8 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
 	public static final String ARG_PROGRAM_NAME = "PROGRAM_NAME";
 
+	public static final String ACTION_CONTINUE_RUN = "CONTINUE_RUN";
+
 	private static final String LIST_FRAGMENT_TAG = "LIST_FRAGMENT_TAG";
 	private static final String RUN_FRAGMENT_TAG = "RUN_FRAGMENT_TAG";
 	private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
@@ -80,6 +82,14 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 			runFragment = (RunFragment) getFragmentManager().findFragmentByTag(RUN_FRAGMENT_TAG);
 		}
 
+		if (ACTION_CONTINUE_RUN.equals(getIntent().getAction())) {
+			onProgramSelected(getIntent().getLongExtra(ARG_PROGRAM_ID, 0), getIntent().getStringExtra(ARG_PROGRAM_NAME));
+
+			if (!tabletLayout) {
+				run();
+			}
+		}
+
 		// Show the Up button in the action bar.
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
@@ -107,8 +117,6 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	public void onProgramSelected(long id, String name) {
 		this.currentProgramId = id;
 		this.currentProgramName = name;
-
-		// this.setTitle(name);
 
 		FragmentTransaction tran = getFragmentManager().beginTransaction();
 

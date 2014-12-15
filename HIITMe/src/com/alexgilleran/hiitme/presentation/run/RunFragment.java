@@ -73,7 +73,10 @@ public class RunFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_run, container, false);
+		int layout = container.getHeight() > container.getWidth() ? R.layout.fragment_run_port
+				: R.layout.fragment_run_land;
+
+		return inflater.inflate(layout, container, false);
 	}
 
 	@Override
@@ -97,12 +100,8 @@ public class RunFragment extends Fragment {
 	public void onStop() {
 		super.onStop();
 
-		if (programBinder != null && !getActivity().isChangingConfigurations()) {
+		if (programBinder != null && !programBinder.isRunning() && !getActivity().isChangingConfigurations()) {
 			getActivity().unbindService(connection);
-
-			if (!programBinder.isActive()) {
-				getActivity().stopService(serviceIntent);
-			}
 		}
 	}
 
@@ -111,7 +110,8 @@ public class RunFragment extends Fragment {
 	}
 
 	private void updateExercise() {
-		if (getView() != null) { // Can happen if we're mid way through an orientation switch
+		// View can == null if we're mid way through an orientation switch
+		if (getView() != null && programBinder.isActive()) {
 			Exercise currentExercise = programBinder.getCurrentExercise();
 			exerciseName.setText(currentExercise.getName());
 			effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
@@ -149,7 +149,7 @@ public class RunFragment extends Fragment {
 		if (programBinder != null && programBinder.isPaused()) {
 			exerciseProgressBar.setProgress(0);
 			exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
-					.getCurrentExercise().getDuration()));
+				.getCurrentExercise().getDuration()));
 			exerciseProgressBar.spin();
 
 			programProgressBar.setProgress(0);
@@ -200,11 +200,11 @@ public class RunFragment extends Fragment {
 
 	private void showAlertThenGoBack(String message) {
 		new AlertDialog.Builder(getActivity()).setMessage(message)
-				.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				}).setCancelable(false).show();
+			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			}).setCancelable(false).show();
 	}
 
 	private OnClickListener stopButtonListener = new OnClickListener() {
@@ -245,6 +245,9 @@ public class RunFragment extends Fragment {
 					duration = program.getAssociatedNode().getDuration();
 				}
 			});
+
+			updateExercise();
+			refreshPauseState();
 		}
 
 		@Override
@@ -260,7 +263,7 @@ public class RunFragment extends Fragment {
 			programProgressBar.setTextLine2(formatTime(programMsRemaining));
 
 			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, programBinder.getCurrentExercise()
-					.getDuration(), EXERCISE_WHEEL_START_DEGREES));
+				.getDuration(), EXERCISE_WHEEL_START_DEGREES));
 			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
 		}
 

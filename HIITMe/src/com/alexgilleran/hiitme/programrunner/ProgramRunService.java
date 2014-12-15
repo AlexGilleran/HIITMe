@@ -7,6 +7,8 @@ import java.util.Queue;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -17,27 +19,28 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 import com.alexgilleran.hiitme.R;
+import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.programrunner.CountDownObserver.ProgramError;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.sound.SoundPlayer;
 import com.alexgilleran.hiitme.sound.TextToSpeechPlayer;
 
 public class ProgramRunService extends IntentService {
+	private static final int NOTIFICATION_ID = 2;
+
+	private NotificationManager notificationManager;
+	private WakeLock wakeLock;
 	private Program program;
-
 	private ProgramRunner programRunner;
-
-	private Notification notification;
+	private SoundPlayer soundPlayer;
+	private int duration;
 
 	private final List<CountDownObserver> observers = new ArrayList<CountDownObserver>();
-
-	private WakeLock wakeLock;
-
 	private Queue<ProgramCallback> programCallbacks = new LinkedList<ProgramCallback>();
 
 	public ProgramRunService() {
@@ -52,8 +55,12 @@ public class ProgramRunService extends IntentService {
 		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
 
 		AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-		SoundPlayer soundPlayer = new TextToSpeechPlayer(getApplicationContext(), audioManager);
-		observers.add(new SoundObserver(soundPlayer));
+		soundPlayer = new TextToSpeechPlayer(getApplicationContext(), audioManager);
+
+		observers.add(soundObserver);
+		observers.add(notificationObserver);
+
+		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	@Override
@@ -77,17 +84,35 @@ public class ProgramRunService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Notification.Builder builder = new Notification.Builder(this.getBaseContext());
-		builder.setContentTitle("HIIT Me");
-		builder.setSmallIcon(R.drawable.ic_launcher);
-		notification = builder.build();
 		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
 
 		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId);
+		duration = program.getAssociatedNode().getDuration();
 
 		while (!programCallbacks.isEmpty()) {
 			programCallbacks.poll().onProgramReady(program);
 		}
+	}
+
+	private Notification buildNotification() {
+		Intent continueIntent = new Intent(getApplicationContext(), MainActivity.class);
+		continueIntent.setAction(MainActivity.ACTION_CONTINUE_RUN);
+		continueIntent.putExtra(MainActivity.ARG_PROGRAM_ID, program.getId());
+		continueIntent.putExtra(MainActivity.ARG_PROGRAM_NAME, program.getName());
+
+		Notification.Builder builder = new Notification.Builder(getBaseContext());
+		builder.setContentTitle(program.getName());
+
+		if (programRunner != null) {
+			builder.setContentText(programRunner.getCurrentExercise().getName());
+			builder.setProgress(duration, duration - programRunner.getProgramMsRemaining(), false);
+		}
+
+		builder.setSmallIcon(R.drawable.ic_launcher);
+		builder.setOngoing(true);
+		builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, continueIntent, 0));
+
+		return builder.build();
 	}
 
 	@Override
@@ -95,12 +120,16 @@ public class ProgramRunService extends IntentService {
 		return new ProgramBinderImpl();
 	}
 
+	private void updateNotification() {
+		notificationManager.notify(NOTIFICATION_ID, buildNotification());
+	}
+
 	public class ProgramBinderImpl extends Binder implements ProgramBinder {
 		@Override
 		public void start() {
 			MasterCountDownObserver masterObserver = new MasterCountDownObserver(observers);
 
-			if (program.getAssociatedNode().getDuration() <= 0) {
+			if (duration <= 0) {
 				masterObserver.onError(ProgramError.ZERO_DURATION);
 				return;
 			}
@@ -108,7 +137,7 @@ public class ProgramRunService extends IntentService {
 			wakeLock.acquire();
 
 			if (programRunner == null || programRunner.isStopped()) {
-				startForeground(1, notification);
+				startForeground(NOTIFICATION_ID, buildNotification());
 
 				programRunner = new ProgramRunnerImpl(program, masterObserver);
 
@@ -117,7 +146,7 @@ public class ProgramRunService extends IntentService {
 				programRunner.start();
 			} else if (programRunner.isRunning()) {
 				Log.wtf(getPackageName(),
-						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
+					"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
 			}
 		}
 
@@ -193,13 +222,31 @@ public class ProgramRunService extends IntentService {
 		}
 	}
 
-	private class SoundObserver implements CountDownObserver {
-		private final SoundPlayer soundPlayer;
-
-		public SoundObserver(SoundPlayer soundPlayer) {
-			this.soundPlayer = soundPlayer;
+	private CountDownObserver notificationObserver = new CountDownObserver() {
+		@Override
+		public void onStart() {
 		}
 
+		@Override
+		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
+			updateNotification();
+		}
+
+		@Override
+		public void onExerciseStart() {
+			updateNotification();
+		}
+
+		@Override
+		public void onProgramFinish() {
+		}
+
+		@Override
+		public void onError(ProgramError error) {
+		}
+	};
+
+	private CountDownObserver soundObserver = new CountDownObserver() {
 		@Override
 		public void onStart() {
 		}
@@ -221,8 +268,7 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void onError(ProgramError error) {
 		}
-
-	}
+	};
 
 	/**
 	 * Listens for count down events and proxies them to a number of other {@link CountDownObserver}s.
