@@ -249,6 +249,7 @@ public class ProgramRunService extends IntentService {
 	private CountDownObserver soundObserver = new CountDownObserver() {
 		@Override
 		public void onStart() {
+			soundPlayer.playExerciseStart(programRunner.getCurrentExercise());
 		}
 
 		@Override

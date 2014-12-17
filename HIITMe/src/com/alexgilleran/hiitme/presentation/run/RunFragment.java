@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
@@ -22,8 +23,8 @@ import android.widget.Toast;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.model.Program;
+import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.programrunner.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
@@ -73,10 +74,17 @@ public class RunFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		int layout = container.getHeight() > container.getWidth() ? R.layout.fragment_run_port
-				: R.layout.fragment_run_land;
+		int layout = shouldShowLandscapeLayout() ? R.layout.fragment_run_port : R.layout.fragment_run_land;
 
 		return inflater.inflate(layout, container, false);
+	}
+
+	private boolean shouldShowLandscapeLayout() {
+		boolean isLarge = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE;
+		boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+
+		// Should be landscape in a portrait tablet layout, or in a landscape phone layout.
+		return (isLandscape && !isLarge) || (!isLandscape && isLarge);
 	}
 
 	@Override
@@ -240,7 +248,10 @@ public class RunFragment extends Fragment {
 				@Override
 				public void onProgramReady(Program program) {
 					programBinder.registerCountDownObserver(countDownObserver);
-					programProgressBar.setProgress(0);
+
+					if (programProgressBar != null) {
+						programProgressBar.setProgress(0);
+					}
 
 					duration = program.getAssociatedNode().getDuration();
 				}
