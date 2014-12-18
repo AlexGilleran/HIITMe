@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="AppTheme" parent="AppTheme.Base"/>
 
     <!-- Application theme. -->
@@ -8,5 +9,10 @@
         <item name="android:imageButtonStyle">?android:borderlessButtonStyle</item>
         <!-- Default style for Buttons -->
         <item name="android:buttonStyle">?android:borderlessButtonStyle</item>
+
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
     </style>
 </resources>

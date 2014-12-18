@@ -7,6 +7,7 @@
     <string name="caption_actionbar_discard_changes">Discard Changes</string>
     <string name="caption_actionbar_add">Create New Program</string>
     <string name="caption_actionbar_delete">Delete Program</string>
+    <string name="caption_actionbar_save">Save</string>
     <string name="effort_hard">Hard</string>
     <string name="effort_easy">Easy</string>
     <string name="effort_rest">Rest</string>

@@ -1,7 +1,5 @@
 package com.alexgilleran.hiitme.activity;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -261,6 +259,8 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			runFragment.stop();
 		} else if (isEditing()) {
 			stopEditing(true);
+		} else if (getFragmentManager().getBackStackEntryCount() > 0) {
+			getFragmentManager().popBackStack();
 		} else {
 			super.onBackPressed();
 		}
