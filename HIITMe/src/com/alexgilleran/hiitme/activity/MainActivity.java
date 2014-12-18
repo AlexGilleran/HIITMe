@@ -1,5 +1,6 @@
 package com.alexgilleran.hiitme.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager.OnBackStackChangedListener;
@@ -8,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,19 +19,8 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 import com.alexgilleran.hiitme.presentation.run.RunFragment;
 
-/**
- * An activity representing a list of Programs. This activity has different presentations for handset and tablet-size
- * devices. On handsets, the activity presents a list of items, which when touched, lead to a
- * {@link ProgramDetailActivity} representing item details. On tablets, the activity presents the list of items and item
- * details side-by-side using two vertical panes.
- * <p>
- * The activity makes heavy use of fragments. The list of items is a {@link ProgramListFragment} and the item details
- * (if present) is a {@link ProgramDetailFragment}.
- * <p>
- * This activity also implements the required {@link ProgramListFragment.Callbacks} interface to listen for item
- * selections.
- */
-public class MainActivity extends Activity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
+
+public class MainActivity extends ActionBarActivity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
 	public static final String ARG_PROGRAM_NAME = "PROGRAM_NAME";
 
@@ -64,10 +55,10 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 			listFragment = new ProgramListFragment();
 			if (tabletLayout) {
 				((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
-					.setActivateOnItemClick(true);
+						.setActivateOnItemClick(true);
 			} else {
 				getFragmentManager().beginTransaction()
-					.replace(R.id.single_activity_container, listFragment, LIST_FRAGMENT_TAG).commit();
+						.replace(R.id.single_activity_container, listFragment, LIST_FRAGMENT_TAG).commit();
 			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
@@ -91,7 +82,7 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 		}
 
 		// Show the Up button in the action bar.
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -168,31 +159,31 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			if (getFragmentManager().getBackStackEntryCount() > 0) {
-				getFragmentManager().popBackStack();
-			} else {
-				navigateUpTo(new Intent(this, MainActivity.class));
-			}
-			return true;
-		case R.id.actionbar_icon_new_program:
-			openNewProgram();
-			return true;
-		case R.id.actionbar_icon_run:
-			run();
-			return true;
-		case R.id.actionbar_icon_edit:
-			startEditing();
-			return true;
-		case R.id.actionbar_icon_delete_program:
-			deleteCurrentProgram();
-			return true;
-		case R.id.actionbar_icon_save:
-			stopEditing(true);
-			return true;
-		case R.id.actionbar_icon_discard_changes:
-			stopEditing(false);
-			return true;
+			case android.R.id.home:
+				if (getFragmentManager().getBackStackEntryCount() > 0) {
+					getFragmentManager().popBackStack();
+				} else {
+					navigateUpTo(new Intent(this, MainActivity.class));
+				}
+				return true;
+			case R.id.actionbar_icon_new_program:
+				openNewProgram();
+				return true;
+			case R.id.actionbar_icon_run:
+				run();
+				return true;
+			case R.id.actionbar_icon_edit:
+				startEditing();
+				return true;
+			case R.id.actionbar_icon_delete_program:
+				deleteCurrentProgram();
+				return true;
+			case R.id.actionbar_icon_save:
+				stopEditing(true);
+				return true;
+			case R.id.actionbar_icon_discard_changes:
+				stopEditing(false);
+				return true;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -222,26 +213,26 @@ public class MainActivity extends Activity implements ProgramListFragment.Callba
 	private void deleteCurrentProgram() {
 		if (!isViewingProgram() && currentProgramId > 0) {
 			throw new IllegalStateException(
-				"Attempted to delete program when there was no current program being viewed");
+					"Attempted to delete program when there was no current program being viewed");
 		}
 
 		new AlertDialog.Builder(this) //
-			.setMessage("Are you sure you want to delete this program?")//
-			.setPositiveButton(android.R.string.yes, new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					getFragmentManager().popBackStack();
-					ProgramDAOSqlite.getInstance(getApplicationContext()).deleteProgram(currentProgramId);
-					listFragment.refresh();
-					dialog.dismiss();
-				}
-			})//
-			.setNegativeButton(android.R.string.no, new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			}).show();
+				.setMessage("Are you sure you want to delete this program?")//
+				.setPositiveButton(android.R.string.yes, new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						getFragmentManager().popBackStack();
+						ProgramDAOSqlite.getInstance(getApplicationContext()).deleteProgram(currentProgramId);
+						listFragment.refresh();
+						dialog.dismiss();
+					}
+				})//
+				.setNegativeButton(android.R.string.no, new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).show();
 	}
 
 	private void startEditing() {

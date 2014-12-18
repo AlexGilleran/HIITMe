@@ -74,7 +74,7 @@ public class RunFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		int layout = shouldShowLandscapeLayout() ? R.layout.fragment_run_port : R.layout.fragment_run_land;
+		int layout = shouldShowLandscapeLayout() ? R.layout.fragment_run_land : R.layout.fragment_run_port;
 
 		return inflater.inflate(layout, container, false);
 	}
