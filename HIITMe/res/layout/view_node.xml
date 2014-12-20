@@ -2,15 +2,17 @@
 <com.alexgilleran.hiitme.presentation.programdetail.views.NodeView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/program_node_view"
     style="@style/Node"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
+    android:layout_margin="10dp"
     android:paddingBottom="20dp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="5dp" >
+    android:paddingLeft="1dp"
+    android:paddingRight="1dp"
+    android:background="@drawable/shadow"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:background="@color/primary"
         android:layout_height="wrap_content" >
 
         <TextView

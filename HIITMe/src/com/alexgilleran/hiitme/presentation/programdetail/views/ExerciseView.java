@@ -1,7 +1,5 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.DragEvent;
@@ -16,7 +14,13 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
-import com.alexgilleran.hiitme.util.ViewUtils;
+
+import java.util.Locale;
+
+import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
+import static com.alexgilleran.hiitme.util.ViewUtils.getPxForDp;
+import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
+import static com.alexgilleran.hiitme.util.ViewUtils.getVisibilityInt;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView name;
@@ -74,12 +78,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		this.nodeView = nodeView;
 	}
 
-	public void setExercise(Exercise exercise) {
-		this.exercise = exercise;
-
-		render();
-	}
-
 	public void render() {
 		effortLevel.setContentDescription(exercise.getEffortLevel().toString());
 		effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
@@ -91,7 +89,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			name.setVisibility(VISIBLE);
 			name.setText(exercise.getName());
 		} else {
-			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(ViewUtils.getPxForDp(getContext(), 32),
+			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(getPxForDp(getContext(), 32),
 					effortLevel.getHeight() - name.getHeight()));
 			name.setVisibility(GONE);
 		}
@@ -125,15 +123,15 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	@Override
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-
-		moveButton.setVisibility(ViewUtils.getVisibilityInt(editable));
+	public boolean isEditable() {
+		return editable;
 	}
 
 	@Override
-	public boolean isEditable() {
-		return editable;
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+
+		moveButton.setVisibility(getVisibilityInt(editable));
 	}
 
 	@Override
@@ -143,24 +141,30 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	@Override
 	public int getTopForDrag() {
-		return ViewUtils.getTopIncludingMargin(this);
+		return getTopIncludingMargin(this);
 	}
 
 	@Override
 	public int getBottomForDrag() {
-		return ViewUtils.getBottomIncludingMargin(this);
+		return getBottomIncludingMargin(this);
 	}
 
 	public Exercise getExercise() {
 		return exercise;
 	}
 
-	public void setNewlyCreated(boolean placed) {
-		this.newlyCreated = placed;
+	public void setExercise(Exercise exercise) {
+		this.exercise = exercise;
+
+		render();
 	}
 
 	@Override
 	public boolean isNewlyCreated() {
 		return newlyCreated;
+	}
+
+	public void setNewlyCreated(boolean placed) {
+		this.newlyCreated = placed;
 	}
 }

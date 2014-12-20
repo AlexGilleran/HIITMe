@@ -1,12 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
-import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,17 +15,20 @@ import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
+import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
+
 public class NodeView extends LinearLayout implements DraggableView {
 	private static final int FIRST_DRAGGABLE_VIEW_INDEX = 1;
-
+	private static final int MARGIN = (int) (5 * Resources.getSystem().getDisplayMetrics().density);
 	private LayoutInflater layoutInflater;
 	private DragManager dragManager;
-
 	private Node programNode;
-
 	private TextView repCountView;
 	private ImageButton moveButton;
-
 	private boolean editable;
 	private boolean newlyCreated = false;
 
@@ -47,6 +45,10 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public NodeView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		layoutInflater = LayoutInflater.from(context);
+	}
+
+	private static boolean topWithinViewBounds(int top, View childView) {
+		return top >= getTopIncludingMargin(childView) && top < getBottomIncludingMargin(childView);
 	}
 
 	@Override
@@ -117,12 +119,12 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	private void setBackground(int resourceId) {
 		// Setting background resource kills padding.
-		int bottom = getPaddingBottom();
-		int top = getPaddingTop();
-		int right = getPaddingRight();
-		int left = getPaddingLeft();
-		setBackgroundResource(resourceId);
-		setPadding(left, top, right, bottom);
+//		int bottom = getPaddingBottom();
+//		int top = getPaddingTop();
+//		int right = getPaddingRight();
+//		int left = getPaddingLeft();
+//		setBackgroundResource(resourceId);
+//		setPadding(left, top, right, bottom);
 	}
 
 	private <V extends View & DraggableView> void addChild(V newView) {
@@ -217,10 +219,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return new InsertionPoint(-1, this, null, top);
 	}
 
-	private static boolean topWithinViewBounds(int top, View childView) {
-		return top >= getTopIncludingMargin(childView) && top < getBottomIncludingMargin(childView);
-	}
-
 	@Override
 	public Node rebuildNode() {
 		Node programNode = new Node();
@@ -264,7 +262,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void addChild(DraggableView child, int index) {
 		child.setEditable(editable);
 		child.setDragManager(dragManager);
-		addView(child.asView(), index);
+
+		LinearLayout.LayoutParams params = new LayoutParams(child.asView().getLayoutParams());
+		params.setMargins(MARGIN, MARGIN, MARGIN, MARGIN);
+
+		addView(child.asView(), index, params);
 	}
 
 	public void removeChild(DraggableView view) {
@@ -280,6 +282,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
+	public boolean isEditable() {
+		return editable;
+	}
+
+	@Override
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 		int visibility = editable ? VISIBLE : INVISIBLE;
@@ -290,11 +297,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
-	}
-
-	@Override
-	public boolean isEditable() {
-		return editable;
 	}
 
 	@Override
@@ -316,13 +318,13 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return getChildCount() - 1;
 	}
 
-	public void setNewlyCreated(boolean placed) {
-		this.newlyCreated = placed;
-	}
-
 	@Override
 	public boolean isNewlyCreated() {
 		return newlyCreated;
+	}
+
+	public void setNewlyCreated(boolean placed) {
+		this.newlyCreated = placed;
 	}
 
 	public class InsertionPoint {
