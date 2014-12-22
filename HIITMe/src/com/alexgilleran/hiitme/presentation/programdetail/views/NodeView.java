@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
 public class NodeView extends LinearLayout implements DraggableView {
 	private static final int FIRST_DRAGGABLE_VIEW_INDEX = 1;
 	private static final int MARGIN = (int) (5 * Resources.getSystem().getDisplayMetrics().density);
+	private static final int SIDE_MARGIN = (int) (10 * Resources.getSystem().getDisplayMetrics().density);
 	private LayoutInflater layoutInflater;
 	private DragManager dragManager;
 	private Node programNode;
@@ -132,14 +134,20 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 		newView.setId(ViewUtils.generateViewId());
 
-		addView(newView);
+		addView(newView, addMargin(newView));
+	}
+
+	private ViewGroup.LayoutParams addMargin(View view) {
+		LinearLayout.LayoutParams params = new LayoutParams(view.getLayoutParams());
+		params.setMargins(SIDE_MARGIN, MARGIN, SIDE_MARGIN, MARGIN);
+		return params;
 	}
 
 	@Override
 	public void setDragManager(DragManager dragManager) {
 		this.dragManager = dragManager;
 
-		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
+//		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
 
 		for (DraggableView child : getChildren()) {
 			child.setDragManager(dragManager);
@@ -264,9 +272,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 		child.setDragManager(dragManager);
 
 		LinearLayout.LayoutParams params = new LayoutParams(child.asView().getLayoutParams());
-		params.setMargins(MARGIN, MARGIN, MARGIN, MARGIN);
+		params.setMargins(SIDE_MARGIN, SIDE_MARGIN, SIDE_MARGIN, SIDE_MARGIN);
 
-		addView(child.asView(), index, params);
+		addView(child.asView(), index, addMargin(child.asView()));
 	}
 
 	public void removeChild(DraggableView view) {
@@ -280,6 +288,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 		}
 		return null;
 	}
+
 
 	@Override
 	public boolean isEditable() {

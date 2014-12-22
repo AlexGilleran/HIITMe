@@ -1,5 +1,6 @@
 package com.alexgilleran.hiitme.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -34,7 +35,20 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 	private long currentProgramId;
 	private String currentProgramName;
+	private OnBackStackChangedListener backStackListener = new OnBackStackChangedListener() {
+		@Override
+		public void onBackStackChanged() {
+			invalidateOptionsMenu();
 
+			if (!isDetailFragmentVisible() && !isRunFragmentVisible()) {
+				currentProgramId = 0;
+				currentProgramName = null;
+				setTitle("Select Program");
+			} else {
+				setTitle(currentProgramName);
+			}
+		}
+	};
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
 	 */
@@ -309,19 +323,4 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	private boolean isEditing() {
 		return isDetailFragmentVisible() && detailFragment.isBeingEdited();
 	}
-
-	private OnBackStackChangedListener backStackListener = new OnBackStackChangedListener() {
-		@Override
-		public void onBackStackChanged() {
-			invalidateOptionsMenu();
-
-			if (!isDetailFragmentVisible() && !isRunFragmentVisible()) {
-				currentProgramId = 0;
-				currentProgramName = null;
-				setTitle("Select Program");
-			} else {
-				setTitle(currentProgramName);
-			}
-		}
-	};
 }

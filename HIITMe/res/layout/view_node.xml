@@ -4,15 +4,16 @@
     style="@style/Node"
     android:layout_margin="10dp"
     android:paddingBottom="20dp"
-    android:paddingLeft="1dp"
-    android:paddingRight="1dp"
+    android:paddingTop="1dp"
+    android:paddingLeft="2.5dp"
+    android:paddingRight="2.5dp"
     android:background="@drawable/shadow"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:background="@color/primary"
+        android:background="@drawable/node_top_bg"
         android:layout_height="wrap_content" >
 
         <TextView

@@ -20,7 +20,6 @@ import java.util.Locale;
 import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
 import static com.alexgilleran.hiitme.util.ViewUtils.getPxForDp;
 import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
-import static com.alexgilleran.hiitme.util.ViewUtils.getVisibilityInt;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
 	private TextView name;
@@ -42,7 +41,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	public void setDragManager(DragManager dragManager) {
-		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
+//		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
 	}
 
 	@Override
@@ -60,14 +59,13 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 				return false;
 			}
 		});
+	}
 
-		getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(effortLevel.getWidth(), ExerciseView.this
-						.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom()));
-			}
-		});
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+
+		effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(effortLevel.getWidth(), ExerciseView.this
+				.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom()));
 	}
 
 	public DraggableView getNodeView() {
@@ -131,7 +129,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 
-		moveButton.setVisibility(getVisibilityInt(editable));
+//		moveButton.setVisibility(getVisibilityInt(editable));
 	}
 
 	@Override

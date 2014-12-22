@@ -17,15 +17,60 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 
-/**
- * A fragment representing a single Program detail screen. This fragment is either contained in a {@link MainActivity}
- * in two-pane mode (on tablets) or a {@link ProgramDetailActivity} on handsets.
- */
+
 public class ProgramDetailFragment extends Fragment {
 	private Program program;
 	private ProgramDetailView detailView;
+	private OnLongClickListener editNodeListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View view) {
+			final NodeView nodeView = (NodeView) view;
 
-	/** Mandatory empty constructor */
+			if (!nodeView.isEditable()) {
+				return false;
+			}
+
+			EditNodeFragment dialog = new EditNodeFragment();
+			dialog.setNode(nodeView.getCurrentNode());
+
+			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+				@Override
+				public void onUpdated() {
+					nodeView.updateRepCount();
+				}
+			});
+
+			dialog.show(getFragmentManager(), "edit_node");
+			return true;
+		}
+	};
+	private OnLongClickListener editExerciseListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View view) {
+			final ExerciseView exerciseView = (ExerciseView) view;
+
+			if (!exerciseView.isEditable()) {
+				return false;
+			}
+
+			EditExerciseFragment dialog = new EditExerciseFragment();
+			dialog.setExercise(exerciseView.getExercise());
+
+			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+				@Override
+				public void onUpdated() {
+					exerciseView.render();
+				}
+			});
+
+			dialog.show(getFragmentManager(), "edit_exercise");
+			return true;
+		}
+	};
+
+	/**
+	 * Mandatory empty constructor
+	 */
 	public ProgramDetailFragment() {
 		super();
 	}
@@ -85,52 +130,4 @@ public class ProgramDetailFragment extends Fragment {
 			detailView.setProgram(program);
 		}
 	}
-
-	private OnLongClickListener editNodeListener = new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View view) {
-			final NodeView nodeView = (NodeView) view;
-
-			if (!nodeView.isEditable()) {
-				return false;
-			}
-
-			EditNodeFragment dialog = new EditNodeFragment();
-			dialog.setNode(nodeView.getCurrentNode());
-
-			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
-				@Override
-				public void onUpdated() {
-					nodeView.updateRepCount();
-				}
-			});
-
-			dialog.show(getFragmentManager(), "edit_node");
-			return true;
-		}
-	};
-
-	private OnLongClickListener editExerciseListener = new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View view) {
-			final ExerciseView exerciseView = (ExerciseView) view;
-
-			if (!exerciseView.isEditable()) {
-				return false;
-			}
-
-			EditExerciseFragment dialog = new EditExerciseFragment();
-			dialog.setExercise(exerciseView.getExercise());
-
-			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
-				@Override
-				public void onUpdated() {
-					exerciseView.render();
-				}
-			});
-
-			dialog.show(getFragmentManager(), "edit_exercise");
-			return true;
-		}
-	};
 }

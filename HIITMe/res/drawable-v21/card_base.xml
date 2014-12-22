@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
         android:color="@color/accent">
     <item
@@ -7,10 +8,8 @@
         android:left="2dp"
         android:right="2dp"
         android:top="1dp"
-        android:drawable="@drawable/card_inner">
+        android:drawable="@drawable/card_ripple_mask">
     </item>
-    <item android:drawable="@drawable/shadow"/>
-    <!--<item
-        android:drawable="@drawable/card_bg">
-    </item>-->
+    <item android:drawable="@drawable/card_bg"/>
+
 </ripple>
