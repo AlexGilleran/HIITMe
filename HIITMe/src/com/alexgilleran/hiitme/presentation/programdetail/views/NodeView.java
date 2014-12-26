@@ -305,6 +305,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 			header.setOnLongClickListener(editable ? longClickListener : null);
 			header.setOnTouchListener(editable ? touchListener : null);
 		}
+		header.setBackgroundResource(editable ? R.drawable.node_top_bg : R.drawable.node_top_bg_inner);
 
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);

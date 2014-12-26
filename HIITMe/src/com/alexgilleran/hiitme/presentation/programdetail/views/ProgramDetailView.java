@@ -132,7 +132,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
-//		onTouchEvent(ev);
 		return currentlyDragging();
 	}
 
