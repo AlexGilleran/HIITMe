@@ -1,13 +1,17 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -31,8 +35,11 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private Node programNode;
 	private TextView repCountView;
 	private ImageButton moveButton;
+	private RelativeLayout header;
 	private boolean editable;
 	private boolean newlyCreated = false;
+	private Rect outRect = new Rect();
+	private int[] location = new int[2];
 
 	public NodeView(Context context) {
 		super(context);
@@ -57,6 +64,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
+		this.header = (RelativeLayout) findViewById(R.id.layout_header);
 	}
 
 	public void init(Node programNode) {
@@ -147,7 +155,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void setDragManager(DragManager dragManager) {
 		this.dragManager = dragManager;
 
-//		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
+		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
 
 		for (DraggableView child : getChildren()) {
 			child.setDragManager(dragManager);
@@ -289,7 +297,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return null;
 	}
 
-
 	@Override
 	public boolean isEditable() {
 		return editable;
@@ -306,6 +313,27 @@ public class NodeView extends LinearLayout implements DraggableView {
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
+	}
+
+	@Override
+	@TargetApi(21)
+	public void drawableHotspotChanged(float x, float y) {
+		header.drawableHotspotChanged(x, y);
+	}
+
+	@Override
+	@TargetApi(21)
+	public boolean onTouchEvent(MotionEvent event) {
+		header.getDrawingRect(outRect);
+		header.getLocationOnScreen(location);
+		outRect.offset(location[0], location[1]);
+		if (outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
+			return super.onTouchEvent(event);
+		} else {
+			event.setAction(MotionEvent.ACTION_CANCEL);
+			return super.onTouchEvent(event);
+		}
+//		return false;
 	}
 
 	@Override
