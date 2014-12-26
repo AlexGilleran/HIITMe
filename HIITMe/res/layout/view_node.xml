@@ -11,7 +11,7 @@
    android:gravity="center_horizontal"
    android:orientation="vertical">
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/layout_header"
         android:layout_width="match_parent"
         android:background="@drawable/node_top_bg"
@@ -20,18 +20,9 @@
         <TextView
             android:id="@+id/textview_repcount"
             style="@style/EditableText"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
+            android:layout_gravity="center"
             android:textSize="35sp"/>
 
-        <ImageButton
-            android:id="@+id/button_move_program_group"
-            android:layout_width="25dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_drag"
-            android:visibility="invisible"/>
-    </RelativeLayout>
+    </FrameLayout>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.NodeView>

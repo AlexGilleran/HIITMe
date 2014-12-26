@@ -41,19 +41,84 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private View recycleBin;
 	private ScrollingProgramView scrollingView;
 	private ObjectAnimator hoverViewAnimator;
-
 	private TextView nameReadOnly;
 	private EditText nameEditable;
 	private ImageButton addExerciseButton;
-	private ImageButton addNodeButton;
+	private OnTouchListener addExerciseListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, final MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
+				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
+				view.setNewlyCreated(true);
 
+				post(new Runnable() {
+					@Override
+					public void run() {
+						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
+					}
+				});
+			}
+			return false;
+		}
+	};
+	private OnTouchListener addNodeListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, final MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+				Node node = new Node();
+				node.setParent(node);
+				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node,
+						scrollingView.getNodeView(), false);
+				view.init(node);
+				view.setDragManager(ProgramDetailView.this);
+				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
+				view.setEditable(true);
+				view.setNewlyCreated(true);
+				startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
+			}
+			return false;
+		}
+	};
+	private ImageButton addNodeButton;
 	private Program program;
+
+	//	private OnLongClickListener exerciseLongClickListener;
+//	private OnLongClickListener nodeLongClickListener;
 	private boolean editable = false;
 	private boolean dragging = false;
 	private int locationOnScreen;
+	private OnGlobalLayoutListener yOffsetObserver = new OnGlobalLayoutListener() {
+		@Override
+		public void onGlobalLayout() {
+			locationOnScreen = ViewUtils.getYCoordOnScreen(ProgramDetailView.this);
+		}
+	};
+	/**
+	 * Update listener for animating the hover cell back to its original position - makes sure that each frame of the
+	 * animation is actually rendered.
+	 */
+	private ValueAnimator.AnimatorUpdateListener hoverCancelAnimatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+		@Override
+		public void onAnimationUpdate(ValueAnimator valueAnimator) {
+			invalidate();
+		}
+	};
+	/**
+	 * Listener for animating the hover cell back to its original position (for when a drag is ended).
+	 */
+	private AnimatorListenerAdapter hoverCancelAnimatorListener = new AnimatorListenerAdapter() {
+		@Override
+		public void onAnimationStart(Animator animation) {
+			setEnabled(false);
+		}
 
-	private OnLongClickListener exerciseLongClickListener;
-	private OnLongClickListener nodeLongClickListener;
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			dragView.asView().setVisibility(VISIBLE);
+			cleanUpAfterDragEnd();
+		}
+	};
 
 	public ProgramDetailView(Context context) {
 		super(context);
@@ -68,6 +133,21 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	public ProgramDetailView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		layoutInflater = LayoutInflater.from(context);
+	}
+
+	/**
+	 * Gets the index of a child {@link View} with its parent {@link ViewGroup} if possible. Returns -1 otherwise.
+	 */
+	private static int getChildIndex(View child) {
+		if (child.getParent() instanceof ViewGroup) {
+			ViewGroup viewGroup = (ViewGroup) child.getParent();
+			for (int i = 0; i < viewGroup.getChildCount(); i++) {
+				if (viewGroup.getChildAt(i) == child) {
+					return i;
+				}
+			}
+		}
+		return -1;
 	}
 
 	@Override
@@ -86,7 +166,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
 
-		getViewTreeObserver().addOnGlobalLayoutListener(TODOListener);
+		getViewTreeObserver().addOnGlobalLayoutListener(yOffsetObserver);
 
 		if (program != null) {
 			render();
@@ -120,7 +200,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
-		onTouchEvent(ev);
+//		onTouchEvent(ev);
 		return currentlyDragging();
 	}
 
@@ -129,24 +209,24 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		scrollingView.handleTouchEvent(event);
 
 		switch (event.getActionMasked()) {
-		case MotionEvent.ACTION_MOVE:
-			if (currentlyDragging()) {
-				lastEventY = (int) event.getRawY();
-				handleHoverCellMove();
+			case MotionEvent.ACTION_MOVE:
+				if (currentlyDragging()) {
+					lastEventY = (int) event.getRawY();
+					handleHoverCellMove();
 
+					return true;
+				}
+
+				break;
+			case MotionEvent.ACTION_UP:
+				touchEventsEnded();
 				return true;
-			}
-
-			break;
-		case MotionEvent.ACTION_UP:
-			touchEventsEnded();
-			return true;
-		case MotionEvent.ACTION_CANCEL:
-			touchEventsEnded();
-			return true;
+			case MotionEvent.ACTION_CANCEL:
+				touchEventsEnded();
+				return true;
 		}
 
-		return false;
+		return true;
 	}
 
 	@Override
@@ -160,6 +240,10 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	@Override
 	public void cancelDrag() {
 		touchEventsEnded();
+	}
+
+	public boolean isEditable() {
+		return editable;
 	}
 
 	public void setEditable(boolean editable) {
@@ -179,10 +263,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		if (!editable) {
 			nameReadOnly.setText(nameEditable.getText());
 		}
-	}
-
-	public boolean isEditable() {
-		return editable;
 	}
 
 	/**
@@ -298,21 +378,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		});
 	}
 
-	/**
-	 * Gets the index of a child {@link View} with its parent {@link ViewGroup} if possible. Returns -1 otherwise.
-	 */
-	private static int getChildIndex(View child) {
-		if (child.getParent() instanceof ViewGroup) {
-			ViewGroup viewGroup = (ViewGroup) child.getParent();
-			for (int i = 0; i < viewGroup.getChildCount(); i++) {
-				if (viewGroup.getChildAt(i) == child) {
-					return i;
-				}
-			}
-		}
-		return -1;
-	}
-
 	public void startDrag(final DraggableView view, int downY, final int startTop) {
 		dragView = view;
 		this.downY = downY;
@@ -373,7 +438,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		return drawable;
 	}
 
-	/** Returns a bitmap showing a screenshot of the view passed in. */
+	/**
+	 * Returns a bitmap showing a screenshot of the view passed in.
+	 */
 	private Bitmap getBitmapFromView(View v) {
 		Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
@@ -394,20 +461,17 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				cleanUpAfterDragEnd();
 			} else {
 				animateRestoreHoverCell();
-
-				if (dragView.isNewlyCreated()) {
-					// FIXME: Eh, instanceofs.
-					if (dragView.asView() instanceof ExerciseView) {
-						exerciseLongClickListener.onLongClick(dragView.asView());
-					} else {
-						nodeLongClickListener.onLongClick(dragView.asView());
-					}
-
-					dragView.setNewlyCreated(false);
-				}
 			}
 		}
 	}
+
+//	public void setExerciseLongClickListener(OnLongClickListener listener) {
+//		this.exerciseLongClickListener = listener;
+//	}
+
+//	public void setNodeLongClickListener(OnLongClickListener listener) {
+//		this.nodeLongClickListener = listener;
+//	}
 
 	/**
 	 * Animates the hover cell back to the actual position of the view it represents.
@@ -427,33 +491,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		hoverViewAnimator.start();
 	}
 
-	/**
-	 * Update listener for animating the hover cell back to its original position - makes sure that each frame of the
-	 * animation is actually rendered.
-	 */
-	private ValueAnimator.AnimatorUpdateListener hoverCancelAnimatorUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
-		@Override
-		public void onAnimationUpdate(ValueAnimator valueAnimator) {
-			invalidate();
-		}
-	};
-
-	/**
-	 * Listener for animating the hover cell back to its original position (for when a drag is ended).
-	 */
-	private AnimatorListenerAdapter hoverCancelAnimatorListener = new AnimatorListenerAdapter() {
-		@Override
-		public void onAnimationStart(Animator animation) {
-			setEnabled(false);
-		}
-
-		@Override
-		public void onAnimationEnd(Animator animation) {
-			dragView.asView().setVisibility(VISIBLE);
-			cleanUpAfterDragEnd();
-		}
-	};
-
 	private void cleanUpAfterDragEnd() {
 		dragView.setBeingDragged(false);
 		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
@@ -464,14 +501,29 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		invalidate();
 	}
 
-	// TODO: Name this.
-	private OnGlobalLayoutListener TODOListener = new OnGlobalLayoutListener() {
-		@Override
-		public void onGlobalLayout() {
-			locationOnScreen = ViewUtils.getYCoordOnScreen(ProgramDetailView.this);
-		}
-	};
+	@Override
+	public ExerciseView buildExerciseView(Exercise exercise, DraggableView parent) {
+		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, this, false);
 
+		exerciseView.setExercise(exercise);
+		exerciseView.setNodeView(parent);
+		exerciseView.setDragManager(this);
+//		exerciseView.setOnLongClickListener(exerciseLongClickListener);
+
+		return exerciseView;
+	}
+
+	@Override
+	public NodeView buildNodeView(Node node) {
+		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, this, false);
+
+		nodeView.setDragManager(this);
+		nodeView.init(node);
+		nodeView.setId(ViewUtils.generateViewId());
+//		nodeView.setOnLongClickListener(nodeLongClickListener);
+
+		return nodeView;
+	}
 	/**
 	 * This TypeEvaluator is used to animate the BitmapDrawable back to its final location when the user lifts their
 	 * finger by modifying the BitmapDrawable's bounds.
@@ -485,76 +537,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 		public int interpolate(int start, int end, float fraction) {
 			return (int) (start + fraction * (end - start));
-		}
-	};
-
-	public void setExerciseLongClickListener(OnLongClickListener listener) {
-		this.exerciseLongClickListener = listener;
-	}
-
-	public void setNodeLongClickListener(OnLongClickListener listener) {
-		this.nodeLongClickListener = listener;
-	}
-
-	@Override
-	public ExerciseView buildExerciseView(Exercise exercise, DraggableView parent) {
-		ExerciseView exerciseView = (ExerciseView) layoutInflater.inflate(R.layout.view_exercise, this, false);
-
-		exerciseView.setExercise(exercise);
-		exerciseView.setNodeView(parent);
-		exerciseView.setDragManager(this);
-		exerciseView.setOnLongClickListener(exerciseLongClickListener);
-
-		return exerciseView;
-	}
-
-	@Override
-	public NodeView buildNodeView(Node node) {
-		NodeView nodeView = (NodeView) layoutInflater.inflate(R.layout.view_node, this, false);
-
-		nodeView.setDragManager(this);
-		nodeView.init(node);
-		nodeView.setId(ViewUtils.generateViewId());
-		nodeView.setOnLongClickListener(nodeLongClickListener);
-
-		return nodeView;
-	}
-
-	private OnTouchListener addExerciseListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, final MotionEvent event) {
-			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
-				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
-				view.setNewlyCreated(true);
-
-				post(new Runnable() {
-					@Override
-					public void run() {
-						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
-					}
-				});
-			}
-			return false;
-		}
-	};
-
-	private OnTouchListener addNodeListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, final MotionEvent event) {
-			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				Node node = new Node();
-				node.setParent(node);
-				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node,
-						scrollingView.getNodeView(), false);
-				view.init(node);
-				view.setDragManager(ProgramDetailView.this);
-				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
-				view.setEditable(true);
-				view.setNewlyCreated(true);
-				startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
-			}
-			return false;
 		}
 	};
 }

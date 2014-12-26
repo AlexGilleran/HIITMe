@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Exercise"
-    android:layout_width="200dp"
-    android:paddingBottom="3dp"
-    android:paddingLeft="1dp"
-    android:paddingRight="1dp"
-    android:background="@drawable/card_base"
-    android:layout_height="wrap_content"
-    android:layout_margin="10dp" >
+   style="@style/Exercise"
+   android:layout_width="200dp"
+   android:paddingBottom="3dp"
+   android:paddingLeft="1dp"
+   android:paddingRight="1dp"
+   android:background="@drawable/card_base"
+   android:layout_height="wrap_content"
+   android:layout_margin="10dp">
 
     <ImageView
         android:id="@+id/imageview_effort_level"
         android:layout_width="32dp"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/effort_icon_bg_hard"
-        android:padding="4dp" />
+        android:padding="4dp"/>
 
     <TextView
         android:id="@+id/exercise_duration"
@@ -26,7 +27,7 @@
         android:layout_toRightOf="@id/imageview_effort_level"
         android:includeFontPadding="false"
         android:paddingTop="3dp"
-        android:textSize="38sp" />
+        android:textSize="38sp"/>
 
     <TextView
         android:id="@+id/exercise_name"
@@ -39,15 +40,7 @@
         android:layout_toRightOf="@id/imageview_effort_level"
         android:maxLines="1"
         android:paddingBottom="3dp"
-        android:textSize="25sp" />
+        android:textSize="25sp"/>
 
-    <ImageButton
-        android:id="@+id/button_move"
-        android:layout_width="25dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/ic_drag"
-        android:visibility="gone" />
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView>

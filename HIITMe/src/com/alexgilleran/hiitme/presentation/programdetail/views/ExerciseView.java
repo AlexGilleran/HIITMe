@@ -2,10 +2,9 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.ImageButton;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,8 +25,8 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private ImageView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
-	private ImageButton moveButton;
 	private DraggableView nodeView;
+	private DragManager dragManager;
 
 	private boolean editable;
 	private boolean newlyCreated = false;
@@ -41,7 +40,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	public void setDragManager(DragManager dragManager) {
-//		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
+		this.dragManager = dragManager;
 	}
 
 	@Override
@@ -50,22 +49,26 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 		effortLevel = (ImageView) findViewById(R.id.imageview_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
-		moveButton = (ImageButton) findViewById(R.id.button_move);
 		name = (TextView) findViewById(R.id.exercise_name);
 
-		moveButton.setOnDragListener(new OnDragListener() {
+
+		this.setOnLongClickListener(new OnLongClickListener() {
 			@Override
-			public boolean onDrag(View v, DragEvent event) {
+			public boolean onLongClick(View v) {
 				return false;
 			}
 		});
-	}
+		this.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+					dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
+					return true;
+				}
 
-	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		super.onLayout(changed, left, top, right, bottom);
-
-		effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(effortLevel.getWidth(), ExerciseView.this
-				.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom()));
+				return false;
+			}
+		});
 	}
 
 	public DraggableView getNodeView() {
@@ -91,6 +94,16 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 					effortLevel.getHeight() - name.getHeight()));
 			name.setVisibility(GONE);
 		}
+
+		this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				effortLevel.getLayoutParams().height = ExerciseView.this
+						.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom();
+				effortLevel.setLayoutParams(effortLevel.getLayoutParams());
+				getViewTreeObserver().removeOnGlobalLayoutListener(this);
+			}
+		});
 	}
 
 	private String timeToString(int number) {

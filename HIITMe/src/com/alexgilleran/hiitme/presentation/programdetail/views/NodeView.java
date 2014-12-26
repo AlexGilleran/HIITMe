@@ -1,6 +1,5 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
@@ -9,9 +8,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alexgilleran.hiitme.R;
@@ -34,8 +32,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private DragManager dragManager;
 	private Node programNode;
 	private TextView repCountView;
-	private ImageButton moveButton;
-	private RelativeLayout header;
+	private FrameLayout header;
 	private boolean editable;
 	private boolean newlyCreated = false;
 	private Rect outRect = new Rect();
@@ -63,8 +60,27 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
-		this.moveButton = (ImageButton) this.findViewById(R.id.button_move_program_group);
-		this.header = (RelativeLayout) findViewById(R.id.layout_header);
+		this.header = (FrameLayout) findViewById(R.id.layout_header);
+
+		header.setOnLongClickListener(new OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				return false;
+			}
+		});
+
+		header.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+					dragManager.startDrag(NodeView.this, (int) event.getRawY());
+				} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+					System.out.println();
+//					header.onTouchEvent(event);
+				}
+				return false;
+			}
+		});
 	}
 
 	public void init(Node programNode) {
@@ -154,8 +170,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void setDragManager(DragManager dragManager) {
 		this.dragManager = dragManager;
-
-		moveButton.setOnTouchListener(new MoveButtonListener(this, dragManager));
 
 		for (DraggableView child : getChildren()) {
 			child.setDragManager(dragManager);
@@ -306,39 +320,15 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 		int visibility = editable ? VISIBLE : INVISIBLE;
-		if (getDepth() > 0) {
-			moveButton.setVisibility(visibility);
-		}
-
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
 	}
 
-	@Override
-	@TargetApi(21)
-	public void drawableHotspotChanged(float x, float y) {
-		header.drawableHotspotChanged(x, y);
-	}
-
-	@Override
-	@TargetApi(21)
-	public boolean onTouchEvent(MotionEvent event) {
-		header.getDrawingRect(outRect);
-		header.getLocationOnScreen(location);
-		outRect.offset(location[0], location[1]);
-		if (outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
-			return super.onTouchEvent(event);
-		} else {
-			event.setAction(MotionEvent.ACTION_CANCEL);
-			return super.onTouchEvent(event);
-		}
-//		return false;
-	}
 
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
-		setBackground(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
+//		setBackground(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
 	}
 
 	@Override

@@ -103,8 +103,8 @@ public class ProgramDetailFragment extends Fragment {
 		}
 
 		if (savedInstanceState == null) {
-			detailView.setExerciseLongClickListener(editExerciseListener);
-			detailView.setNodeLongClickListener(editNodeListener);
+//			detailView.setExerciseLongClickListener(editExerciseListener);
+//			detailView.setNodeLongClickListener(editNodeListener);
 		}
 	}
 
