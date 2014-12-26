@@ -11,9 +11,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseFragment;
 import com.alexgilleran.hiitme.presentation.programdetail.views.EditNodeFragment;
-import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 
@@ -21,52 +19,6 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailVie
 public class ProgramDetailFragment extends Fragment {
 	private Program program;
 	private ProgramDetailView detailView;
-	private OnLongClickListener editNodeListener = new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View view) {
-			final NodeView nodeView = (NodeView) view;
-
-			if (!nodeView.isEditable()) {
-				return false;
-			}
-
-			EditNodeFragment dialog = new EditNodeFragment();
-			dialog.setNode(nodeView.getCurrentNode());
-
-			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
-				@Override
-				public void onUpdated() {
-					nodeView.updateRepCount();
-				}
-			});
-
-			dialog.show(getFragmentManager(), "edit_node");
-			return true;
-		}
-	};
-	private OnLongClickListener editExerciseListener = new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View view) {
-			final ExerciseView exerciseView = (ExerciseView) view;
-
-			if (!exerciseView.isEditable()) {
-				return false;
-			}
-
-			EditExerciseFragment dialog = new EditExerciseFragment();
-			dialog.setExercise(exerciseView.getExercise());
-
-			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
-				@Override
-				public void onUpdated() {
-					exerciseView.render();
-				}
-			});
-
-			dialog.show(getFragmentManager(), "edit_exercise");
-			return true;
-		}
-	};
 
 	/**
 	 * Mandatory empty constructor
@@ -98,13 +50,9 @@ public class ProgramDetailFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		detailView = (ProgramDetailView) getView().findViewById(R.id.layout_root);
+		detailView.setFragmentManager(getFragmentManager());
 		if (program != null) {
 			detailView.setProgram(program);
-		}
-
-		if (savedInstanceState == null) {
-//			detailView.setExerciseLongClickListener(editExerciseListener);
-//			detailView.setNodeLongClickListener(editNodeListener);
 		}
 	}
 

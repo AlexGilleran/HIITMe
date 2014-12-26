@@ -13,6 +13,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
+import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
 
 import java.util.Locale;
 
@@ -50,25 +51,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		effortLevel = (ImageView) findViewById(R.id.imageview_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
 		name = (TextView) findViewById(R.id.exercise_name);
-
-
-		this.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				return false;
-			}
-		});
-		this.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-					dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
-					return true;
-				}
-
-				return false;
-			}
-		});
 	}
 
 	public DraggableView getNodeView() {
@@ -142,7 +124,9 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 
-//		moveButton.setVisibility(getVisibilityInt(editable));
+		setOnLongClickListener(editable ? longClickListener : null);
+		setOnTouchListener(editable ? touchListener : null);
+		setBackgroundResource(editable ? R.drawable.card_base : R.drawable.card_bg);
 	}
 
 	@Override
@@ -178,4 +162,34 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	public void setNewlyCreated(boolean placed) {
 		this.newlyCreated = placed;
 	}
+
+	private final OnLongClickListener longClickListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+			EditExerciseFragment dialog = new EditExerciseFragment();
+			dialog.setExercise(getExercise());
+
+			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+				@Override
+				public void onUpdated() {
+					render();
+				}
+			});
+
+			dialog.show(dragManager.getFragmentManager(), "edit_exercise");
+			return true;
+		}
+	};
+
+	private final OnTouchListener touchListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+				dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
+				return true;
+			}
+
+			return false;
+		}
+	};
 }

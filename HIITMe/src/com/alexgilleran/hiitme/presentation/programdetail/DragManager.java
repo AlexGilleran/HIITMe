@@ -1,5 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
+import android.app.FragmentManager;
+
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
@@ -19,4 +21,6 @@ public interface DragManager {
 	ExerciseView buildExerciseView(Exercise exercise, DraggableView parent);
 	
 	NodeView buildNodeView(Node node);
+
+	FragmentManager getFragmentManager();
 }

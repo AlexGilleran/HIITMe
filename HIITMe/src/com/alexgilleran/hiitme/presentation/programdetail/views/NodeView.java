@@ -16,6 +16,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
+import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
 public class NodeView extends LinearLayout implements DraggableView {
 	private static final int FIRST_DRAGGABLE_VIEW_INDEX = 1;
 	private static final int MARGIN = (int) (5 * Resources.getSystem().getDisplayMetrics().density);
-	private static final int SIDE_MARGIN = (int) (10 * Resources.getSystem().getDisplayMetrics().density);
+	private static final int SIDE_MARGIN = (int) (20 * Resources.getSystem().getDisplayMetrics().density);
 	private LayoutInflater layoutInflater;
 	private DragManager dragManager;
 	private Node programNode;
@@ -61,26 +62,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		this.header = (FrameLayout) findViewById(R.id.layout_header);
-
-		header.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				return false;
-			}
-		});
-
-		header.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-					dragManager.startDrag(NodeView.this, (int) event.getRawY());
-				} else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-					System.out.println();
-//					header.onTouchEvent(event);
-				}
-				return false;
-			}
-		});
 	}
 
 	public void init(Node programNode) {
@@ -319,7 +300,12 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void setEditable(boolean editable) {
 		this.editable = editable;
-		int visibility = editable ? VISIBLE : INVISIBLE;
+
+		if (getDepth() > 0) {
+			header.setOnLongClickListener(editable ? longClickListener : null);
+			header.setOnTouchListener(editable ? touchListener : null);
+		}
+
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
@@ -353,6 +339,34 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void setNewlyCreated(boolean placed) {
 		this.newlyCreated = placed;
 	}
+
+	private final OnTouchListener touchListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+				dragManager.startDrag(NodeView.this, (int) event.getRawY());
+			}
+			return false;
+		}
+	};
+
+	private final OnLongClickListener longClickListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+			EditNodeFragment dialog = new EditNodeFragment();
+			dialog.setNode(getCurrentNode());
+
+			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+				@Override
+				public void onUpdated() {
+					updateRepCount();
+				}
+			});
+
+			dialog.show(dragManager.getFragmentManager(), "edit_node");
+			return true;
+		}
+	};
 
 	public class InsertionPoint {
 		int index;
