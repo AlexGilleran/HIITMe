@@ -1,6 +1,5 @@
 package com.alexgilleran.hiitme.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
@@ -43,10 +42,9 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			if (!isDetailFragmentVisible() && !isRunFragmentVisible()) {
 				currentProgramId = 0;
 				currentProgramName = null;
-				setTitle("Select Program");
-			} else {
-				setTitle(currentProgramName);
 			}
+
+			updateTitle();
 		}
 	};
 	/**
@@ -74,11 +72,6 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
-			currentProgramName = savedInstanceState.getString(ARG_PROGRAM_NAME, null);
-
-			if (currentProgramName != null) {
-				setTitle(currentProgramName);
-			}
 
 			listFragment = (ProgramListFragment) getFragmentManager().findFragmentByTag(LIST_FRAGMENT_TAG);
 			detailFragment = (ProgramDetailFragment) getFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
@@ -95,6 +88,22 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 		// Show the Up button in the action bar.
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	private void updateTitle() {
+		String title;
+
+		if (isEditing()) {
+			title = getString(R.string.title_edit);
+		} else if (isRunFragmentVisible()) {
+			title = getString(R.string.title_run);
+		} else if (isDetailFragmentVisible()) {
+			title = getString(R.string.title_view);
+		} else {
+			title = getString(R.string.title_select);
+		}
+
+		setTitle(title);
 	}
 
 	@Override
@@ -177,28 +186,30 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 				} else {
 					navigateUpTo(new Intent(this, MainActivity.class));
 				}
-				return true;
+				break;
 			case R.id.actionbar_icon_new_program:
 				openNewProgram();
-				return true;
+				break;
 			case R.id.actionbar_icon_run:
 				run();
-				return true;
+				break;
 			case R.id.actionbar_icon_edit:
 				startEditing();
-				return true;
+				break;
 			case R.id.actionbar_icon_delete_program:
 				deleteCurrentProgram();
-				return true;
+				break;
 			case R.id.actionbar_icon_save:
 				stopEditing(true);
-				return true;
+				break;
 			case R.id.actionbar_icon_discard_changes:
 				stopEditing(false);
-				return true;
+				break;
 		}
 
-		return super.onOptionsItemSelected(item);
+		updateTitle();
+
+		return true;
 	}
 
 	private void openNewProgram() {

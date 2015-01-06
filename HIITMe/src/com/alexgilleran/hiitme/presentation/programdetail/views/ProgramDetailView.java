@@ -132,6 +132,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		// We do this so that new exercises/nodes drop straight down.
+		onTouchEvent(ev);
+
 		return currentlyDragging();
 	}
 
@@ -228,8 +231,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				dragView.getParentNode().removeChild(dragView);
 			}
 		} else {
-			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top
-					+ hoverCellCurrentBounds.height() / 2, dragView);
+			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
 				insertAt(dragView, insertionPoint);
@@ -309,6 +311,11 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		});
 	}
 
+	@Override
+	public void startDrag(DraggableView view, int downY) {
+		startDrag(view, downY, ViewUtils.getYCoordOnScreen(view.asView()));
+	}
+
 	public void startDrag(final DraggableView view, int downY, final int startTop) {
 		dragView = view;
 		this.downY = downY;
@@ -337,11 +344,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				invalidate();
 			}
 		});
-	}
-
-	@Override
-	public void startDrag(DraggableView view, int downY) {
-		startDrag(view, downY, ViewUtils.getYCoordOnScreen(view.asView()));
 	}
 
 	/**
@@ -485,7 +487,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 					}
 				});
 			}
-			return false;
+			return true;
 		}
 	};
 	private OnTouchListener addNodeListener = new OnTouchListener() {
@@ -503,7 +505,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				view.setNewlyCreated(true);
 				startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 			}
-			return false;
+			return true;
 		}
 	};
 	private OnGlobalLayoutListener yOffsetObserver = new OnGlobalLayoutListener() {

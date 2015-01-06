@@ -68,9 +68,14 @@ public class ProgramListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 
 		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext())
-			.getProgramList());
+				.getProgramList());
 		setListAdapter(adapter);
 	}
 

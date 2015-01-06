@@ -87,8 +87,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		}
 
 		updateRepCount();
-
-		setBackground(determineBgDrawableRes());
 	}
 
 	public void updateRepCount() {
@@ -111,17 +109,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		ExerciseView view = dragManager.buildExerciseView(exercise, this);
 		addChild(view, index);
 		return view;
-	}
-
-	@Override
-	protected void onAttachedToWindow() {
-		super.onAttachedToWindow();
-
-		refreshBackground();
-	}
-
-	private void refreshBackground() {
-		setBackground(determineBgDrawableRes());
 	}
 
 	private void setBackground(int resourceId) {
@@ -157,12 +144,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		}
 	}
 
-	private int determineBgDrawableRes() {
-		int depth = getDepth();
-
-		return depth % 2 == 0 ? R.drawable.card_nested_even_depth : R.drawable.card_nested_odd_depth;
-	}
-
 	private int getDepth() {
 		if (getParentNode() != null) {
 			return 1 + getParentNode().getDepth();
@@ -194,7 +175,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 			return new InsertionPoint(1, this, null, top);
 		}
 
-		// TODO: Guess the correct place instead of going top-to-bottom
 		for (int i = FIRST_DRAGGABLE_VIEW_INDEX; i <= getLastDraggableChildIndex(); i++) {
 			View childView = getChildAt(i);
 
@@ -305,7 +285,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 			header.setOnLongClickListener(editable ? longClickListener : null);
 			header.setOnTouchListener(editable ? touchListener : null);
 		}
-		header.setBackgroundResource(editable ? R.drawable.node_top_bg : R.drawable.node_top_bg_inner);
+		header.setBackgroundResource(editable ? R.drawable.node_top_bg : R.drawable.node_top_bg_standard);
 
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
@@ -315,7 +295,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
-//		setBackground(beingDragged ? R.drawable.card_dragged : determineBgDrawableRes());
+		header.setBackgroundResource(beingDragged ? R.drawable.node_top_bg_selected : R.drawable.node_top_bg);
 	}
 
 	@Override

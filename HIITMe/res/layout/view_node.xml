@@ -4,10 +4,7 @@
    style="@style/Node"
    android:layout_margin="10dp"
    android:paddingBottom="20dp"
-   android:paddingTop="1dp"
-   android:paddingLeft="2.5dp"
-   android:paddingRight="2.5dp"
-   android:background="@drawable/shadow"
+   android:background="@drawable/card_base"
    android:gravity="center_horizontal"
    android:orientation="vertical">
 
