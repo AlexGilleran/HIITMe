@@ -18,5 +18,6 @@
     <color name="effort_level_easy">#f57c00</color>
     <color name="effort_level_hard">#d32f2f</color>
 
-
+    <color name="recycle_bin_bg">#b71c1c</color>
+    <color name="recycle_bin_bg_hover">#f44336</color>
 </resources>

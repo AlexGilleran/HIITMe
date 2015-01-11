@@ -1,6 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,6 +29,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private Exercise exercise;
 	private DraggableView nodeView;
 	private DragManager dragManager;
+	private Handler longPressHandler = new Handler();
 
 	private boolean editable;
 	private boolean newlyCreated = false;
@@ -163,9 +165,34 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		this.newlyCreated = placed;
 	}
 
+	// We have to have a long press handler to trigger the ripple in Android 5+
 	private final OnLongClickListener longClickListener = new OnLongClickListener() {
 		@Override
 		public boolean onLongClick(View v) {
+			return true;
+		}
+	};
+
+	private final OnTouchListener touchListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				longPressHandler.postDelayed(longPressRunnable, 1200);
+			}
+			if ((event.getAction() == MotionEvent.ACTION_MOVE) || (event.getAction() == MotionEvent.ACTION_UP)) {
+				longPressHandler.removeCallbacks(longPressRunnable);
+			}
+			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+				dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
+				return true;
+			}
+
+			return false;
+		}
+	};
+
+	private Runnable longPressRunnable = new Runnable() {
+		public void run() {
 			EditExerciseFragment dialog = new EditExerciseFragment();
 			dialog.setExercise(getExercise());
 
@@ -177,19 +204,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			});
 
 			dialog.show(dragManager.getFragmentManager(), "edit_exercise");
-			return true;
-		}
-	};
-
-	private final OnTouchListener touchListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-				dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
-				return true;
-			}
-
-			return false;
 		}
 	};
 }

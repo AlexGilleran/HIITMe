@@ -227,10 +227,12 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	 */
 	private void moveDragViewIfNecessary() {
 		if (hoverCellCurrentBounds.top > recycleBin.getTop() && hoverCellCurrentBounds.top < recycleBin.getBottom()) {
+			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg_hover);
 			if (dragView.getParentNode() != null) {
 				dragView.getParentNode().removeChild(dragView);
 			}
 		} else {
+			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg);
 			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
@@ -395,6 +397,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			} else {
 				animateRestoreHoverCell();
 			}
+
+			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg);
 		}
 	}
 

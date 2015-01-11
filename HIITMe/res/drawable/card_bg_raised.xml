@@ -22,7 +22,6 @@
         </shape>
     </item>
     <item
-        android:id="@+id/card"
         android:bottom="3dp"
         android:left="1dp"
         android:right="1dp"
@@ -32,7 +31,7 @@
             android:shape="rectangle">
             <corners android:radius="3dp"/>
 
-            <solid android:color="@color/accent"/>
+            <solid android:color="#FFFFFF"/>
 
             <padding
                 android:bottom="3dp"

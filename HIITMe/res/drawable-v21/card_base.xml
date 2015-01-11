@@ -4,12 +4,20 @@
         android:color="@color/accent">
     <item
         android:id="@android:id/mask"
-        android:bottom="3.3dp"
-        android:left="2dp"
-        android:right="2dp"
+        android:bottom="2dp"
+        android:left="1dp"
+        android:right="1dp"
         android:top="1dp"
         android:drawable="@drawable/card_ripple_mask">
     </item>
-    <item android:drawable="@drawable/card_bg"/>
-
+    <item>
+        <selector>
+            <item
+                android:state_pressed="false"
+                android:drawable="@drawable/card_bg"/>
+            <item
+                android:state_pressed="true"
+                android:drawable="@drawable/card_bg_raised"/>
+        </selector>
+    </item>
 </ripple>

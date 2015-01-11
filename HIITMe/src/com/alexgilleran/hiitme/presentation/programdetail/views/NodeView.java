@@ -3,6 +3,7 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,6 +39,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private boolean newlyCreated = false;
 	private Rect outRect = new Rect();
 	private int[] location = new int[2];
+	private Handler longPressHandler = new Handler();
 
 	public NodeView(Context context) {
 		super(context);
@@ -281,17 +283,14 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 
-		if (getDepth() > 0) {
-			header.setOnLongClickListener(editable ? longClickListener : null);
-			header.setOnTouchListener(editable ? touchListener : null);
-		}
+		header.setOnLongClickListener(editable ? longClickListener : null);
+		header.setOnTouchListener(editable ? touchListener : null);
 		header.setBackgroundResource(editable ? R.drawable.node_top_bg : R.drawable.node_top_bg_standard);
 
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
 	}
-
 
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
@@ -324,16 +323,23 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private final OnTouchListener touchListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				longPressHandler.postDelayed(longPressRunnable, 1200);
+			}
+			if ((event.getAction() == MotionEvent.ACTION_MOVE) || (event.getAction() == MotionEvent.ACTION_UP)) {
+				longPressHandler.removeCallbacks(longPressRunnable);
+			}
 			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-				dragManager.startDrag(NodeView.this, (int) event.getRawY());
+				if (getDepth() > 0) {
+					dragManager.startDrag(NodeView.this, (int) event.getRawY());
+				}
 			}
 			return false;
 		}
 	};
 
-	private final OnLongClickListener longClickListener = new OnLongClickListener() {
-		@Override
-		public boolean onLongClick(View v) {
+	private Runnable longPressRunnable = new Runnable() {
+		public void run() {
 			EditNodeFragment dialog = new EditNodeFragment();
 			dialog.setNode(getCurrentNode());
 
@@ -345,6 +351,13 @@ public class NodeView extends LinearLayout implements DraggableView {
 			});
 
 			dialog.show(dragManager.getFragmentManager(), "edit_node");
+		}
+	};
+
+	// Have to have this to cause ripples
+	private final OnLongClickListener longClickListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
 			return true;
 		}
 	};

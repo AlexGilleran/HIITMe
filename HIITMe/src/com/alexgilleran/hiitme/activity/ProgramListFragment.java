@@ -1,7 +1,5 @@
 package com.alexgilleran.hiitme.activity;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
@@ -13,55 +11,22 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.ProgramMetaData;
-import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 
-/**
- * A list fragment representing a list of Programs. This fragment also supports tablet devices by allowing list items to
- * be given an 'activated' state upon selection. This helps indicate which item is currently being viewed in a
- * {@link ProgramDetailFragment}.
- * <p>
- * Activities containing this fragment MUST implement the {@link Callbacks} interface.
- */
+import java.util.List;
+
 public class ProgramListFragment extends ListFragment {
-
-	/**
-	 * The serialization (saved instance state) Bundle key representing the activated item position. Only used on
-	 * tablets.
-	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
-
-	/**
-	 * The fragment's current callback object, which is notified of list item clicks.
-	 */
 	private Callbacks hostingActivity;
-
-	/**
-	 * The current activated item position. Only used on tablets.
-	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
-
 	private ProgramAdapter adapter;
 
-	/**
-	 * A callback interface that all activities containing this fragment must implement. This mechanism allows
-	 * activities to be notified of item selections.
-	 */
 	public interface Callbacks {
-		/**
-		 * Callback for when an item has been selected.
-		 * 
-		 * @param name
-		 *            TODO
-		 */
 		public void onProgramSelected(long id, String name);
 	}
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon screen orientation
-	 * changes).
-	 */
 	public ProgramListFragment() {
 	}
 
@@ -136,8 +101,6 @@ public class ProgramListFragment extends ListFragment {
 	 * touched.
 	 */
 	public void setActivateOnItemClick(boolean activateOnItemClick) {
-		// When setting CHOICE_MODE_SINGLE, ListView will automatically
-		// give items the 'activated' state when touched.
 		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 	}
 
@@ -153,7 +116,7 @@ public class ProgramListFragment extends ListFragment {
 
 	private class ProgramAdapter extends BaseAdapter {
 		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
-			Context.LAYOUT_INFLATER_SERVICE);
+				Context.LAYOUT_INFLATER_SERVICE);
 		private List<ProgramMetaData> programList;
 
 		private ProgramAdapter(List<ProgramMetaData> programList) {
@@ -182,13 +145,15 @@ public class ProgramListFragment extends ListFragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(android.R.layout.simple_list_item_activated_1, parent, false);
+				convertView = inflater.inflate(R.layout.progam_list_item, parent, false);
 			}
 
-			TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
+			TextView textView = (TextView) convertView.findViewById(R.id.name);
 			textView.setText(programList.get(position).getName());
 
 			return convertView;
 		}
-	};
+	}
+
+	;
 }
