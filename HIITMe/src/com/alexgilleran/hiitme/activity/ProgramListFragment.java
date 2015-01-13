@@ -42,6 +42,7 @@ public class ProgramListFragment extends ListFragment {
 		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext())
 				.getProgramList());
 		setListAdapter(adapter);
+		getListView().setSelector(R.color.accent);
 	}
 
 	@Override

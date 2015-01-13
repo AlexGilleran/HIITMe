@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:progresswheel="http://schemas.android.com/apk/res/com.alexgilleran.hiitme"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
+              xmlns:progresswheel="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
     <RelativeLayout
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" >
+        android:layout_gravity="center_horizontal">
 
         <com.todddavies.components.progressbar.ProgressWheel
             android:id="@+id/progressbar_program"
@@ -24,7 +25,7 @@
             progresswheel:textColorLine1="#222"
             progresswheel:textColorLine2="#AFA"
             progresswheel:textSizeLine1="40sp"
-            progresswheel:textSizeLine2="28sp" />
+            progresswheel:textSizeLine2="28sp"/>
 
         <com.todddavies.components.progressbar.ProgressWheel
             android:id="@+id/progressbar_exercise"
@@ -36,7 +37,7 @@
             progresswheel:barWidth="5dp"
             progresswheel:rimColor="#330097D6"
             progresswheel:rimWidth="2dp"
-            progresswheel:spinSpeed="1px" />
+            progresswheel:spinSpeed="1px"/>
     </RelativeLayout>
 
     <ImageView
@@ -45,34 +46,34 @@
         android:layout_height="60dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
-        android:background="#000" />
+        android:background="#000"/>
 
     <TextView
         android:id="@+id/textview_exercise_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textSize="40sp" />
+        android:textSize="40sp"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/rep_button_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:src="@drawable/ic_action_play_dark" />
+            android:src="@drawable/ic_action_play_dark"/>
 
         <ImageButton
             android:id="@+id/rep_button_play_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:src="@drawable/ic_action_stop" />
+            android:src="@drawable/ic_action_stop"/>
     </LinearLayout>
 
 </LinearLayout>

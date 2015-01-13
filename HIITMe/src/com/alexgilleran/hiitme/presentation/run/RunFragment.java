@@ -157,7 +157,7 @@ public class RunFragment extends Fragment {
 		if (programBinder != null && programBinder.isPaused()) {
 			exerciseProgressBar.setProgress(0);
 			exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
-				.getCurrentExercise().getDuration()));
+					.getCurrentExercise().getDuration()));
 			exerciseProgressBar.spin();
 
 			programProgressBar.setProgress(0);
@@ -197,22 +197,23 @@ public class RunFragment extends Fragment {
 		float degreesFraction = ((float) duration - (float) msecondsRemaining)
 				/ ((float) duration / (float) ProgressWheel.getMax());
 
+
 		// This is a bit of a tweak to make the bar appear at 100% for a tiny
 		// bit longer while revolving.
-		if (degreesFraction < minDegrees) {
-			return ProgressWheel.getMax();
-		} else {
+//		if (degreesFraction < minDegrees) {
+//			return ProgressWheel.getMax();
+//		} else {
 			return Math.round(degreesFraction);
-		}
+//		}
 	}
 
 	private void showAlertThenGoBack(String message) {
 		new AlertDialog.Builder(getActivity()).setMessage(message)
-			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			}).setCancelable(false).show();
+				.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).setCancelable(false).show();
 	}
 
 	private OnClickListener stopButtonListener = new OnClickListener() {
@@ -265,7 +266,9 @@ public class RunFragment extends Fragment {
 		public void onServiceDisconnected(ComponentName arg0) {
 			Toast.makeText(getActivity(), "Lost connection to run service", Toast.LENGTH_SHORT).show();
 		}
-	};
+	}
+
+	;
 
 	private final CountDownObserver countDownObserver = new CountDownObserver() {
 		@Override
@@ -274,7 +277,7 @@ public class RunFragment extends Fragment {
 			programProgressBar.setTextLine2(formatTime(programMsRemaining));
 
 			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, programBinder.getCurrentExercise()
-				.getDuration(), EXERCISE_WHEEL_START_DEGREES));
+					.getDuration(), EXERCISE_WHEEL_START_DEGREES));
 			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
 		}
 

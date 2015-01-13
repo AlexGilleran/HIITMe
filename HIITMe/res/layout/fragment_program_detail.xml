@@ -15,6 +15,7 @@
     <EditText
         android:id="@+id/name_edit"
         style="@style/EditableText"
+        android:singleLine="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
