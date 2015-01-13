@@ -3,9 +3,9 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 import android.content.Context;
 import android.text.InputFilter;
 import android.util.AttributeSet;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TableLayout;
 
 import com.alexgilleran.hiitme.R;
@@ -34,15 +34,14 @@ public class EditExerciseView extends TableLayout {
 		super.onFinishInflate();
 
 		effortSpinner = (Spinner) findViewById(R.id.exercise_edit_effort_level);
-		ArrayAdapter<EffortLevel> effortAdapter = new ArrayAdapter<EffortLevel>(getContext(),
-				R.layout.spinner_effort_level, EffortLevel.values());
+		SpinnerAdapter effortAdapter = new EffortLevelAdapter(getContext());
 		effortSpinner.setAdapter(effortAdapter);
 
 		durationMinutes = (EditText) findViewById(R.id.exercise_edit_duration_minutes);
 		durationSeconds = (EditText) findViewById(R.id.exercise_edit_duration_seconds);
 
-		durationMinutes.setFilters(new InputFilter[] { new InputFilterMinMax("0", "99") });
-		durationSeconds.setFilters(new InputFilter[] { new InputFilterMinMax("0", "59") });
+		durationMinutes.setFilters(new InputFilter[]{new InputFilterMinMax("0", "99")});
+		durationSeconds.setFilters(new InputFilter[]{new InputFilterMinMax("0", "59")});
 
 		name = (EditText) findViewById(R.id.exercise_edit_name);
 	}

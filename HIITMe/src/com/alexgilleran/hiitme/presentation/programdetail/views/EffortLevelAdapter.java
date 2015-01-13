@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.EffortLevel;
 
 class EffortLevelAdapter extends BaseAdapter {
@@ -31,8 +33,8 @@ class EffortLevelAdapter extends BaseAdapter {
 		return position;
 	}
 
-	private String getEffortLevelString(int position) {
-		return ((EffortLevel) getItem(position)).getString(context);
+	private EffortLevel getEffortLevel(int position) {
+		return ((EffortLevel) getItem(position));
 	}
 
 	@Override
@@ -41,26 +43,25 @@ class EffortLevelAdapter extends BaseAdapter {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		if (convertView == null) {
-			convertView = inflater.inflate(android.R.layout.simple_spinner_item, null);
+			convertView = inflater.inflate(R.layout.spinner_effort_level, null);
 		}
+
+		EffortLevel effortLevel = getEffortLevel(position);
 
 		// simple_spinner_item is a textview
-		TextView spinnerItem = (TextView) convertView;
-		spinnerItem.setText(getEffortLevelString(position));
-		return spinnerItem;
-	}
+		TextView text = (TextView) convertView.findViewById(R.id.text_effort_level);
+		text.setText(effortLevel.getString(context));
 
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) parent.getContext()
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		ImageView image = (ImageView) convertView.findViewById(R.id.imageview_effort_level);
 
-		if (convertView == null) {
-			convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, null);
+		if (effortLevel.isBlank()) {
+			image.setVisibility(View.INVISIBLE);
+		} else {
+			image.setVisibility(View.VISIBLE);
+			image.setImageResource(effortLevel.getIconId());
 		}
 
-		// simple_spinner_dropdown_item is a textview
-		TextView dropDownItem = (TextView) convertView;
-		dropDownItem.setText(getEffortLevelString(position));
-		return dropDownItem;
+		return convertView;
 	}
+
 }
