@@ -64,9 +64,14 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	}
 
 	public void render() {
-		effortLevel.setContentDescription(exercise.getEffortLevel().toString());
-		effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
-		effortLevel.setBackgroundResource(exercise.getEffortLevel().getBackgroundId());
+		if (exercise.getEffortLevel().isBlank()) {
+			effortLevel.setVisibility(View.INVISIBLE);
+		} else {
+			effortLevel.setVisibility(View.VISIBLE);
+			effortLevel.setContentDescription(exercise.getEffortLevel().toString());
+			effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
+			effortLevel.setBackgroundResource(exercise.getEffortLevel().getBackgroundId());
+		}
 
 		duration.setText(timeToString(exercise.getMinutes()) + "." + timeToString(exercise.getSeconds()));
 

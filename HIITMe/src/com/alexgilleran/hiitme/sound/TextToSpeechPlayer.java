@@ -17,9 +17,11 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 	private boolean init = false;
 	private String missedExText = null;
 	private AudioManager audioManager;
+	private Context context;
 
 	public TextToSpeechPlayer(Context context, AudioManager audioManager) {
 		this.audioManager = audioManager;
+		this.context = context;
 
 		textToSpeech = new TextToSpeech(context, this);
 		textToSpeech.setSpeechRate(1.4f);
@@ -37,7 +39,10 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 		if (exercise.getName() != null && !exercise.getName().isEmpty()) {
 			exText.append(exercise.getName()).append(", ");
 		}
-		exText.append(exercise.getEffortLevel()).append(", ");
+
+		if (!exercise.getEffortLevel().isBlank()) {
+			exText.append(exercise.getEffortLevel().getString(context)).append(", ");
+		}
 
 		if (exercise.getMinutes() > 0) {
 			exText.append(exercise.getMinutes()).append(" minutes ");

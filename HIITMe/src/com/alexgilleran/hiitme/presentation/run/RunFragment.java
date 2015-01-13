@@ -122,7 +122,13 @@ public class RunFragment extends Fragment {
 		if (getView() != null && programBinder.isActive()) {
 			Exercise currentExercise = programBinder.getCurrentExercise();
 			exerciseName.setText(currentExercise.getName());
-			effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+
+			if (currentExercise.getEffortLevel().isBlank()) {
+				effortLevelIcon.setVisibility(View.INVISIBLE);
+			} else {
+				effortLevelIcon.setVisibility(View.VISIBLE);
+				effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+			}
 			exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getView().getContext()));
 		}
 	}

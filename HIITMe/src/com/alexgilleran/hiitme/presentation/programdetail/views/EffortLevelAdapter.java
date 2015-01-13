@@ -10,6 +10,12 @@ import android.widget.TextView;
 import com.alexgilleran.hiitme.model.EffortLevel;
 
 class EffortLevelAdapter extends BaseAdapter {
+	private Context context;
+
+	public EffortLevelAdapter(Context context) {
+		this.context = context;
+	}
+
 	@Override
 	public int getCount() {
 		return EffortLevel.values().length;
@@ -26,7 +32,7 @@ class EffortLevelAdapter extends BaseAdapter {
 	}
 
 	private String getEffortLevelString(int position) {
-		return ((EffortLevel) getItem(position)).toString();
+		return ((EffortLevel) getItem(position)).getString(context);
 	}
 
 	@Override
@@ -51,7 +57,7 @@ class EffortLevelAdapter extends BaseAdapter {
 		if (convertView == null) {
 			convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, null);
 		}
-		
+
 		// simple_spinner_dropdown_item is a textview
 		TextView dropDownItem = (TextView) convertView;
 		dropDownItem.setText(getEffortLevelString(position));

@@ -11,6 +11,7 @@
     <string name="effort_hard">Hard</string>
     <string name="effort_easy">Easy</string>
     <string name="effort_rest">Rest</string>
+    <string name="effort_none">n/a</string>
     <string name="title_edit">Editing Program</string>
     <string name="title_select">Select Program</string>
     <string name="title_run">Run Program</string>
