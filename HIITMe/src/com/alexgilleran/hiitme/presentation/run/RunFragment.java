@@ -44,6 +44,7 @@ public class RunFragment extends Fragment {
 	private ImageButton stopButton;
 	private TextView exerciseName;
 	private ImageView effortLevelIcon;
+	private TextView effortLevelText;
 
 	private Callbacks hostingActivity;
 	private RunnerServiceConnection connection;
@@ -97,6 +98,7 @@ public class RunFragment extends Fragment {
 		stopButton = (ImageButton) getView().findViewById(R.id.rep_button_play_stop);
 		exerciseName = (TextView) getView().findViewById(R.id.textview_exercise_name);
 		effortLevelIcon = (ImageView) getView().findViewById(R.id.imageview_effort_level);
+		effortLevelText = (TextView) getView().findViewById(R.id.textview_effort_level);
 
 		playButton.setOnClickListener(playButtonListener);
 		stopButton.setOnClickListener(stopButtonListener);
@@ -125,9 +127,14 @@ public class RunFragment extends Fragment {
 
 			if (currentExercise.getEffortLevel().isBlank()) {
 				effortLevelIcon.setVisibility(View.INVISIBLE);
+				effortLevelText.setVisibility(View.INVISIBLE);
 			} else {
 				effortLevelIcon.setVisibility(View.VISIBLE);
-				effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getIconId());
+				effortLevelText.setVisibility(View.VISIBLE);
+
+				effortLevelIcon.setImageResource(currentExercise.getEffortLevel().getColourIconId());
+				effortLevelText.setText(currentExercise.getEffortLevel().getString(getActivity()));
+				effortLevelText.setTextColor(currentExercise.getEffortLevel().getColorId(getActivity()));
 			}
 			exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getView().getContext()));
 		}
@@ -209,7 +216,7 @@ public class RunFragment extends Fragment {
 //		if (degreesFraction < minDegrees) {
 //			return ProgressWheel.getMax();
 //		} else {
-			return Math.round(degreesFraction);
+		return Math.round(degreesFraction);
 //		}
 	}
 

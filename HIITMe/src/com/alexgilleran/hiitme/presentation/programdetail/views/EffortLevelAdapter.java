@@ -49,7 +49,7 @@ class EffortLevelAdapter extends BaseAdapter {
 		EffortLevel effortLevel = getEffortLevel(position);
 
 		// simple_spinner_item is a textview
-		TextView text = (TextView) convertView.findViewById(R.id.text_effort_level);
+		TextView text = (TextView) convertView.findViewById(R.id.textview_effort_level);
 		text.setText(effortLevel.getString(context));
 
 		ImageView image = (ImageView) convertView.findViewById(R.id.imageview_effort_level);
@@ -58,7 +58,7 @@ class EffortLevelAdapter extends BaseAdapter {
 			image.setVisibility(View.INVISIBLE);
 		} else {
 			image.setVisibility(View.VISIBLE);
-			image.setImageResource(effortLevel.getIconId());
+			image.setImageResource(effortLevel.getColourIconId());
 		}
 
 		return convertView;

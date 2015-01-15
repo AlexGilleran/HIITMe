@@ -19,7 +19,6 @@ import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListen
 import java.util.Locale;
 
 import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
-import static com.alexgilleran.hiitme.util.ViewUtils.getPxForDp;
 import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
@@ -69,7 +68,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		} else {
 			effortLevel.setVisibility(View.VISIBLE);
 			effortLevel.setContentDescription(exercise.getEffortLevel().toString());
-			effortLevel.setImageResource(exercise.getEffortLevel().getIconId());
+			effortLevel.setImageResource(exercise.getEffortLevel().getLightIconId());
 			effortLevel.setBackgroundResource(exercise.getEffortLevel().getBackgroundId());
 		}
 
@@ -79,7 +78,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			name.setVisibility(VISIBLE);
 			name.setText(exercise.getName());
 		} else {
-			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(getPxForDp(getContext(), 32),
+			effortLevel.setLayoutParams(new RelativeLayout.LayoutParams(effortLevel.getLayoutParams().width,
 					effortLevel.getHeight() - name.getHeight()));
 			name.setVisibility(GONE);
 		}

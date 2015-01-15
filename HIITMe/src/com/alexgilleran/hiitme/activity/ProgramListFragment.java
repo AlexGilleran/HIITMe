@@ -3,6 +3,7 @@ package com.alexgilleran.hiitme.activity;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +43,11 @@ public class ProgramListFragment extends ListFragment {
 		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext())
 				.getProgramList());
 		setListAdapter(adapter);
-		getListView().setSelector(R.color.accent);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			// In lollipop this shows an orange ripple, otherwise use straight orange
+			getListView().setSelector(R.color.accent);
+		}
 	}
 
 	@Override

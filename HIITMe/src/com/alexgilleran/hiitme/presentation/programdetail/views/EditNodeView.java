@@ -1,6 +1,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
+import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -27,6 +28,8 @@ public class EditNodeView extends TableLayout {
 		super.onFinishInflate();
 
 		repCount = (EditText) findViewById(R.id.node_edit_rep_count);
+
+		repCount.setFilters(new InputFilter[]{new InputFilterMinMax("1", "100")});
 	}
 
 	public Node update() {
