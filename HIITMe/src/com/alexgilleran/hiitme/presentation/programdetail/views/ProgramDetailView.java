@@ -491,6 +491,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 					}
 				});
 			}
+			addExerciseButton.onTouchEvent(event);
 			return true;
 		}
 	};
@@ -509,6 +510,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				view.setNewlyCreated(true);
 				startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
 			}
+			addNodeButton.onTouchEvent(event);
 			return true;
 		}
 	};

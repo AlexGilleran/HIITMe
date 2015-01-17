@@ -24,8 +24,11 @@
 
     <ImageButton
         android:id="@+id/button_add_exercise"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:padding="15dp"
+        android:layout_marginTop="2dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:adjustViewBounds="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/ic_exercise_add"
@@ -33,8 +36,11 @@
 
     <ImageButton
         android:id="@+id/button_add_node"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:padding="15dp"
+        android:layout_marginTop="2dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:adjustViewBounds="true"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@id/button_add_exercise"
         android:src="@drawable/ic_node_add"

@@ -76,14 +76,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:src="@drawable/ic_action_play_dark" />
+                android:src="@drawable/ic_play_dark" />
 
             <ImageButton
                 android:id="@+id/rep_button_play_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:src="@drawable/ic_action_stop" />
+                android:src="@drawable/ic_stop" />
         </LinearLayout>
     </LinearLayout>
 

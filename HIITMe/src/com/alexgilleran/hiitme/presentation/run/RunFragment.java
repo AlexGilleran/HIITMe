@@ -163,7 +163,7 @@ public class RunFragment extends Fragment {
 	private void refreshPauseState() {
 		boolean enableStopButton = programBinder != null && programBinder.isActive();
 		stopButton.setEnabled(enableStopButton);
-		stopButton.setImageResource(enableStopButton ? R.drawable.ic_action_stop : R.drawable.ic_action_stop_light);
+		stopButton.setImageResource(enableStopButton ? R.drawable.ic_stop : R.drawable.ic_stop_disabled);
 
 		playButton.setImageResource(getPlayButtonResource());
 
@@ -186,13 +186,13 @@ public class RunFragment extends Fragment {
 	private int getPlayButtonResource() {
 		if (programBinder != null) {
 			if (isRunning()) {
-				return R.drawable.ic_action_pause;
+				return R.drawable.ic_pause;
 			} else if (isStopped()) {
-				return R.drawable.ic_action_repeat;
+				return R.drawable.ic_repeat;
 			}
 		}
 
-		return R.drawable.ic_action_play_dark;
+		return R.drawable.ic_play_dark;
 	}
 
 	private String formatTime(long mseconds) {
