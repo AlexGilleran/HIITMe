@@ -1,7 +1,5 @@
 package com.alexgilleran.hiitme.sound;
 
-import java.util.HashMap;
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
@@ -9,7 +7,10 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
 
+import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
+
+import java.util.HashMap;
 
 public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 	private HashMap<String, String> speechParams = new HashMap<String, String>();
@@ -45,11 +46,11 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 		}
 
 		if (exercise.getMinutes() > 0) {
-			exText.append(exercise.getMinutes()).append(" minutes ");
+			exText.append(exercise.getMinutes()).append(" " + context.getString(R.string.minutes) + " ");
 		}
 
 		if (exercise.getSeconds() > 0) {
-			exText.append(exercise.getSeconds()).append(" seconds");
+			exText.append(exercise.getSeconds()).append(" " + context.getString(R.string.seconds) + " ");
 		}
 
 		if (init) {
@@ -65,7 +66,7 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 
 	@Override
 	public void playEnd() {
-		textToSpeech.speak("Program finished, well done!", TextToSpeech.QUEUE_FLUSH, speechParams);
+		textToSpeech.speak(context.getString(R.string.finish_message), TextToSpeech.QUEUE_FLUSH, speechParams);
 	}
 
 	@Override

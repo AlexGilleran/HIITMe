@@ -11,17 +11,13 @@ public class Node extends DatabaseModel {
 	private List<Node> children;
 
 	public Node() {
-		super();
+		this(1);
 	}
 
 	public Node(int repCount) {
-		this();
+		super();
 
 		setTotalReps(repCount);
-	}
-
-	public void prepareForSave() {
-
 	}
 
 	public Node addChildNode(int repCount) {
@@ -85,6 +81,10 @@ public class Node extends DatabaseModel {
 
 	public int getTotalReps() {
 		return totalReps;
+	}
+
+	public boolean isEmpty() {
+		return !hasChildren() && getAttachedExercise() == null;
 	}
 
 	public Exercise getAttachedExercise() {

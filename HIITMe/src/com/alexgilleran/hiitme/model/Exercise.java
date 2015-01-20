@@ -9,8 +9,8 @@ public class Exercise extends DatabaseModel implements Cloneable {
 	public Exercise() {
 		super();
 
-		this.duration = 0;
-		this.effortLevel = EffortLevel.EASY;
+		this.duration = 30000;
+		this.effortLevel = EffortLevel.NONE;
 	}
 
 	public Exercise(int duration, EffortLevel effortLevel, Node node) {

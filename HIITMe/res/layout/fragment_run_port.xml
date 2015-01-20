@@ -23,8 +23,8 @@
             progresswheel:rimColor="#330097D6"
             progresswheel:rimWidth="2dp"
             progresswheel:spinSpeed="1px"
-            progresswheel:textColorLine1="#222"
-            progresswheel:textColorLine2="#AFA"
+            progresswheel:textColorLine1="@color/primary_text"
+            progresswheel:textColorLine2="@color/primary_text"
             progresswheel:textSizeLine1="40sp"
             progresswheel:textSizeLine2="28sp"/>
 

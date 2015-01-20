@@ -3,9 +3,12 @@ package com.alexgilleran.hiitme.programrunner;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProgramNodeState {
 	private Node wrappedNode;
-	private ProgramNodeState[] children;
+	private List<ProgramNodeState> children;
 
 	private int completedReps;
 	private int currentChildIndex;
@@ -13,9 +16,12 @@ public class ProgramNodeState {
 	public ProgramNodeState(Node node) {
 		this.wrappedNode = node;
 
-		children = new ProgramNodeState[node.getChildren().size()];
+		children = new ArrayList<ProgramNodeState>(node.getChildren().size());
 		for (int i = 0; i < node.getChildren().size(); i++) {
-			children[i] = new ProgramNodeState(node.getChildren().get(i));
+			Node child = node.getChildren().get(i);
+			if (!child.isEmpty() && child.getTotalReps() > 0) {
+				children.add(new ProgramNodeState(child));
+			}
 		}
 		reset();
 	}
@@ -27,7 +33,7 @@ public class ProgramNodeState {
 	private void nextNode() {
 		currentChildIndex++;
 
-		if (currentChildIndex >= children.length) {
+		if (currentChildIndex >= children.size()) {
 			nextRep();
 		}
 	}
@@ -69,7 +75,7 @@ public class ProgramNodeState {
 		}
 
 		if (wrappedNode.hasChildren()) {
-			return children[currentChildIndex];
+			return children.get(currentChildIndex);
 		} else {
 			return this;
 		}

@@ -113,16 +113,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		return view;
 	}
 
-	private void setBackground(int resourceId) {
-		// Setting background resource kills padding.
-//		int bottom = getPaddingBottom();
-//		int top = getPaddingTop();
-//		int right = getPaddingRight();
-//		int left = getPaddingLeft();
-//		setBackgroundResource(resourceId);
-//		setPadding(left, top, right, bottom);
-	}
-
 	private <V extends View & DraggableView> void addChild(V newView) {
 		newView.setDragManager(dragManager);
 
@@ -338,19 +328,23 @@ public class NodeView extends LinearLayout implements DraggableView {
 		}
 	};
 
+	public void edit() {
+		EditNodeFragment dialog = new EditNodeFragment();
+		dialog.setNode(getCurrentNode());
+
+		dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+			@Override
+			public void onUpdated() {
+				updateRepCount();
+			}
+		});
+
+		dialog.show(dragManager.getFragmentManager(), "edit_node");
+	}
+
 	private Runnable longPressRunnable = new Runnable() {
 		public void run() {
-			EditNodeFragment dialog = new EditNodeFragment();
-			dialog.setNode(getCurrentNode());
-
-			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
-				@Override
-				public void onUpdated() {
-					updateRepCount();
-				}
-			});
-
-			dialog.show(dragManager.getFragmentManager(), "edit_node");
+			edit();
 		}
 	};
 

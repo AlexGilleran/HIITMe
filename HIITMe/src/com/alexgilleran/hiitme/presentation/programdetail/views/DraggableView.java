@@ -30,4 +30,6 @@ public interface DraggableView {
 	boolean isNewlyCreated();
 
 	void setNewlyCreated(boolean newlyCreated);
+
+	void edit();
 }

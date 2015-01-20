@@ -17,8 +17,9 @@
         <TextView
             android:id="@+id/textview_repcount"
             style="@style/EditableText"
+            android:textColor="#e6ffffff"
             android:layout_gravity="center"
-            android:textSize="35sp"/>
+            android:textSize="40sp"/>
 
     </FrameLayout>
 

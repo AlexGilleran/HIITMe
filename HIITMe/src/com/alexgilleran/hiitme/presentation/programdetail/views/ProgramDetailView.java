@@ -395,6 +395,11 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				// Animate removing the view.
 				cleanUpAfterDragEnd();
 			} else {
+				if (dragView.isNewlyCreated()) {
+					dragView.edit();
+					dragView.setNewlyCreated(false);
+				}
+
 				animateRestoreHoverCell();
 			}
 
@@ -499,8 +504,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				Node node = new Node();
+				Node node = new Node(1);
 				node.setParent(node);
+
 				final NodeView view = (NodeView) layoutInflater.inflate(R.layout.view_node,
 						scrollingView.getNodeView(), false);
 				view.init(node);

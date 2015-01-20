@@ -181,11 +181,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
-				if (getFragmentManager().getBackStackEntryCount() > 0) {
-					getFragmentManager().popBackStack();
-				} else {
-					navigateUpTo(new Intent(this, MainActivity.class));
-				}
+				this.onBackPressed();
 				break;
 			case R.id.actionbar_icon_new_program:
 				openNewProgram();
@@ -287,7 +283,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		} else if (getFragmentManager().getBackStackEntryCount() > 0) {
 			getFragmentManager().popBackStack();
 		} else {
-			super.onBackPressed();
+			navigateUpTo(new Intent(this, MainActivity.class));
 		}
 	}
 

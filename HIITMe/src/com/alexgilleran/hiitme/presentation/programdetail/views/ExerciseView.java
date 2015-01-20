@@ -100,8 +100,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	@Override
 	public Node rebuildNode() {
-		Node node = new Node();
-		node.setTotalReps(1);
+		Node node = new Node(1);
 
 		Exercise exercise = this.exercise.clone();
 		exercise.setNode(node);
@@ -169,6 +168,22 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		this.newlyCreated = placed;
 	}
 
+	@Override
+	public void edit() {
+		EditExerciseFragment dialog = new EditExerciseFragment();
+		dialog.setExercise(getExercise());
+
+		dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
+			@Override
+			public void onUpdated() {
+				render();
+			}
+		});
+
+		dialog.show(dragManager.getFragmentManager(), "edit_exercise");
+
+	}
+
 	// We have to have a long press handler to trigger the ripple in Android 5+
 	private final OnLongClickListener longClickListener = new OnLongClickListener() {
 		@Override
@@ -197,17 +212,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	private Runnable longPressRunnable = new Runnable() {
 		public void run() {
-			EditExerciseFragment dialog = new EditExerciseFragment();
-			dialog.setExercise(getExercise());
-
-			dialog.setDialogUpdateListener(new EditDialogUpdateListener() {
-				@Override
-				public void onUpdated() {
-					render();
-				}
-			});
-
-			dialog.show(dragManager.getFragmentManager(), "edit_exercise");
+			edit();
 		}
 	};
 }
