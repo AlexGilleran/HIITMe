@@ -37,6 +37,10 @@
 
         <service android:name="com.alexgilleran.hiitme.programrunner.ProgramRunService" >
         </service>
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="4d4b968f7f91b4375251d4d588a9baf5a4b132f4" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
