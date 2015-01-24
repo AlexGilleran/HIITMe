@@ -20,7 +20,7 @@ import com.alexgilleran.hiitme.R;
  * This has been modified to allow for two independently-styled lines of text in the middle.
  * 
  * @author Todd Davies
- * @author Alex Gilleran
+ * @author Alex Gilleran (modifications)
  * 
  *         Licensed under the Creative Commons Attribution 3.0 license see: http://creativecommons.org/licenses/by/3.0/
  */

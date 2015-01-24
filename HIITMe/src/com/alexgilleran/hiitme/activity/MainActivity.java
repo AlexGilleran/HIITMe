@@ -1,3 +1,21 @@
+/*
+ * HIIT Me, a High Intensity Interval Training app for Android
+ * Copyright (C) 2015 Alex Gilleran
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.alexgilleran.hiitme.activity;
 
 import android.app.AlertDialog;
@@ -19,6 +37,10 @@ import com.alexgilleran.hiitme.presentation.run.RunFragment;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 
+/**
+ * The main activity - this is a single activity app so this holds all the logic that can't fit into
+ * a fragment, particularly around the action bar.
+ */
 public class MainActivity extends ActionBarActivity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
 	public static final String ARG_PROGRAM_ID = "PROGRAM_ID";
 	public static final String ARG_PROGRAM_NAME = "PROGRAM_NAME";
@@ -184,6 +206,9 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			case android.R.id.home:
 				this.onBackPressed();
 				break;
+			case R.id.actionbar_icon_about:
+				showAbout();
+				break;
 			case R.id.actionbar_icon_new_program:
 				openNewProgram();
 				break;
@@ -207,6 +232,15 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		updateTitle();
 
 		return true;
+	}
+
+	private void showAbout() {
+		new AlertDialog.Builder(this).setMessage(R.string.about_message)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).setCancelable(false).show();
 	}
 
 	private void openNewProgram() {
@@ -292,7 +326,8 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
 
-		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowNewButton());
+		menu.findItem(R.id.actionbar_icon_about).setVisible(shouldShowListButtons());
+		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowListButtons());
 
 		menu.findItem(R.id.actionbar_icon_delete_program).setVisible(isViewingProgram());
 		menu.findItem(R.id.actionbar_icon_edit).setVisible(isViewingProgram());
@@ -304,7 +339,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		return true;
 	}
 
-	private boolean shouldShowNewButton() {
+	private boolean shouldShowListButtons() {
 		return listFragment != null && listFragment.isVisible();
 	}
 

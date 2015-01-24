@@ -4,6 +4,12 @@
 
     <!-- program list -->
     <item
+        android:id="@+id/actionbar_icon_about"
+        android:icon="@drawable/ic_action_about"
+        app:showAsAction="ifRoom"
+        android:title="@string/caption_actionbar_about">
+    </item>
+    <item
         android:id="@+id/actionbar_icon_new_program"
         android:icon="@drawable/ic_action_new"
         app:showAsAction="ifRoom"

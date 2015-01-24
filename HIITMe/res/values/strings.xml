@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">HIIT Me</string>
     <string name="title_program_detail">Program Detail</string>
+    <string name="caption_actionbar_about">About</string>
     <string name="caption_actionbar_edit">Edit</string>
     <string name="caption_actionbar_run">Run</string>
     <string name="caption_actionbar_discard_changes">Discard Changes</string>
@@ -22,4 +23,13 @@
     <string name="caption_edit_effort">Effort: </string>
     <string name="caption_edit_duration">Duration: </string>
     <string name="caption_edit_exercise_name">Name: </string>
+    <string name="about_message">HIIT Me, a high intensity interval training app
+        \n\nCopyright © Alex Gilleran 2015
+        \n\nSource code available under GPLv3 at <a href="http://github.com/AlexGilleran/HIITMe">http://github.com/AlexGilleran/HIITMe</a>
+        \n\nThe following are licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>:
+        \n<li>Icons from <a href="http://icons8.com">http://icons8.com</a></li>
+        \n<li><em>Add Exercise</em> and <em>Add Group</em> icons, derivatives of icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a>
+            from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a></li>
+        \n<li>Modified Progress Wheels by Todd Davies from <a href="https://github.com/Todd-Davies/ProgressWheel">https://github.com/Todd-Davies/ProgressWheel</a>.</li>
+    </string>
 </resources>
