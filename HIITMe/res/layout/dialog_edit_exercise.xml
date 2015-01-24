@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:stretchColumns="1" >
+                                                                           android:layout_width="match_parent"
+                                                                           android:layout_height="match_parent"
+                                                                           android:gravity="center_vertical"
+                                                                           android:orientation="vertical"
+                                                                           android:padding="20dp"
+                                                                           android:stretchColumns="1">
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:selectAllOnFocus="true"
-            android:text="Effort: "
-            android:textSize="20sp" />
+            android:text="@string/caption_edit_effort"
+            android:textSize="20sp"/>
 
         <Spinner
             android:id="@+id/exercise_edit_effort_level"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
     </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Duration: "
-            android:textSize="20sp" />
+            android:text="@string/caption_edit_duration"
+            android:textSize="20sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical" >
+            android:gravity="center_vertical">
 
             <EditText
                 android:id="@+id/exercise_edit_duration_minutes"
@@ -50,13 +50,13 @@
                 android:inputType="number"
                 android:maxLength="2"
                 android:selectAllOnFocus="true"
-                android:textSize="25sp" />
+                android:textSize="25sp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=":"
-                android:textSize="20sp" />
+                android:textSize="20sp"/>
 
             <EditText
                 android:id="@+id/exercise_edit_duration_seconds"
@@ -64,26 +64,27 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:selectAllOnFocus="true"
-                android:textSize="25sp" />
+                android:textSize="25sp"/>
         </LinearLayout>
     </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name:"
-            android:textSize="20sp" />
+            android:text="@string/caption_edit_exercise_name"
+            android:textSize="20sp"/>
 
         <EditText
             android:id="@+id/exercise_edit_name"
             android:layout_width="0dp"
+            android:singleLine="true"
             android:layout_height="wrap_content"
-            android:textSize="25sp" />
+            android:textSize="25sp"/>
     </TableRow>
 
 </com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView>

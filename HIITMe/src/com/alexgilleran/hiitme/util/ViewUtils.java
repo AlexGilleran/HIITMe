@@ -3,6 +3,8 @@ package com.alexgilleran.hiitme.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,7 +21,7 @@ public class ViewUtils {
 	 * <p>
 	 * This is copied from <a href=" http://developer.android.com/reference/android/view/View
 	 * .html#generateViewId%28%29">the android code</a>, which is only present in API > 17.
-	 * 
+	 *
 	 * @return a generated ID value
 	 */
 	public static int generateViewId() {
@@ -87,5 +89,10 @@ public class ViewUtils {
 	public static int getPxForDp(Context ctx, int dp) {
 		DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
 		return (int) (dp * (displayMetrics.densityDpi / 160));
+	}
+
+	public static boolean isLarge(Resources resources) {
+		int size = resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+		return size == Configuration.SCREENLAYOUT_SIZE_LARGE || size == Configuration.SCREENLAYOUT_SIZE_XLARGE;
 	}
 }

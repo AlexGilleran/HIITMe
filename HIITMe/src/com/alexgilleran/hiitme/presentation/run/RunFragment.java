@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import com.alexgilleran.hiitme.programrunner.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
+import com.alexgilleran.hiitme.util.ViewUtils;
 import com.todddavies.components.progressbar.ProgressWheel;
 
 public class RunFragment extends Fragment {
@@ -81,8 +83,8 @@ public class RunFragment extends Fragment {
 	}
 
 	private boolean shouldShowLandscapeLayout() {
-		boolean isLarge = (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE;
 		boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+		boolean isLarge = ViewUtils.isLarge(getResources());
 
 		// Should be landscape in a portrait tablet layout, or in a landscape phone layout.
 		return (isLandscape && !isLarge) || (!isLandscape && isLarge);
@@ -107,8 +109,8 @@ public class RunFragment extends Fragment {
 	}
 
 	@Override
-	public void onStop() {
-		super.onStop();
+	public void onDestroy() {
+		super.onDestroy();
 
 		if (programBinder != null && !programBinder.isRunning() && !getActivity().isChangingConfigurations()) {
 			getActivity().unbindService(connection);

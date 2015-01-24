@@ -16,6 +16,7 @@ import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
 import com.alexgilleran.hiitme.presentation.run.RunFragment;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 
 public class MainActivity extends ActionBarActivity implements ProgramListFragment.Callbacks, RunFragment.Callbacks {
@@ -280,7 +281,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			runFragment.stop();
 		} else if (isEditing()) {
 			stopEditing(true);
-		} else if (getFragmentManager().getBackStackEntryCount() > 0) {
+		} else if (getFragmentManager().getBackStackEntryCount() > 0 && !ViewUtils.isLarge(getResources())) {
 			getFragmentManager().popBackStack();
 		} else {
 			navigateUpTo(new Intent(this, MainActivity.class));

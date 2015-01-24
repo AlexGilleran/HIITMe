@@ -151,7 +151,7 @@ public class ProgramListFragment extends ListFragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.progam_list_item, parent, false);
+				convertView = inflater.inflate(R.layout.program_list_item, parent, false);
 			}
 
 			TextView textView = (TextView) convertView.findViewById(R.id.name);

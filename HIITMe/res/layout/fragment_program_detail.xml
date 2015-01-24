@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView xmlns:android="http://schemas.android.com/apk/res/android"
-                                                                            android:id="@+id/layout_root"
-                                                                            android:layout_width="match_parent"
-                                                                            android:layout_height="match_parent"
-                                                                            android:orientation="horizontal">
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/name_ro"
         style="@style/EditableText"
+        android:singleLine="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginRight="120dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"/>
 
@@ -17,6 +19,7 @@
         android:id="@+id/name_edit"
         style="@style/EditableText"
         android:singleLine="true"
+        android:layout_marginRight="120dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
