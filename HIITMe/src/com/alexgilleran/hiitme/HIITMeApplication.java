@@ -28,5 +28,4 @@ public class HIITMeApplication extends Application {
 		super.onCreate();
 		Fabric.with(this, new Crashlytics());
 	}
-
 }

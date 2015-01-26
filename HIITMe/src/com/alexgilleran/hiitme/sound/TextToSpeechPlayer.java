@@ -43,8 +43,8 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 		this.context = context;
 
 		textToSpeech = new TextToSpeech(context, this);
-		textToSpeech.setSpeechRate(1.4f);
-		textToSpeech.setOnUtteranceProgressListener(utteranceListener);
+		textToSpeech.setSpeechRate(1.3f);
+		textToSpeech.setOnUtteranceProgressListener(utteranceListener);;
 
 		speechParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_NOTIFICATION));
 		// mandatory to listen to utterances even though we don't care about the ID.
@@ -64,11 +64,23 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 		}
 
 		if (exercise.getMinutes() > 0) {
-			exText.append(exercise.getMinutes()).append(" " + context.getString(R.string.minutes) + " ");
+			exText.append(exercise.getMinutes()).append(" " + context.getString(R.string.time_unit_minute));
+
+			if (exercise.getMinutes() > 1) {
+				exText.append(context.getString(R.string.time_unit_pluraliser));
+			}
+
+			exText.append(" ");
 		}
 
 		if (exercise.getSeconds() > 0) {
-			exText.append(exercise.getSeconds()).append(" " + context.getString(R.string.seconds) + " ");
+			exText.append(exercise.getSeconds()).append(" " + context.getString(R.string.time_unit_second));
+
+			if (exercise.getSeconds() > 1) {
+				exText.append(context.getString(R.string.time_unit_pluraliser));
+			}
+
+			exText.append(" ");
 		}
 
 		if (init) {
@@ -85,6 +97,12 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 	@Override
 	public void playEnd() {
 		textToSpeech.speak(context.getString(R.string.finish_message), TextToSpeech.QUEUE_FLUSH, speechParams);
+	}
+
+	@Override
+	public void cleanUp() {
+		textToSpeech.stop();
+		textToSpeech.shutdown();
 	}
 
 	@Override

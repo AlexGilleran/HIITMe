@@ -181,7 +181,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		}
 
-		tran.addToBackStack(null).commit();
+		tran.addToBackStack("name").commit();
 	}
 
 	@Override

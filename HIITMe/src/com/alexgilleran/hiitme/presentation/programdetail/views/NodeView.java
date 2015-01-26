@@ -134,7 +134,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private <V extends View & DraggableView> void addChild(V newView) {
 		newView.setDragManager(dragManager);
 
-		newView.setId(ViewUtils.generateViewId());
+		newView.setId(View.generateViewId());
 
 		addView(newView, addMargin(newView));
 	}

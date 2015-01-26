@@ -18,6 +18,8 @@
 
 package com.alexgilleran.hiitme.model;
 
+import com.alexgilleran.hiitme.util.ViewUtils;
+
 public class Exercise extends DatabaseModel implements Cloneable {
 	private String name;
 	private int duration;
@@ -79,14 +81,14 @@ public class Exercise extends DatabaseModel implements Cloneable {
 	 * Gets the number of minutes this exercise lasts, rounded down.
 	 */
 	public int getMinutes() {
-		return duration / 1000 / 60;
+		return ViewUtils.getMinutesFromMs(duration);
 	}
 
 	/**
 	 * Gets the number of seconds this exercise lasts, not including minutes.
 	 */
 	public int getSeconds() {
-		return duration / 1000 % 60;
+		return ViewUtils.getSecondsFromMs(duration);
 	}
 
 	@Override

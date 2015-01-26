@@ -18,11 +18,6 @@
 
 package com.alexgilleran.hiitme.programrunner;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -39,6 +34,7 @@ import android.util.Log;
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
+import com.alexgilleran.hiitme.model.EffortLevel;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
@@ -47,10 +43,22 @@ import com.alexgilleran.hiitme.programrunner.CountDownObserver.ProgramError;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.sound.SoundPlayer;
 import com.alexgilleran.hiitme.sound.TextToSpeechPlayer;
+import com.alexgilleran.hiitme.util.ViewUtils;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class ProgramRunService extends IntentService {
+	/**
+	 * We will only update the notification once for every TICK_RATE_DIVISOR ticks - should result
+	 * in being notified once per second.
+	 */
+	private static final int TICK_RATE_DIVISOR = 1000 / ProgramRunner.TICK_RATE;
 	private static final int NOTIFICATION_ID = 2;
 
+	private String notificationTitle;
 	private NotificationManager notificationManager;
 	private WakeLock wakeLock;
 	private Program program;
@@ -84,6 +92,7 @@ public class ProgramRunService extends IntentService {
 	@Override
 	public void onDestroy() {
 		stopRun();
+		soundPlayer.cleanUp();
 
 		super.onDestroy();
 	}
@@ -106,6 +115,7 @@ public class ProgramRunService extends IntentService {
 
 		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId);
 		duration = program.getAssociatedNode().getDuration();
+		notificationTitle = getString(R.string.app_name) + ": " + program.getName();
 
 		while (!programCallbacks.isEmpty()) {
 			programCallbacks.poll().onProgramReady(program);
@@ -119,10 +129,10 @@ public class ProgramRunService extends IntentService {
 		continueIntent.putExtra(MainActivity.ARG_PROGRAM_NAME, program.getName());
 
 		Notification.Builder builder = new Notification.Builder(getBaseContext());
-		builder.setContentTitle(program.getName());
+		builder.setContentTitle(notificationTitle);
 
 		if (programRunner != null) {
-			builder.setContentText(programRunner.getCurrentExercise().getName());
+			builder.setContentText(getNotificationText());
 			builder.setProgress(duration, duration - programRunner.getProgramMsRemaining(), false);
 		}
 
@@ -131,6 +141,22 @@ public class ProgramRunService extends IntentService {
 		builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, continueIntent, 0));
 
 		return builder.build();
+	}
+
+	private String getNotificationText() {
+		StringBuilder builder = new StringBuilder();
+
+		if (programRunner.getCurrentExercise().getName() != null) {
+			builder.append(programRunner.getCurrentExercise().getName()).append(" ");
+		}
+
+		if (programRunner.getCurrentExercise().getEffortLevel() != EffortLevel.NONE) {
+			builder.append(programRunner.getCurrentExercise().getEffortLevel().getString(getApplicationContext())).append(" ");
+		}
+
+		builder.append(ViewUtils.getTimeText(programRunner.getExerciseMsRemaining()));
+
+		return builder.toString();
 	}
 
 	@Override
@@ -164,7 +190,7 @@ public class ProgramRunService extends IntentService {
 				programRunner.start();
 			} else if (programRunner.isRunning()) {
 				Log.wtf(getPackageName(),
-					"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
+						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
 			}
 		}
 
@@ -241,13 +267,21 @@ public class ProgramRunService extends IntentService {
 	}
 
 	private CountDownObserver notificationObserver = new CountDownObserver() {
+		private int tickCount = 0;
+
 		@Override
 		public void onStart() {
 		}
 
 		@Override
 		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
-			updateNotification();
+			tickCount++;
+
+			// Only update the notification every second.
+			if (tickCount >= TICK_RATE_DIVISOR) {
+				tickCount = 0;
+				updateNotification();
+			}
 		}
 
 		@Override

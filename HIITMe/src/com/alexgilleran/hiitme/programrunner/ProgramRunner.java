@@ -20,8 +20,11 @@ package com.alexgilleran.hiitme.programrunner;
 
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
+import com.alexgilleran.hiitme.model.Program;
 
 public interface ProgramRunner {
+	public static final int TICK_RATE = 100;
+
 	void start();
 
 	void stop();
@@ -43,4 +46,6 @@ public interface ProgramRunner {
 	Exercise getNextExercise();
 
 	Node getCurrentNode();
+
+	Program getProgram();
 }

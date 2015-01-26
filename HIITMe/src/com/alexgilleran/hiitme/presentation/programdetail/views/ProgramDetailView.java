@@ -230,8 +230,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	public void handleHoverCellMove() {
 		int deltaY = lastEventY - downY;
 
-		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
-		if (hoverCell != null) {
+		if (hoverCellCurrentBounds != null && hoverCell != null) {
+			hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, hoverCellOriginalBounds.top + deltaY);
 			hoverCell.setBounds(hoverCellCurrentBounds);
 			invalidate();
 		}
@@ -470,7 +470,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 		nodeView.setDragManager(this);
 		nodeView.init(node);
-		nodeView.setId(ViewUtils.generateViewId());
+		nodeView.setId(View.generateViewId());
 
 		return nodeView;
 	}

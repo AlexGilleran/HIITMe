@@ -23,4 +23,5 @@ import com.alexgilleran.hiitme.model.Exercise;
 public interface SoundPlayer {
 	void playExerciseStart(Exercise exercise);
 	void playEnd();
+	void cleanUp();
 }

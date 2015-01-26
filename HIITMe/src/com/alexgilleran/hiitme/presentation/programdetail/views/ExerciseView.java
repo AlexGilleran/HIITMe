@@ -33,8 +33,7 @@ import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
-
-import java.util.Locale;
+import com.alexgilleran.hiitme.util.ViewUtils;
 
 import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
 import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
@@ -90,7 +89,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 			effortLevel.setBackgroundResource(exercise.getEffortLevel().getBackgroundId());
 		}
 
-		duration.setText(timeToString(exercise.getMinutes()) + "." + timeToString(exercise.getSeconds()));
+		duration.setText(ViewUtils.getTimeText(exercise.getDuration()));
 
 		if (exercise.getName() != null && !exercise.getName().trim().isEmpty()) {
 			name.setVisibility(VISIBLE);
@@ -110,10 +109,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 				getViewTreeObserver().removeOnGlobalLayoutListener(this);
 			}
 		});
-	}
-
-	private String timeToString(int number) {
-		return String.format(Locale.ENGLISH, "%02d", number);
 	}
 
 	@Override

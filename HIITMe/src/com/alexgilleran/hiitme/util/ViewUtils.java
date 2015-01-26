@@ -18,8 +18,6 @@
 
 package com.alexgilleran.hiitme.util;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -30,31 +28,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class ViewUtils {
 	private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
-
-	/**
-	 * Generate a value suitable for use in {@link #setId(int)}. This value will not collide with ID values generated at
-	 * build time by aapt for R.id.
-	 * <p>
-	 * This is copied from <a href=" http://developer.android.com/reference/android/view/View
-	 * .html#generateViewId%28%29">the android code</a>, which is only present in API > 17.
-	 *
-	 * @return a generated ID value
-	 */
-	public static int generateViewId() {
-		for (;;) {
-			final int result = sNextGeneratedId.get();
-			// aapt-generated IDs have the high byte nonzero; clamp to the range
-			// under that.
-			int newValue = result + 1;
-			if (newValue > 0x00FFFFFF)
-				newValue = 1; // Roll over to 1, not 0.
-			if (sNextGeneratedId.compareAndSet(result, newValue)) {
-				return result;
-			}
-		}
-	}
 
 	public static int getVisibilityInt(boolean visible) {
 		return visible ? View.VISIBLE : View.GONE;
@@ -112,5 +90,21 @@ public class ViewUtils {
 	public static boolean isLarge(Resources resources) {
 		int size = resources.getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
 		return size == Configuration.SCREENLAYOUT_SIZE_LARGE || size == Configuration.SCREENLAYOUT_SIZE_XLARGE;
+	}
+
+	public static String timeUnitToString(int number, int digits) {
+		return String.format(Locale.ENGLISH, "%0" + digits + "d", number);
+	}
+
+	public static String getTimeText(int ms) {
+		return timeUnitToString(getMinutesFromMs(ms), 1) + "." + timeUnitToString(getSecondsFromMs(ms), 2);
+	}
+
+	public static int getMinutesFromMs(int ms) {
+		return ms / 1000 / 60;
+	}
+
+	public static int getSecondsFromMs(int ms) {
+		return ms / 1000 % 60;
 	}
 }

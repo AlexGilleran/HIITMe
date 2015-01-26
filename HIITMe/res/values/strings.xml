@@ -17,18 +17,19 @@
     <string name="title_select">Select Program</string>
     <string name="title_run">Run Program</string>
     <string name="title_view">View Program</string>
-    <string name="minutes">minutes</string>
-    <string name="seconds">seconds</string>
+    <string name="time_unit_minute">minute</string>
+    <string name="time_unit_second">second</string>
+    <string name="time_unit_pluraliser">s</string>
     <string name="finish_message">Finished, well done!</string>
     <string name="caption_edit_effort">Effort: </string>
     <string name="caption_edit_duration">Duration: </string>
     <string name="caption_edit_exercise_name">Name: </string>
-    <string name="about_message">HIIT Me, a high intensity interval training app
+    <string name="about_message">HIIT Me, a High Intensity Interval Training app
         \n\nCopyright © Alex Gilleran 2015
         \n\nSource code available under GPLv3 at <a href="http://github.com/AlexGilleran/HIITMe">http://github.com/AlexGilleran/HIITMe</a>
         \n\nThe following are licensed under <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>:
         \n<li>Icons from <a href="http://icons8.com">http://icons8.com</a></li>
-        \n<li><em>Add Exercise</em> and <em>Add Group</em> icons, derivatives of icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a>
+        \n<li>Launcher, Add Exercise and Add Group icons, derivatives of icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a>
             from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a></li>
         \n<li>Modified Progress Wheels by Todd Davies from <a href="https://github.com/Todd-Davies/ProgressWheel">https://github.com/Todd-Davies/ProgressWheel</a>.</li>
     </string>

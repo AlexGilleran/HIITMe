@@ -285,7 +285,10 @@ public class RunFragment extends Fragment {
 			});
 
 			updateExercise();
-			refreshPauseState();
+
+			if (stopButton != null) {
+				refreshPauseState();
+			}
 		}
 
 		@Override

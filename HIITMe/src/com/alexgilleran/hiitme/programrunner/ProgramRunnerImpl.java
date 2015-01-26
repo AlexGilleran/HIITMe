@@ -26,11 +26,10 @@ import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.util.PeekaheadQueue;
 
 public class ProgramRunnerImpl implements ProgramRunner {
-	private static final int DEFAULT_TICK_RATE = 25;
-	private final int tickRate;
 
 	private CountDownTimer countDown;
 
+	private Program program;
 	private PeekaheadQueue<Node> nodeQueue;
 	private CountDownObserver observer;
 	private int exerciseMsRemaining;
@@ -40,17 +39,13 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	private boolean stopped = false;
 
 	public ProgramRunnerImpl(Program program, CountDownObserver observer) {
-		this(program, observer, DEFAULT_TICK_RATE);
-	}
-
-	public ProgramRunnerImpl(Program program, CountDownObserver observer, int tickRate) {
+		this.program = program;
 		this.nodeQueue = program.asQueue();
 		this.observer = observer;
 		this.exerciseMsRemaining = getCurrentExercise().getDuration();
 		this.programMsRemaining = program.getAssociatedNode().getDuration();
-		this.tickRate = tickRate;
 
-		countDown = new ProgramCountDown(programMsRemaining, tickRate);
+		countDown = new ProgramCountDown(programMsRemaining, TICK_RATE);
 	}
 
 	@Override
@@ -101,6 +96,11 @@ public class ProgramRunnerImpl implements ProgramRunner {
 	}
 
 	@Override
+	public Program getProgram() {
+		return program;
+	}
+
+	@Override
 	public Exercise getNextExercise() {
 		Node next = nodeQueue.peek(1);
 		return next != null ? next.getAttachedExercise() : null;
@@ -113,7 +113,7 @@ public class ProgramRunnerImpl implements ProgramRunner {
 
 		countDown.cancel();
 
-		countDown = new ProgramCountDown(programMsRemaining, tickRate);
+		countDown = new ProgramCountDown(programMsRemaining, TICK_RATE);
 	}
 
 	@Override
