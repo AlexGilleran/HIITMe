@@ -29,11 +29,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ViewUtils {
-	private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
-
 	public static int getVisibilityInt(boolean visible) {
 		return visible ? View.VISIBLE : View.GONE;
 	}
@@ -106,5 +103,20 @@ public class ViewUtils {
 
 	public static int getSecondsFromMs(int ms) {
 		return ms / 1000 % 60;
+	}
+
+	public static boolean isPointInView(View view, float x, float y, float slop) {
+		return x >= -slop && y >= -slop && x < ((view.getRight() - view.getLeft()) + slop) &&
+				y < ((view.getBottom() - view.getTop()) + slop);
+	}
+
+	public static void setBackgroundPreservePadding(View view, int resourceId) {
+		// Setting background resource kills padding.
+		int bottom = view.getPaddingBottom();
+		int top = view.getPaddingTop();
+		int right = view.getPaddingRight();
+		int left = view.getPaddingLeft();
+		view.setBackgroundResource(resourceId);
+		view.setPadding(left, top, right, bottom);
 	}
 }

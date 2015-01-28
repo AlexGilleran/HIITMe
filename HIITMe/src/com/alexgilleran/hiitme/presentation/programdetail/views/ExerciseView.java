@@ -19,9 +19,7 @@
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
@@ -33,19 +31,22 @@ import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
+import com.alexgilleran.hiitme.util.DraggableViewFocusListener;
+import com.alexgilleran.hiitme.util.DraggableViewTouchListener;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 import static com.alexgilleran.hiitme.util.ViewUtils.getBottomIncludingMargin;
 import static com.alexgilleran.hiitme.util.ViewUtils.getTopIncludingMargin;
 
 public class ExerciseView extends RelativeLayout implements DraggableView {
+
+	private OnTouchListener touchListener;
 	private TextView name;
 	private ImageView effortLevel;
 	private TextView duration;
 	private Exercise exercise;
 	private DraggableView nodeView;
 	private DragManager dragManager;
-	private Handler longPressHandler = new Handler();
 
 	private boolean editable;
 	private boolean newlyCreated = false;
@@ -60,6 +61,10 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	public void setDragManager(DragManager dragManager) {
 		this.dragManager = dragManager;
+
+		touchListener = new DraggableViewTouchListener(this, dragManager);
+
+		setOnFocusChangeListener(new DraggableViewFocusListener(this, dragManager));
 	}
 
 	@Override
@@ -145,6 +150,9 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		setOnLongClickListener(editable ? longClickListener : null);
 		setOnTouchListener(editable ? touchListener : null);
 		setBackgroundResource(editable ? R.drawable.card_base : R.drawable.card_bg);
+
+		setFocusable(editable);
+		setFocusableInTouchMode(editable);
 	}
 
 	@Override
@@ -205,27 +213,4 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		}
 	};
 
-	private final OnTouchListener touchListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				longPressHandler.postDelayed(longPressRunnable, 1200);
-			}
-			if ((event.getAction() == MotionEvent.ACTION_MOVE) || (event.getAction() == MotionEvent.ACTION_UP)) {
-				longPressHandler.removeCallbacks(longPressRunnable);
-			}
-			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-				dragManager.startDrag(ExerciseView.this, (int) event.getRawY());
-				return true;
-			}
-
-			return false;
-		}
-	};
-
-	private Runnable longPressRunnable = new Runnable() {
-		public void run() {
-			edit();
-		}
-	};
 }

@@ -21,9 +21,7 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
-import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +34,8 @@ import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.EditDialogUpdateListener;
+import com.alexgilleran.hiitme.util.DraggableViewFocusListener;
+import com.alexgilleran.hiitme.util.DraggableViewTouchListener;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -48,30 +48,25 @@ public class NodeView extends LinearLayout implements DraggableView {
 	private static final int FIRST_DRAGGABLE_VIEW_INDEX = 1;
 	private static final int MARGIN = (int) (5 * Resources.getSystem().getDisplayMetrics().density);
 	private static final int SIDE_MARGIN = (int) (20 * Resources.getSystem().getDisplayMetrics().density);
-	private LayoutInflater layoutInflater;
+
 	private DragManager dragManager;
 	private Node programNode;
 	private TextView repCountView;
 	private FrameLayout header;
 	private boolean editable;
 	private boolean newlyCreated = false;
-	private Rect outRect = new Rect();
-	private int[] location = new int[2];
-	private Handler longPressHandler = new Handler();
+	private OnTouchListener touchListener;
 
 	public NodeView(Context context) {
 		super(context);
-		layoutInflater = LayoutInflater.from(context);
 	}
 
 	public NodeView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		layoutInflater = LayoutInflater.from(context);
 	}
 
 	public NodeView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		layoutInflater = LayoutInflater.from(context);
 	}
 
 	private static boolean topWithinViewBounds(int top, View childView) {
@@ -82,6 +77,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 	public void onFinishInflate() {
 		this.repCountView = (TextView) this.findViewById(R.id.textview_repcount);
 		this.header = (FrameLayout) findViewById(R.id.layout_header);
+
+		setFocusable(true);
+		setFocusableInTouchMode(true);
 	}
 
 	public void init(Node programNode) {
@@ -146,12 +144,29 @@ public class NodeView extends LinearLayout implements DraggableView {
 	}
 
 	@Override
-	public void setDragManager(DragManager dragManager) {
+	public void setDragManager(final DragManager dragManager) {
 		this.dragManager = dragManager;
 
 		for (DraggableView child : getChildren()) {
 			child.setDragManager(dragManager);
 		}
+
+		touchListener = new OnTouchListener() {
+			private DraggableViewTouchListener delegate = new DraggableViewTouchListener(NodeView.this, dragManager);
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					ViewUtils.setBackgroundPreservePadding(NodeView.this, R.drawable.card_bg_raised);
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					ViewUtils.setBackgroundPreservePadding(NodeView.this, R.drawable.card_base);
+				}
+
+				return delegate.onTouch(v, event);
+			}
+		};
+
+		header.setOnFocusChangeListener(new DraggableViewFocusListener(this, dragManager));
 	}
 
 	private int getDepth() {
@@ -295,6 +310,9 @@ public class NodeView extends LinearLayout implements DraggableView {
 		header.setOnTouchListener(editable ? touchListener : null);
 		header.setBackgroundResource(editable ? R.drawable.node_top_bg : R.drawable.node_top_bg_standard);
 
+		header.setFocusable(editable);
+		header.setFocusableInTouchMode(editable);
+
 		for (DraggableView child : getChildren()) {
 			child.setEditable(editable);
 		}
@@ -302,7 +320,12 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
-		header.setBackgroundResource(beingDragged ? R.drawable.node_top_bg_selected : R.drawable.node_top_bg);
+		header.setBackgroundResource(beingDragged ? R.drawable.node_top_bg_focused : R.drawable.node_top_bg);
+	}
+
+	@Override
+	public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+		return header.requestFocus(direction, previouslyFocusedRect);
 	}
 
 	@Override
@@ -328,24 +351,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 		this.newlyCreated = placed;
 	}
 
-	private final OnTouchListener touchListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
-				longPressHandler.postDelayed(longPressRunnable, 1200);
-			}
-			if ((event.getAction() == MotionEvent.ACTION_MOVE) || (event.getAction() == MotionEvent.ACTION_UP)) {
-				longPressHandler.removeCallbacks(longPressRunnable);
-			}
-			if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
-				if (getDepth() > 0) {
-					dragManager.startDrag(NodeView.this, (int) event.getRawY());
-				}
-			}
-			return false;
-		}
-	};
-
 	public void edit() {
 		EditNodeFragment dialog = new EditNodeFragment();
 		dialog.setNode(getCurrentNode());
@@ -359,12 +364,6 @@ public class NodeView extends LinearLayout implements DraggableView {
 
 		dialog.show(dragManager.getFragmentManager(), "edit_node");
 	}
-
-	private Runnable longPressRunnable = new Runnable() {
-		public void run() {
-			edit();
-		}
-	};
 
 	// Have to have this to cause ripples
 	private final OnLongClickListener longClickListener = new OnLongClickListener() {

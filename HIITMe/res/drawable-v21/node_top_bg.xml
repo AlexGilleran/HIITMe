@@ -2,7 +2,11 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
         android:color="@color/accent">
 
-    <item
-        android:drawable="@color/primary">
+    <item>
+        <selector>
+            <item
+                android:drawable="@drawable/node_top_bg_standard">
+            </item>
+        </selector>
     </item>
 </ripple>

@@ -16,32 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.alexgilleran.hiitme.presentation.programdetail;
+package com.alexgilleran.hiitme.util;
 
-import android.app.FragmentManager;
 import android.view.View;
 
-import com.alexgilleran.hiitme.model.Exercise;
-import com.alexgilleran.hiitme.model.Node;
+import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.DraggableView;
-import com.alexgilleran.hiitme.presentation.programdetail.views.ExerciseView;
-import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 
-public interface DragManager {
+public class DraggableViewFocusListener implements View.OnFocusChangeListener {
+	private final DragManager dragManager;
+	private final DraggableView view;
 
-	void cancelDrag();
+	public DraggableViewFocusListener(DraggableView view, DragManager dragManager) {
+		this.dragManager = dragManager;
+		this.view = view;
+	}
 
-	void startDrag(DraggableView view, int downY);
-	
-	boolean currentlyDragging();
-	
-	void handleHoverCellMove();
-	
-	ExerciseView buildExerciseView(Exercise exercise, DraggableView parent);
-	
-	NodeView buildNodeView(Node node);
-
-	FragmentManager getFragmentManager();
-
-	void notifyFocused(boolean focused, DraggableView focusedView);
+	@Override
+	public void onFocusChange(View v, boolean hasFocus) {
+		dragManager.notifyFocused(hasFocus, view);
+	}
 }

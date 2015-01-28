@@ -17,7 +17,7 @@
                 android:drawable="@drawable/card_bg"/>
             <item
                 android:state_pressed="true"
-                android:drawable="@drawable/card_bg_raised"/>
+                android:drawable="@drawable/card_pressed"/>
         </selector>
     </item>
 </ripple>

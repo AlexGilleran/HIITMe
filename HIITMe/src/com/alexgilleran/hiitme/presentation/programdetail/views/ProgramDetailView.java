@@ -52,37 +52,41 @@ import com.alexgilleran.hiitme.util.ViewUtils;
 
 public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private static final int MOVE_DURATION = 150;
+
 	private LayoutInflater layoutInflater;
-	private int downY, lastEventY;
-	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
-	private BitmapDrawable hoverCell;
-	private DraggableView dragView;
-	private View recycleBin;
+
 	private ScrollingProgramView scrollingView;
-	private ObjectAnimator hoverViewAnimator;
 	private TextView nameReadOnly;
 	private EditText nameEditable;
+	private ImageButton editButton;
 	private ImageButton addExerciseButton;
 	private ImageButton addNodeButton;
+	private View recycleBin;
+
 	private Program program;
 	private boolean editable = false;
 	private boolean dragging = false;
 	private int locationOnScreen;
+	private int downY, lastEventY;
+	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
+
 	private FragmentManager fragmentManager;
+	private BitmapDrawable hoverCell;
+	private DraggableView dragView;
+	private DraggableView lastFocusedView;
+	private ObjectAnimator hoverViewAnimator;
+
 
 	public ProgramDetailView(Context context) {
 		super(context);
-		layoutInflater = LayoutInflater.from(context);
 	}
 
 	public ProgramDetailView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		layoutInflater = LayoutInflater.from(context);
 	}
 
 	public ProgramDetailView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		layoutInflater = LayoutInflater.from(context);
 	}
 
 	/**
@@ -104,17 +108,21 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	public void onFinishInflate() {
 		super.onFinishInflate();
 
+		layoutInflater = LayoutInflater.from(getContext());
+
 		recycleBin = (View) findViewById(R.id.recycle_bin);
 
 		scrollingView = (ScrollingProgramView) findViewById(R.id.view_scrolling);
 
 		nameReadOnly = (TextView) findViewById(R.id.name_ro);
 		nameEditable = (EditText) findViewById(R.id.name_edit);
+		editButton = (ImageButton) findViewById(R.id.button_edit);
 		addExerciseButton = (ImageButton) findViewById(R.id.button_add_exercise);
 		addNodeButton = (ImageButton) findViewById(R.id.button_add_node);
 
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
+		editButton.setOnClickListener(editListener);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(yOffsetObserver);
 
@@ -208,6 +216,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		nameEditable.setVisibility(editableVisibility);
 		addExerciseButton.setVisibility(editableVisibility);
 		addNodeButton.setVisibility(editableVisibility);
+		editButton.setVisibility(editableVisibility);
 		recycleBin.setVisibility(editableVisibility);
 		((RelativeLayout.LayoutParams) scrollingView.getLayoutParams()).addRule(RelativeLayout.BELOW,
 				editable ? R.id.name_edit : R.id.name_ro);
@@ -348,6 +357,12 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 					hoverViewAnimator.end();
 				}
 
+				// Set the focus on the outermost layout to defocus whatever was focused before,
+				// without focusing on the name button.
+				requestFocus();
+				// Make sure the edit button stays visible during the drag.
+				editButton.setVisibility(VISIBLE);
+
 				dragView.setBeingDragged(true);
 				hoverCell = getAndAddHoverView(dragView);
 
@@ -444,6 +459,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	}
 
 	private void cleanUpAfterDragEnd() {
+		dragView.asView().setVisibility(VISIBLE);
+		dragView.asView().requestFocus();
 		dragView.setBeingDragged(false);
 		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
 			hoverViewAnimator.cancel();
@@ -484,6 +501,22 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		return fragmentManager;
 	}
 
+	@Override
+	public void notifyFocused(boolean focused, DraggableView focusedView) {
+		int visibility = focused ? View.VISIBLE : View.INVISIBLE;
+
+		editButton.setVisibility(visibility);
+
+		lastFocusedView = (DraggableView) focusedView;
+	}
+
+	private final OnClickListener editListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			lastFocusedView.edit();
+		}
+	};
+
 	/**
 	 * This TypeEvaluator is used to animate the BitmapDrawable back to its final location when the user lifts their
 	 * finger by modifying the BitmapDrawable's bounds.
@@ -499,6 +532,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			return (int) (start + fraction * (end - start));
 		}
 	};
+
 	private OnTouchListener addExerciseListener = new OnTouchListener() {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
@@ -539,6 +573,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			return true;
 		}
 	};
+
 	private OnGlobalLayoutListener yOffsetObserver = new OnGlobalLayoutListener() {
 		@Override
 		public void onGlobalLayout() {
@@ -566,7 +601,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 		@Override
 		public void onAnimationEnd(Animator animation) {
-			dragView.asView().setVisibility(VISIBLE);
 			cleanUpAfterDragEnd();
 		}
 	};

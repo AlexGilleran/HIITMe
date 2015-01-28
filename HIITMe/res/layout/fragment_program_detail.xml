@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_root"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -47,6 +49,18 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@id/button_add_exercise"
         android:src="@drawable/ic_node_add"
+        android:visibility="gone"/>
+
+    <ImageButton
+        android:id="@+id/button_edit"
+        android:padding="15dp"
+        android:layout_marginTop="2dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:adjustViewBounds="true"
+        android:layout_toLeftOf="@id/button_add_node"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_edit_dark"
         android:visibility="gone"/>
 
     <com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView
