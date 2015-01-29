@@ -30,6 +30,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -343,6 +344,8 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	@Override
 	public void startDrag(DraggableView view, int downY) {
 		startDrag(view, downY, ViewUtils.getYCoordOnScreen(view.asView()));
+
+		performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 	}
 
 	public void startDrag(final DraggableView view, int downY, final int startTop) {

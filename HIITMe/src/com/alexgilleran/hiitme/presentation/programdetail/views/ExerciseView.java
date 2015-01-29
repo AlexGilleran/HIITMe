@@ -209,7 +209,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 	private final OnLongClickListener longClickListener = new OnLongClickListener() {
 		@Override
 		public boolean onLongClick(View v) {
-			return true;
+			return false;
 		}
 	};
 

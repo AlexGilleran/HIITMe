@@ -19,6 +19,7 @@
 package com.alexgilleran.hiitme.util;
 
 import android.os.Handler;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -47,20 +48,26 @@ public class DraggableViewTouchListener implements View.OnTouchListener {
 
 		switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
-				longPressHandler.postDelayed(dragRunnable, ViewConfiguration.getLongPressTimeout());
+				if (viewHasParent()) {
+					longPressHandler.postDelayed(dragRunnable, ViewConfiguration.getLongPressTimeout());
+				}
 				break;
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
 				longPressHandler.removeCallbacks(dragRunnable);
 				break;
 			case MotionEvent.ACTION_MOVE:
-				if (!ViewUtils.isPointInView(v, event.getX(), event.getY(), touchSlop)) {
+				if (viewHasParent() && !ViewUtils.isPointInView(v, event.getX(), event.getY(), touchSlop)) {
 					longPressHandler.removeCallbacks(dragRunnable);
 					return true;
 				}
 		}
 
 		return false;
+	}
+
+	private boolean viewHasParent() {
+		return view.getParentNode() != null;
 	}
 
 	private Runnable dragRunnable = new Runnable() {
