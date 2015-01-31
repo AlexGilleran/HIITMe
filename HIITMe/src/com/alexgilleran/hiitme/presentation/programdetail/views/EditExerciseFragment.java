@@ -45,13 +45,13 @@ public class EditExerciseFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-		builder.setTitle("Edit Exercise");
+		builder.setTitle(getString(R.string.heading_edit_exercise));
 		final EditExerciseView editView = (EditExerciseView) getActivity().getLayoutInflater().inflate(
 				R.layout.dialog_edit_exercise, null);
 		editView.setExercise(exercise);
 		builder.setView(editView);
 		builder.setCancelable(true);
-		builder.setPositiveButton("OK", new OnClickListener() {
+		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				editView.update();

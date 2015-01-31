@@ -67,9 +67,11 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private Program program;
 	private boolean editable = false;
 	private boolean dragging = false;
+	private boolean draggableViewFocused = false;
 	private int locationOnScreen;
 	private int downY, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
+	private int originalScrollingViewTopMargin = 0;
 
 	private FragmentManager fragmentManager;
 	private BitmapDrawable hoverCell;
@@ -124,6 +126,10 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
 		editButton.setOnClickListener(editListener);
+
+		LayoutParams scrollingViewLayoutParams = (LayoutParams) scrollingView.getLayoutParams();
+		originalScrollingViewTopMargin = scrollingViewLayoutParams.topMargin;
+		setScrollingViewTopMargin(0);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(yOffsetObserver);
 
@@ -213,18 +219,64 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		scrollingView.setEditable(editable);
 		nameReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
 
+		animateScrollViewSlide(editable);
+
 		int editableVisibility = ViewUtils.getVisibilityInt(editable);
 		nameEditable.setVisibility(editableVisibility);
-		addExerciseButton.setVisibility(editableVisibility);
-		addNodeButton.setVisibility(editableVisibility);
-		editButton.setVisibility(editableVisibility);
-		recycleBin.setVisibility(editableVisibility);
-		((RelativeLayout.LayoutParams) scrollingView.getLayoutParams()).addRule(RelativeLayout.BELOW,
-				editable ? R.id.name_edit : R.id.name_ro);
 
 		if (!editable) {
 			nameReadOnly.setText(nameEditable.getText());
 		}
+	}
+
+	private void animateScrollViewSlide(boolean editable) {
+		final int newTopMargin = editable ? originalScrollingViewTopMargin : 0;
+		scrollingView.setTranslationY(((LayoutParams) scrollingView.getLayoutParams()).topMargin);
+		setScrollingViewTopMargin(0);
+
+		scrollingView.animate().translationY(newTopMargin).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				scrollingView.setTranslationY(0);
+				setScrollingViewTopMargin(newTopMargin);
+			}
+		});
+
+		animateEditButtons(editable);
+	}
+
+	private void animateEditButtons(boolean editable) {
+		slide(recycleBin, editable);
+		slide(addExerciseButton, editable);
+		slide(addNodeButton, editable);
+	}
+
+	private void slide(final View view, boolean in) {
+		if ((in && view.getVisibility() == VISIBLE) || (!in && view.getVisibility() != VISIBLE)) {
+			return;
+		}
+
+		final float toTranslation = in ? 0 : -view.getHeight() - view.getTop();
+		final int toVisibility = in ? VISIBLE : GONE;
+
+		if (in) {
+			view.setVisibility(VISIBLE);
+			LayoutParams params = (LayoutParams) view.getLayoutParams();
+			view.setTranslationY(-params.height - params.topMargin);
+		}
+		view.animate().translationY(toTranslation).setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				view.setVisibility(toVisibility);
+			}
+		});
+	}
+
+	private void setScrollingViewTopMargin(int scrollingViewTopMargin) {
+		LayoutParams params = ((LayoutParams) scrollingView.getLayoutParams());
+		params.topMargin = scrollingViewTopMargin;
+		scrollingView.setLayoutParams(params);
+		scrollingView.requestLayout();
 	}
 
 	/**
@@ -360,11 +412,11 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 					hoverViewAnimator.end();
 				}
 
-				// Set the focus on the outermost layout to defocus whatever was focused before,
+				// Set the focus on the outermost layout to defocus whatever was draggableViewFocused before,
 				// without focusing on the name button.
 				requestFocus();
 				// Make sure the edit button stays visible during the drag.
-				editButton.setVisibility(VISIBLE);
+				slide(editButton, true);
 
 				dragView.setBeingDragged(true);
 				hoverCell = getAndAddHoverView(dragView);
@@ -428,8 +480,9 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			dragging = false;
 
 			if (dragView.getParentNode() == null) {
-				// Animate removing the view.
+				// Deleted
 				cleanUpAfterDragEnd();
+				notifyFocused(false, null);
 			} else {
 				if (dragView.isNewlyCreated()) {
 					dragView.edit();
@@ -469,7 +522,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			hoverViewAnimator.cancel();
 		}
 		hoverCell = null;
-		setEnabled(true);
 		invalidate();
 	}
 
@@ -504,13 +556,20 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		return fragmentManager;
 	}
 
+	private Runnable hideEditButtonRunnable = new Runnable() {
+		@Override
+		public void run() {
+			slide(editButton, draggableViewFocused || currentlyDragging());
+		}
+	};
+
 	@Override
 	public void notifyFocused(boolean focused, DraggableView focusedView) {
-		int visibility = focused ? View.VISIBLE : View.INVISIBLE;
-
-		editButton.setVisibility(visibility);
-
-		lastFocusedView = (DraggableView) focusedView;
+		draggableViewFocused = focused;
+		if (focused) {
+			lastFocusedView = (DraggableView) focusedView;
+		}
+		postDelayed(hideEditButtonRunnable, 10);
 	}
 
 	private final OnClickListener editListener = new OnClickListener() {
@@ -593,6 +652,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 			invalidate();
 		}
 	};
+
 	/**
 	 * Listener for animating the hover cell back to its original position (for when a drag is ended).
 	 */

@@ -33,4 +33,6 @@
             from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a></li>
         \n<li>Modified Progress Wheels by Todd Davies from <a href="https://github.com/Todd-Davies/ProgressWheel">https://github.com/Todd-Davies/ProgressWheel</a>.</li>
     </string>
+    <string name="heading_edit_node">Edit Group</string>
+    <string name="heading_edit_exercise">Edit Exercise</string>
 </resources>
