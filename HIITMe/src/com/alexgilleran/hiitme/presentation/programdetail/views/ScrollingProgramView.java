@@ -18,9 +18,6 @@
 
 package com.alexgilleran.hiitme.presentation.programdetail.views;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -35,6 +32,9 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView.InsertionPoint;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ScrollingProgramView extends ScrollView {
 	private static final int DRAG_SCROLL_INTERVAL = 100;
 	private static final float DRAG_SCROLL_THRESHOLD_FRACTION = 0.2f;
@@ -43,6 +43,7 @@ public class ScrollingProgramView extends ScrollView {
 
 	private int dragScrollUpThreshold = -1;
 	private int dragScrollDownThreshold = -1;
+	private boolean scrollLocked = false;
 	private Timer scrollTimer;
 	private NodeView nodeView;
 	private DragManager dragManager;
@@ -123,15 +124,17 @@ public class ScrollingProgramView extends ScrollView {
 	}
 
 	private void startScrolling(final int scrollY) {
-		TimerTask timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				scrollBy(0, scrollY);
-				post(handlePointerMoveRunnable);
-			}
-		};
-		scrollTimer = new Timer();
-		scrollTimer.scheduleAtFixedRate(timerTask, 0, DRAG_SCROLL_INTERVAL);
+		if (!scrollLocked) {
+			TimerTask timerTask = new TimerTask() {
+				@Override
+				public void run() {
+					scrollBy(0, scrollY);
+					post(handlePointerMoveRunnable);
+				}
+			};
+			scrollTimer = new Timer();
+			scrollTimer.scheduleAtFixedRate(timerTask, 0, DRAG_SCROLL_INTERVAL);
+		}
 	}
 
 	private Runnable handlePointerMoveRunnable = new Runnable() {
@@ -162,8 +165,18 @@ public class ScrollingProgramView extends ScrollView {
 				startScrolling((eventY - dragScrollDownThreshold) / 2);
 			} else if (eventY < dragScrollUpThreshold) {
 				startScrolling((eventY - dragScrollUpThreshold) / 2);
+			} else if (scrollLocked) {
+				scrollLocked = false;
 			}
 		}
+	}
+
+	/**
+	 * Locks drag scrolling until the touch events meet the middle of the view between the scroll
+	 * thresholds.
+	 */
+	public void lockScrollUntilTouchInMiddle() {
+		scrollLocked = true;
 	}
 
 	/**

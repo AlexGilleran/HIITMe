@@ -226,7 +226,9 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 	@Override
 	public long saveProgram(Program program) {
 		cache.delete(program.getId());
-		return this.saveProgram(program, getWritableDatabase());
+		long id = this.saveProgram(program, getWritableDatabase());
+		cache.put(program.getId(), program);
+		return id;
 	}
 
 	private long saveProgram(Program program, SQLiteDatabase db) {

@@ -602,6 +602,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
 				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
 				view.setNewlyCreated(true);
+				scrollingView.lockScrollUntilTouchInMiddle();
 
 				post(new Runnable() {
 					@Override
@@ -611,7 +612,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				});
 			}
 			addExerciseButton.onTouchEvent(event);
-			return true;
+			return false;
 		}
 	};
 
@@ -629,10 +630,17 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
 				view.setEditable(true);
 				view.setNewlyCreated(true);
-				startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
+				scrollingView.lockScrollUntilTouchInMiddle();
+
+				post(new Runnable() {
+					@Override
+					public void run() {
+						startDrag(view, (int) event.getRawY(), ViewUtils.getYCoordOnScreen(addExerciseButton));
+					}
+				});
 			}
 			addNodeButton.onTouchEvent(event);
-			return true;
+			return false;
 		}
 	};
 
