@@ -155,19 +155,15 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 		FragmentTransaction tran = getFragmentManager().beginTransaction();
 
-		if (detailFragment != null) {
-			tran.remove(detailFragment);
-		}
-		if (runFragment != null) {
-			tran.remove(runFragment);
-		}
-
 		Bundle arguments = buildProgramIdBundle();
 
 		detailFragment = new ProgramDetailFragment();
 		detailFragment.setArguments(arguments);
 
 		if (tabletLayout) {
+			if (runFragment != null) {
+				tran.remove(runFragment);
+			}
 			tran.replace(R.id.program_detail_container, detailFragment, DETAIL_FRAGMENT_TAG);
 
 			runFragment = new RunFragment();
@@ -181,7 +177,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		}
 
-		tran.addToBackStack("name").commit();
+		tran.addToBackStack(null).commit();
 	}
 
 	@Override
@@ -320,6 +316,13 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		} else {
 			navigateUpTo(new Intent(this, MainActivity.class));
 		}
+	}
+
+	/**
+	 * Sometimes when changing orientations android decides to insert null fragments into the back stack.
+	 */
+	private boolean androidHasFuckedTheBackstackUp() {
+		return getFragmentManager().findFragmentById(getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getId()) == null;
 	}
 
 	@Override

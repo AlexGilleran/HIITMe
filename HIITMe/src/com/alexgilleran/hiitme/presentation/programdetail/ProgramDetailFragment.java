@@ -32,8 +32,11 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailVie
 
 
 public class ProgramDetailFragment extends Fragment {
+	private final static String IS_EDITING_KEY = "IS_EDITING";
+
 	private Program program;
 	private ProgramDetailView detailView;
+
 
 	/**
 	 * Mandatory empty constructor
@@ -47,11 +50,6 @@ public class ProgramDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		refreshProgram(false);
-	}
-
-	private void refreshProgram(boolean skipCache) {
-		long programId = getArguments().getLong(MainActivity.ARG_PROGRAM_ID);
-		program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(programId, skipCache);
 	}
 
 	@Override
@@ -69,7 +67,31 @@ public class ProgramDetailFragment extends Fragment {
 		if (program != null) {
 			detailView.setProgram(program);
 		}
+
+		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_EDITING_KEY)) {
+			detailView.setEditable(true);
+		}
 	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(IS_EDITING_KEY, detailView.isEditable());
+
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onStop() {
+		save();
+
+		super.onStop();
+	}
+
+	private void refreshProgram(boolean skipCache) {
+		long programId = getArguments().getLong(MainActivity.ARG_PROGRAM_ID);
+		program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(programId, skipCache);
+	}
+
 
 	public boolean isBeingEdited() {
 		return detailView.isEditable();
