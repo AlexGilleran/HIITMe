@@ -27,7 +27,7 @@ import com.alexgilleran.hiitme.model.Node;
 public interface ProgramDAO {
 	List<ProgramMetaData> getProgramList();
 
-	Program getProgram(long programId);
+	Program getProgram(long programId, boolean skipCache);
 
 	void replaceProgramNode(ProgramMetaData program, Node programNode);
 

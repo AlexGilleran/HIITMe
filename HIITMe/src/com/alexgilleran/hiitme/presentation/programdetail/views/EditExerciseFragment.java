@@ -51,6 +51,12 @@ public class EditExerciseFragment extends DialogFragment {
 		editView.setExercise(exercise);
 		builder.setView(editView);
 		builder.setCancelable(true);
+		builder.setNegativeButton(android.R.string.cancel, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
 		builder.setPositiveButton(android.R.string.ok, new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {

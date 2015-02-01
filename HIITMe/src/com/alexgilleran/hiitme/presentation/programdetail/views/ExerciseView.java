@@ -202,7 +202,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		});
 
 		dialog.show(dragManager.getFragmentManager(), "edit_exercise");
-
 	}
 
 	// We have to have a long press handler to trigger the ripple in Android 5+

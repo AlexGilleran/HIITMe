@@ -113,7 +113,7 @@ public class ProgramRunService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
 
-		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId);
+		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId, false);
 		duration = program.getAssociatedNode().getDuration();
 		notificationTitle = getString(R.string.app_name) + ": " + program.getName();
 

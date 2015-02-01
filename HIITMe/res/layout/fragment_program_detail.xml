@@ -11,7 +11,7 @@
     <ImageView
         android:src="@drawable/ic_action_discard"
         android:id="@+id/recycle_bin"
-        android:layout_width="170dp"
+        android:layout_width="160dp"
         android:layout_height="45dp"
         android:scaleType="center"
         android:layout_margin="10dp"
@@ -60,7 +60,7 @@
         android:id="@+id/view_scrolling"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="65dp"
         android:fillViewport="false">
 
         <LinearLayout

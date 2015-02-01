@@ -22,15 +22,12 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
-import com.alexgilleran.hiitme.presentation.programdetail.views.EditNodeFragment;
-import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView;
 
 
@@ -49,12 +46,12 @@ public class ProgramDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		refreshProgram();
+		refreshProgram(false);
 	}
 
-	private void refreshProgram() {
+	private void refreshProgram(boolean skipCache) {
 		long programId = getArguments().getLong(MainActivity.ARG_PROGRAM_ID);
-		program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(programId);
+		program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(programId, skipCache);
 	}
 
 	@Override
@@ -92,7 +89,7 @@ public class ProgramDetailFragment extends Fragment {
 		if (save) {
 			save();
 		} else {
-			refreshProgram();
+			refreshProgram(true);
 			detailView.setProgram(program);
 		}
 	}
