@@ -39,7 +39,7 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -51,7 +51,7 @@ import com.alexgilleran.hiitme.presentation.programdetail.DragManager;
 import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView.InsertionPoint;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
-public class ProgramDetailView extends RelativeLayout implements DragManager {
+public class ProgramDetailView extends LinearLayout implements DragManager {
 	private static final int MOVE_DURATION = 150;
 
 	private LayoutInflater layoutInflater;
@@ -59,6 +59,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private ScrollingProgramView scrollingView;
 	private TextView nameReadOnly;
 	private EditText nameEditable;
+	private LinearLayout editBar;
 	private ImageButton editButton;
 	private ImageButton addExerciseButton;
 	private ImageButton addNodeButton;
@@ -71,7 +72,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private int locationOnScreen;
 	private int downY, lastEventY;
 	private Rect hoverCellCurrentBounds, hoverCellOriginalBounds;
-	private int originalScrollingViewTopMargin = 0;
 
 	private FragmentManager fragmentManager;
 	private BitmapDrawable hoverCell;
@@ -119,6 +119,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 
 		nameReadOnly = (TextView) findViewById(R.id.name_ro);
 		nameEditable = (EditText) findViewById(R.id.name_edit);
+		editBar = (LinearLayout) findViewById(R.id.layout_edit_button_bar);
 		editButton = (ImageButton) findViewById(R.id.button_edit);
 		addExerciseButton = (ImageButton) findViewById(R.id.button_add_exercise);
 		addNodeButton = (ImageButton) findViewById(R.id.button_add_node);
@@ -126,10 +127,6 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
 		editButton.setOnClickListener(editListener);
-
-		LayoutParams scrollingViewLayoutParams = (LayoutParams) scrollingView.getLayoutParams();
-		originalScrollingViewTopMargin = scrollingViewLayoutParams.topMargin;
-		setScrollingViewTopMargin(0);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(yOffsetObserver);
 
@@ -230,53 +227,27 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	}
 
 	private void animateScrollViewSlide(boolean editable) {
-		final int newTopMargin = editable ? originalScrollingViewTopMargin : 0;
-		scrollingView.setTranslationY(((LayoutParams) scrollingView.getLayoutParams()).topMargin);
-		setScrollingViewTopMargin(0);
+		LayoutParams params = (LayoutParams) editBar.getLayoutParams();
+		float editBarHeight = params.height;
 
-		scrollingView.animate().translationY(newTopMargin).setListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				scrollingView.setTranslationY(0);
-				setScrollingViewTopMargin(newTopMargin);
-			}
-		});
+		if (editable) {
+			setTranslationY(-editBarHeight);
+			editBar.setVisibility(VISIBLE);
+			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
 
-		animateEditButtons(editable);
-	}
-
-	private void animateEditButtons(boolean editable) {
-		slide(recycleBin, editable);
-		slide(addExerciseButton, editable);
-		slide(addNodeButton, editable);
-	}
-
-	private void slide(final View view, boolean in) {
-		if ((in && view.getVisibility() == VISIBLE) || (!in && view.getVisibility() != VISIBLE)) {
-			return;
+				}
+			});
+		} else {
+			animate().translationY(-editBarHeight).setListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					editBar.setVisibility(GONE);
+					setTranslationY(0);
+				}
+			});
 		}
-
-		final float toTranslation = in ? 0 : -view.getHeight() - view.getTop();
-		final int toVisibility = in ? VISIBLE : GONE;
-
-		if (in) {
-			view.setVisibility(VISIBLE);
-			LayoutParams params = (LayoutParams) view.getLayoutParams();
-			view.setTranslationY(-params.height - params.topMargin);
-		}
-		view.animate().translationY(toTranslation).setListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				view.setVisibility(toVisibility);
-			}
-		});
-	}
-
-	private void setScrollingViewTopMargin(int scrollingViewTopMargin) {
-		LayoutParams params = ((LayoutParams) scrollingView.getLayoutParams());
-		params.topMargin = scrollingViewTopMargin;
-		scrollingView.setLayoutParams(params);
-		scrollingView.requestLayout();
 	}
 
 	/**
@@ -416,7 +387,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 				// without focusing on the name button.
 				requestFocus();
 				// Make sure the edit button stays visible during the drag.
-				slide(editButton, true);
+				editButton.setVisibility(VISIBLE);
 
 				dragView.setBeingDragged(true);
 				hoverCell = getAndAddHoverView(dragView);
@@ -559,7 +530,7 @@ public class ProgramDetailView extends RelativeLayout implements DragManager {
 	private Runnable hideEditButtonRunnable = new Runnable() {
 		@Override
 		public void run() {
-			slide(editButton, draggableViewFocused || currentlyDragging());
+			editButton.setVisibility(ViewUtils.getVisibilityInt(draggableViewFocused || currentlyDragging()));
 		}
 	};
 

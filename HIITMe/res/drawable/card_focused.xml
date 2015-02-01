@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
+    <item
+        android:bottom="1.3dp">
         <shape
             android:dither="true"
             android:shape="rectangle">
@@ -12,7 +13,8 @@
     <item
         android:top="1dp"
         android:left="1dp"
-        android:right="1dp">
+        android:right="1dp"
+        android:bottom="1.3dp">
         <shape
             android:dither="true"
             android:shape="rectangle">

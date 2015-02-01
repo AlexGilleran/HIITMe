@@ -9,5 +9,5 @@
         android:drawable="@drawable/card_pressed"/>
     <item
         android:state_focused="true"
-        android:drawable="@drawable/card_dragged"/>
+        android:drawable="@drawable/card_focused"/>
 </selector>

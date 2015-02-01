@@ -157,7 +157,7 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
-		setBackgroundResource(beingDragged ? R.drawable.card_dragged : R.drawable.card_base);
+		setBackgroundResource(beingDragged ? R.drawable.card_bg_focused_raised : R.drawable.card_base);
 	}
 
 	@Override

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -151,20 +150,8 @@ public class NodeView extends LinearLayout implements DraggableView {
 			child.setDragManager(dragManager);
 		}
 
-		touchListener = new OnTouchListener() {
-			private DraggableViewTouchListener delegate = new DraggableViewTouchListener(NodeView.this, dragManager);
+		touchListener = new DraggableViewTouchListener(NodeView.this, dragManager);
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					ViewUtils.setBackgroundPreservePadding(NodeView.this, R.drawable.card_bg_raised);
-				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					ViewUtils.setBackgroundPreservePadding(NodeView.this, R.drawable.card_base);
-				}
-
-				return delegate.onTouch(v, event);
-			}
-		};
 
 		header.setOnFocusChangeListener(new DraggableViewFocusListener(this, dragManager));
 	}
@@ -321,6 +308,7 @@ public class NodeView extends LinearLayout implements DraggableView {
 	@Override
 	public void setBeingDragged(boolean beingDragged) {
 		header.setBackgroundResource(beingDragged ? R.drawable.node_top_bg_focused : R.drawable.node_top_bg);
+		ViewUtils.setBackgroundPreservePadding(NodeView.this, beingDragged ? R.drawable.card_bg_raised : R.drawable.card_bg);
 	}
 
 	@Override
