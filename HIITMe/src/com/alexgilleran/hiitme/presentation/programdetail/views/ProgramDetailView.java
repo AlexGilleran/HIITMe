@@ -229,6 +229,8 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 	private void animateScrollViewSlide(boolean editable) {
 		LayoutParams params = (LayoutParams) editBar.getLayoutParams();
 		float editBarHeight = params.height;
+		final int originalHeight = getLayoutParams().height;
+		getLayoutParams().height = getHeight() + (int) editBarHeight;
 
 		if (editable) {
 			setTranslationY(-editBarHeight);
@@ -236,7 +238,8 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
 				@Override
 				public void onAnimationEnd(Animator animation) {
-
+					getLayoutParams().height = originalHeight;
+					requestLayout();
 				}
 			});
 		} else {
@@ -245,6 +248,8 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 				public void onAnimationEnd(Animator animation) {
 					editBar.setVisibility(GONE);
 					setTranslationY(0);
+					getLayoutParams().height = originalHeight;
+					requestLayout();
 				}
 			});
 		}
