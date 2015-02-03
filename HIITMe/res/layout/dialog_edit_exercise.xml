@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView xmlns:android="http://schemas.android.com/apk/res/android"
-                                                                           android:layout_width="match_parent"
-                                                                           android:layout_height="match_parent"
-                                                                           android:gravity="center_vertical"
-                                                                           android:orientation="vertical"
-                                                                           android:padding="20dp"
-                                                                           android:stretchColumns="1">
+<com.alexgilleran.hiitme.presentation.programdetail.views.EditExerciseView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:stretchColumns="1">
 
     <TableRow
         android:layout_width="match_parent"
@@ -63,6 +64,7 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:inputType="number"
                 android:selectAllOnFocus="true"
                 android:textSize="25sp"/>
         </LinearLayout>

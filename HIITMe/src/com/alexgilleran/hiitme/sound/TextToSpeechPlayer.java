@@ -44,9 +44,10 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 
 		textToSpeech = new TextToSpeech(context, this);
 		textToSpeech.setSpeechRate(1.3f);
-		textToSpeech.setOnUtteranceProgressListener(utteranceListener);;
+		textToSpeech.setOnUtteranceProgressListener(utteranceListener);
+		;
 
-		speechParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_NOTIFICATION));
+		speechParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_MUSIC));
 		// mandatory to listen to utterances even though we don't care about the ID.
 		speechParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id");
 	}
@@ -146,7 +147,7 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 
 		@Override
 		public void onStart(String utteranceId) {
-			audioManager.requestAudioFocus(afChangeListener, AudioManager.STREAM_NOTIFICATION,
+			audioManager.requestAudioFocus(afChangeListener, AudioManager.STREAM_MUSIC,
 					AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
 		}
 	};

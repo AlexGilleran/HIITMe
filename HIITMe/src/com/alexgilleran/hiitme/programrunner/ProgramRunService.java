@@ -100,6 +100,7 @@ public class ProgramRunService extends IntentService {
 	private void stopRun() {
 		if (programRunner != null && !programRunner.isStopped()) {
 			programRunner.stop();
+			programRunner = null;
 		}
 
 		stopForeground(true);

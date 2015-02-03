@@ -162,7 +162,6 @@ public class RunFragment extends Fragment {
 		programProgressBar.setProgress(ProgressWheel.getMax());
 		exerciseProgressBar.setProgress(ProgressWheel.getMax());
 
-
 		programProgressBar.setTextLine1(formatTime(0));
 		programProgressBar.setTextLine2(formatTime(0));
 		exerciseName.setVisibility(View.INVISIBLE);
@@ -179,7 +178,7 @@ public class RunFragment extends Fragment {
 
 	private void updateExercise() {
 		// View can == null if we're mid way through an orientation switch
-		if (getView() != null && programBinder.isActive()) {
+		if (getView() != null && programBinder != null && programBinder.isActive()) {
 			Exercise currentExercise = programBinder.getCurrentExercise();
 			exerciseName.setText(currentExercise.getName());
 
@@ -194,12 +193,18 @@ public class RunFragment extends Fragment {
 				effortLevelText.setText(currentExercise.getEffortLevel().getString(getActivity()));
 				effortLevelText.setTextColor(currentExercise.getEffortLevel().getColorId(getActivity()));
 			}
+
 			exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getView().getContext()));
 		}
 	}
 
 	public boolean isRunning() {
 		return programBinder != null && programBinder.isRunning();
+	}
+
+
+	public boolean isPaused() {
+		return programBinder != null && programBinder.isPaused();
 	}
 
 	private boolean isStopped() {
@@ -287,6 +292,19 @@ public class RunFragment extends Fragment {
 				}).setCancelable(false).show();
 	}
 
+	private void updateProgress(long exerciseMsRemaining, long programMsRemaining) {
+		if (programProgressBar != null) {
+			programProgressBar.setTextLine1(formatTime(exerciseMsRemaining));
+			programProgressBar.setTextLine2(formatTime(programMsRemaining));
+			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
+		}
+
+		if (exerciseProgressBar != null) {
+			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, programBinder.getCurrentExercise()
+					.getDuration(), EXERCISE_WHEEL_START_DEGREES));
+		}
+	}
+
 	private OnClickListener stopButtonListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
@@ -325,6 +343,9 @@ public class RunFragment extends Fragment {
 				}
 			});
 
+			if (programBinder.isActive()) {
+				updateProgress(programBinder.getExerciseMsRemaining(), programBinder.getProgramMsRemaining());
+			}
 			updateExercise();
 
 			if (stopButton != null) {
@@ -341,12 +362,7 @@ public class RunFragment extends Fragment {
 	private final CountDownObserver countDownObserver = new CountDownObserver() {
 		@Override
 		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
-			programProgressBar.setTextLine1(formatTime(exerciseMsRemaining));
-			programProgressBar.setTextLine2(formatTime(programMsRemaining));
-
-			exerciseProgressBar.setProgress(getDegrees(exerciseMsRemaining, programBinder.getCurrentExercise()
-					.getDuration(), EXERCISE_WHEEL_START_DEGREES));
-			programProgressBar.setProgress(getDegrees(programMsRemaining, duration));
+			updateProgress(exerciseMsRemaining, programMsRemaining);
 		}
 
 		@Override

@@ -363,7 +363,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	}
 
 	private boolean isRunning() {
-		return runFragment != null && runFragment.isRunning();
+		return runFragment != null && (runFragment.isRunning() || runFragment.isPaused());
 	}
 
 	private boolean isEditing() {
