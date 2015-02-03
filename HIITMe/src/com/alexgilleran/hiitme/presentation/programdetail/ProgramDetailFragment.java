@@ -75,7 +75,9 @@ public class ProgramDetailFragment extends Fragment {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putBoolean(IS_EDITING_KEY, detailView.isEditable());
+		if (detailView != null) { // THIS GETS RUN EVEN WHEN THIS FRAGMENT ISN'T ON SCREEN WTF ANDROID?!
+			outState.putBoolean(IS_EDITING_KEY, detailView.isEditable());
+		}
 
 		super.onSaveInstanceState(outState);
 	}

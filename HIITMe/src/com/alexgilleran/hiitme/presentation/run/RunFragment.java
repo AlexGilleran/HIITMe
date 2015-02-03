@@ -27,7 +27,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.LayoutInflater;
@@ -57,6 +56,8 @@ public class RunFragment extends Fragment {
 	 * is turning from one exercise to the next instead of stopping and starting
 	 */
 	private static final int EXERCISE_WHEEL_START_DEGREES = 5;
+	private static final String FINISHED_KEY = "FINISHED";
+	private static final String EXERCISE_WHEEL_COLOR_KEY = "EXERCISE_WHEEL_COLOR";
 
 	private ProgressWheel programProgressBar;
 	private ProgressWheel exerciseProgressBar;
@@ -72,6 +73,7 @@ public class RunFragment extends Fragment {
 
 	private int duration;
 	private Intent serviceIntent;
+	private boolean isFinished = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +125,15 @@ public class RunFragment extends Fragment {
 		playButton.setOnClickListener(playButtonListener);
 		stopButton.setOnClickListener(stopButtonListener);
 
-		refreshPauseState();
+		if (savedInstanceState != null && savedInstanceState.getBoolean(FINISHED_KEY)) {
+			isFinished = true;
+
+			exerciseProgressBar.setBarColor(savedInstanceState.getInt(EXERCISE_WHEEL_COLOR_KEY, R.color.primary));
+
+			onRunFinish();
+		} else {
+			refreshPauseState();
+		}
 	}
 
 	@Override
@@ -133,6 +143,34 @@ public class RunFragment extends Fragment {
 		if (programBinder != null && !programBinder.isRunning() && !getActivity().isChangingConfigurations()) {
 			getActivity().unbindService(connection);
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		if (isFinished) {
+			outState.putBoolean(FINISHED_KEY, isFinished);
+
+			if (exerciseProgressBar != null) {
+				outState.putInt(EXERCISE_WHEEL_COLOR_KEY, exerciseProgressBar.getBarColor());
+			}
+		}
+	}
+
+	private void onRunFinish() {
+		hostingActivity.onProgramRunStopped();
+		refreshPauseState();
+		programProgressBar.setProgress(ProgressWheel.getMax());
+		exerciseProgressBar.setProgress(ProgressWheel.getMax());
+
+
+		programProgressBar.setTextLine1(formatTime(0));
+		programProgressBar.setTextLine2(formatTime(0));
+		exerciseName.setVisibility(View.INVISIBLE);
+		effortLevelText.setVisibility(View.INVISIBLE);
+		effortLevelIcon.setVisibility(View.INVISIBLE);
+
+		exerciseProgressBar.invalidate();
+		programProgressBar.invalidate();
 	}
 
 	public void stop() {
@@ -188,6 +226,8 @@ public class RunFragment extends Fragment {
 		playButton.setImageResource(getPlayButtonResource());
 
 		if (programBinder != null && programBinder.isPaused()) {
+			int progress = isFinished ? exerciseProgressBar.getMax() : 0;
+
 			exerciseProgressBar.setProgress(0);
 			exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
 					.getCurrentExercise().getDuration()));
@@ -197,9 +237,14 @@ public class RunFragment extends Fragment {
 			programProgressBar.setBarLength(getDegrees(programBinder.getProgramMsRemaining(), duration));
 			programProgressBar.spin();
 		} else {
-			// Be careful with this, it tends to reset the amount of progress.
-			exerciseProgressBar.stopSpinning();
-			programProgressBar.stopSpinning();
+			if (exerciseProgressBar.isSpinning()) {
+				// Be careful with this, it tends to reset the amount of progress.
+				exerciseProgressBar.stopSpinning();
+			}
+
+			if (programProgressBar.isSpinning()) {
+				programProgressBar.stopSpinning();
+			}
 		}
 	}
 
@@ -276,10 +321,6 @@ public class RunFragment extends Fragment {
 				public void onProgramReady(Program program) {
 					programBinder.registerCountDownObserver(countDownObserver);
 
-					if (programProgressBar != null) {
-						programProgressBar.setProgress(0);
-					}
-
 					duration = program.getAssociatedNode().getDuration();
 				}
 			});
@@ -293,11 +334,9 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
-			Toast.makeText(getActivity(), "Lost connection to run service", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), R.string.error_no_connection, Toast.LENGTH_SHORT).show();
 		}
 	}
-
-	;
 
 	private final CountDownObserver countDownObserver = new CountDownObserver() {
 		@Override
@@ -317,17 +356,13 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onProgramFinish() {
-			hostingActivity.onProgramRunStopped();
-			refreshPauseState();
-			programProgressBar.setProgress(ProgressWheel.getMax());
-			exerciseProgressBar.setProgress(ProgressWheel.getMax());
-			programProgressBar.setTextLine1(formatTime(0));
-			programProgressBar.setTextLine2(formatTime(0));
-			exerciseProgressBar.invalidate();
+			isFinished = true;
+			onRunFinish();
 		}
 
 		@Override
 		public void onStart() {
+			isFinished = false;
 			hostingActivity.onProgramRunStarted();
 			refreshPauseState();
 			updateExercise();
@@ -335,7 +370,7 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onError(ProgramError error) {
-			showAlertThenGoBack("This program runs for 0 seconds! Add some exercises to it first!");
+			showAlertThenGoBack(getString(R.string.error_program_zero_duration));
 		}
 	};
 

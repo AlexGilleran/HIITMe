@@ -16,12 +16,12 @@ import com.alexgilleran.hiitme.R;
 
 /**
  * An indicator of progress, similar to Android's ProgressBar. Can be used in 'spin mode' or 'increment mode'
- * 
+ * <p/>
  * This has been modified to allow for two independently-styled lines of text in the middle.
- * 
+ *
  * @author Todd Davies
  * @author Alex Gilleran (modifications)
- * 
+ *         <p/>
  *         Licensed under the Creative Commons Attribution 3.0 license see: http://creativecommons.org/licenses/by/3.0/
  */
 public class ProgressWheel extends View {
@@ -95,7 +95,7 @@ public class ProgressWheel extends View {
 
 	/**
 	 * The constructor for the ProgressWheel
-	 * 
+	 *
 	 * @param context
 	 * @param attrs
 	 */
@@ -185,9 +185,8 @@ public class ProgressWheel extends View {
 
 	/**
 	 * Parse the attributes passed to the view from the XML
-	 * 
-	 * @param a
-	 *            the attributes to parse
+	 *
+	 * @param a the attributes to parse
 	 */
 	private void parseAttributes(TypedArray a) {
 		barWidth = (int) a.getDimension(R.styleable.ProgressWheel_barWidth, barWidth);
@@ -230,7 +229,7 @@ public class ProgressWheel extends View {
 	// ----------------------------------
 	// Animation stuff
 	// ----------------------------------
-
+	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		// Draw the rim
@@ -274,6 +273,10 @@ public class ProgressWheel extends View {
 		spinHandler.removeMessages(0);
 	}
 
+	public boolean isSpinning() {
+		return isSpinning;
+	}
+
 	/**
 	 * Puts the view on spin mode
 	 */
@@ -307,9 +310,8 @@ public class ProgressWheel extends View {
 
 	/**
 	 * Set the text in the progress bar Doesn't invalidate the view
-	 * 
-	 * @param text
-	 *            the text to show ('\n' constitutes a new line)
+	 *
+	 * @param text the text to show ('\n' constitutes a new line)
 	 */
 	public void setTextLine1(String text) {
 		this.textLine1 = text;
