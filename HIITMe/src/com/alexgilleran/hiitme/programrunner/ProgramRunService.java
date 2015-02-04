@@ -137,7 +137,7 @@ public class ProgramRunService extends IntentService {
 			builder.setProgress(duration, duration - programRunner.getProgramMsRemaining(), false);
 		}
 
-		builder.setSmallIcon(R.drawable.ic_launcher);
+		builder.setSmallIcon(R.drawable.notification_icon);
 		builder.setOngoing(true);
 		builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, continueIntent, 0));
 
