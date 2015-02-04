@@ -268,8 +268,9 @@ public class RunFragment extends Fragment {
 	private String formatTime(long mseconds) {
 		int minutes = (int) mseconds / 60000;
 		int seconds = (int) mseconds % 60000;
+		int dSeconds = (int) seconds % 1000 / 100;
 
-		return minutes + ":" + seconds / 1000 + "." + (seconds % 1000 / 100);
+		return minutes + ":" + ViewUtils.timeUnitToString(seconds / 1000) + "." + ViewUtils.timeUnitToString(dSeconds);
 	}
 
 	private int getDegrees(long msecondsRemaining, int duration) {

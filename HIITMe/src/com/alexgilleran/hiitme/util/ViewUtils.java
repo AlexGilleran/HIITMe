@@ -89,12 +89,12 @@ public class ViewUtils {
 		return size == Configuration.SCREENLAYOUT_SIZE_LARGE || size == Configuration.SCREENLAYOUT_SIZE_XLARGE;
 	}
 
-	public static String timeUnitToString(int number, int digits) {
-		return String.format(Locale.ENGLISH, "%0" + digits + "d", number);
+	public static String timeUnitToString(int number) {
+		return String.format(Locale.ENGLISH, "%02d", number);
 	}
 
 	public static String getTimeText(int ms) {
-		return timeUnitToString(getMinutesFromMs(ms), 1) + "." + timeUnitToString(getSecondsFromMs(ms), 2);
+		return timeUnitToString(getMinutesFromMs(ms)) + "." + timeUnitToString(getSecondsFromMs(ms));
 	}
 
 	public static int getMinutesFromMs(int ms) {
