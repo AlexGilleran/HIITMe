@@ -62,10 +62,10 @@ public class Node extends DatabaseModel {
 		getChildren().remove(child);
 	}
 
-	public Exercise addChildExercise(String name, int duration, EffortLevel effortLevel, int repCount) {
+	public Exercise addChildExercise(String name, int duration, EffortLevel effortLevel) {
 		checkCanHaveChildren();
 
-		Node containerNode = addChildNode(repCount);
+		Node containerNode = addChildNode(1);
 		Exercise newExercise = new Exercise(name, duration, effortLevel, containerNode);
 		containerNode.setAttachedExercise(newExercise);
 

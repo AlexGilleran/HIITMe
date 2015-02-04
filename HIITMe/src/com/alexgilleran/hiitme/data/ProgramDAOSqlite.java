@@ -69,26 +69,63 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 		db.execSQL(nodeTable.getCreateSql());
 		db.execSQL(programTable.getCreateSql());
 
-		Program tabata = new Program("Tabata");
+		Program tabata = new Program("Tabata Protocol");
 		tabata.getAssociatedNode().setTotalReps(8);
-		tabata.getAssociatedNode().addChildExercise("Hard", 2000, EffortLevel.HARD, 1);
-		tabata.getAssociatedNode().addChildExercise("Rest", 1000, EffortLevel.REST, 1);
+		tabata.getAssociatedNode().addChildExercise("Hard", 20000, EffortLevel.HARD);
+		tabata.getAssociatedNode().addChildExercise("Rest", 10000, EffortLevel.REST);
 
 		saveProgram(tabata, db);
 
-		Program nestTest = new Program("NestTest");
-		nestTest.getAssociatedNode().setTotalReps(2);
-		Node nestNode1 = nestTest.getAssociatedNode().addChildNode(2);
-		Node nestNode11 = nestNode1.addChildNode(2);
-		Node nestNode111 = nestNode11.addChildNode(1);
-		nestNode111.addChildExercise("Ex1", 1000, EffortLevel.HARD, 2);
-		nestNode111.addChildExercise("Ex2", 2000, EffortLevel.HARD, 3);
-		Node nestNode12 = nestNode1.addChildNode(3);
-		nestNode12.addChildExercise("Ex3", 1500, EffortLevel.EASY, 1);
-		Node nestNode2 = nestTest.getAssociatedNode().addChildNode(1);
-		nestNode2.addChildExercise("Ex4", 1000, EffortLevel.REST, 1);
+		Program c25k = new Program("Couch to 5k Week 1");
+		c25k.getAssociatedNode().addChildExercise("Warm up walk", minutesInMs(5), EffortLevel.NONE);
+		Node running = c25k.getAssociatedNode().addChildNode(7);
+		running.addChildExercise("Run", 60000, EffortLevel.EASY);
+		running.addChildExercise("Walk", 90000, EffortLevel.NONE);
+		c25k.getAssociatedNode().addChildExercise("Run", 60000, EffortLevel.EASY);
+		c25k.getAssociatedNode().addChildExercise("Cool down walk", minutesInMs(5), EffortLevel.NONE);
 
-		saveProgram(nestTest, db);
+		saveProgram(c25k, db);
+
+		Program fartlek = new Program("Fartlek");
+		fartlek.getAssociatedNode().addChildExercise("Warm up", minutesInMs(15), EffortLevel.EASY);
+		Node exercises = fartlek.getAssociatedNode().addChildNode(6);
+		exercises.addChildExercise("Burst!", 30000, EffortLevel.HARD);
+		exercises.addChildExercise("Recover", minutesInMs(3), EffortLevel.EASY);
+		fartlek.getAssociatedNode().addChildExercise("Cool down", minutesInMs(10), EffortLevel.EASY);
+
+		saveProgram(fartlek, db);
+
+		Program pyramid = new Program("Cardio-Sprint Pyramid");
+		pyramid.getAssociatedNode().addChildExercise("Warm up", minutesInMs(15), EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", 30000, EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", 30000, EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", minutesInMs(1), EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", minutesInMs(1), EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", minutesInMs(2), EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", minutesInMs(2), EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", minutesInMs(4), EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", minutesInMs(4), EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", minutesInMs(2), EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", minutesInMs(2), EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", minutesInMs(1), EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", minutesInMs(1), EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Sprint", 30000, EffortLevel.HARD);
+		pyramid.getAssociatedNode().addChildExercise("Recover", 30000, EffortLevel.EASY);
+
+		pyramid.getAssociatedNode().addChildExercise("Cool down", minutesInMs(10), EffortLevel.EASY);
+
+		saveProgram(pyramid, db);
+	}
+
+	private static int minutesInMs(int ms) {
+		return ms * 60000;
 	}
 
 	@Override

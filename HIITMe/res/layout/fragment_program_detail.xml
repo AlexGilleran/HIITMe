@@ -76,13 +76,14 @@
                 style="@style/EditableText"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="0dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="19dp"
                 android:layout_marginBottom="13dp"
                 android:singleLine="true"/>
 
             <EditText
                 android:id="@+id/name_edit"
                 style="@style/EditableText"
+                android:layout_marginTop="15dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
                 android:singleLine="true"
