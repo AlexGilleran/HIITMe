@@ -203,8 +203,6 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void pause() {
 			programRunner.pause();
-
-			wakeLock.release();
 		}
 
 		@Override

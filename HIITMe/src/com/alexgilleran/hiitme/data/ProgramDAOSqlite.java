@@ -71,8 +71,8 @@ public class ProgramDAOSqlite extends SQLiteOpenHelper implements ProgramDAO {
 
 		Program tabata = new Program("Tabata Protocol");
 		tabata.getAssociatedNode().setTotalReps(8);
-		tabata.getAssociatedNode().addChildExercise("Hard", 20000, EffortLevel.HARD);
-		tabata.getAssociatedNode().addChildExercise("Rest", 10000, EffortLevel.REST);
+		tabata.getAssociatedNode().addChildExercise(null, 20000, EffortLevel.HARD);
+		tabata.getAssociatedNode().addChildExercise(null, 10000, EffortLevel.REST);
 
 		saveProgram(tabata, db);
 

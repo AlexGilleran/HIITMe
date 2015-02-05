@@ -194,6 +194,8 @@ public class RunFragment extends Fragment {
 				effortLevelText.setTextColor(currentExercise.getEffortLevel().getColorId(getActivity()));
 			}
 
+			exerciseName.setVisibility(currentExercise.getName() == null ? View.INVISIBLE : View.VISIBLE);
+
 			exerciseProgressBar.setBarColor(currentExercise.getEffortLevel().getColorId(getView().getContext()));
 		}
 	}

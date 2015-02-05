@@ -282,6 +282,10 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 	 * it.
 	 */
 	private void moveDragViewIfNecessary() {
+		if (hoverCellCurrentBounds == null) {
+			return;
+		}
+
 		if (hoverCellCurrentBounds.top > recycleBin.getTop() && hoverCellCurrentBounds.top < recycleBin.getBottom()) {
 			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg_hover);
 			if (dragView.getParentNode() != null) {
