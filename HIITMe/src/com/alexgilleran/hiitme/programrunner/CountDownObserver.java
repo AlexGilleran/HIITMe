@@ -27,6 +27,8 @@ public interface CountDownObserver {
 
 	void onProgramFinish();
 
+	void onPause();
+
 	void onError(CountDownObserver.ProgramError error);
 
 	public enum ProgramError {

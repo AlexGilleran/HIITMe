@@ -22,8 +22,10 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
@@ -57,6 +59,7 @@ public class ProgramRunService extends IntentService {
 	 */
 	private static final int TICK_RATE_DIVISOR = 1000 / ProgramRunner.TICK_RATE;
 	private static final int NOTIFICATION_ID = 2;
+	private static final IntentFilter noisyIntentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
 	private String notificationTitle;
 	private NotificationManager notificationManager;
@@ -91,13 +94,29 @@ public class ProgramRunService extends IntentService {
 
 	@Override
 	public void onDestroy() {
-		stopRun();
+		stop();
 		soundPlayer.cleanUp();
 
 		super.onDestroy();
 	}
 
-	private void stopRun() {
+	private void pause() {
+		unregisterReceiver(headphonesUnpluggedReceiver);
+		programRunner.pause();
+	}
+
+	private void start() {
+		registerReceiver(headphonesUnpluggedReceiver, noisyIntentFilter);
+		programRunner.start();
+	}
+
+	private void stop() {
+		try {
+			unregisterReceiver(headphonesUnpluggedReceiver);
+		} catch (IllegalArgumentException e) {
+			// Already unregistered, oh well.
+		}
+
 		if (programRunner != null && !programRunner.isStopped()) {
 			programRunner.stop();
 			programRunner = null;
@@ -169,6 +188,15 @@ public class ProgramRunService extends IntentService {
 		notificationManager.notify(NOTIFICATION_ID, buildNotification());
 	}
 
+	private BroadcastReceiver headphonesUnpluggedReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+				ProgramRunService.this.pause();
+			}
+		}
+	};
+
 	public class ProgramBinderImpl extends Binder implements ProgramBinder {
 		@Override
 		public void start() {
@@ -186,9 +214,9 @@ public class ProgramRunService extends IntentService {
 
 				programRunner = new ProgramRunnerImpl(program, masterObserver);
 
-				programRunner.start();
+				ProgramRunService.this.start();
 			} else if (programRunner.isPaused()) {
-				programRunner.start();
+				ProgramRunService.this.start();
 			} else if (programRunner.isRunning()) {
 				Log.wtf(getPackageName(),
 						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
@@ -197,12 +225,12 @@ public class ProgramRunService extends IntentService {
 
 		@Override
 		public void stop() {
-			stopRun();
+			ProgramRunService.this.stop();
 		}
 
 		@Override
 		public void pause() {
-			programRunner.pause();
+			ProgramRunService.this.pause();
 		}
 
 		@Override
@@ -293,6 +321,11 @@ public class ProgramRunService extends IntentService {
 		}
 
 		@Override
+		public void onPause() {
+
+		}
+
+		@Override
 		public void onError(ProgramError error) {
 		}
 	};
@@ -315,6 +348,11 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void onProgramFinish() {
 			soundPlayer.playEnd();
+		}
+
+		@Override
+		public void onPause() {
+
 		}
 
 		@Override
@@ -352,7 +390,14 @@ public class ProgramRunService extends IntentService {
 				observer.onProgramFinish();
 			}
 
-			stopRun();
+			stop();
+		}
+
+		@Override
+		public void onPause() {
+			for (CountDownObserver observer : observers) {
+				observer.onPause();
+			}
 		}
 
 		@Override

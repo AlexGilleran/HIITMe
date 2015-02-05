@@ -327,8 +327,6 @@ public class RunFragment extends Fragment {
 			} else {
 				programBinder.start();
 			}
-
-			refreshPauseState();
 		}
 	};
 
@@ -377,6 +375,11 @@ public class RunFragment extends Fragment {
 		public void onProgramFinish() {
 			isFinished = true;
 			onRunFinish();
+		}
+
+		@Override
+		public void onPause() {
+			refreshPauseState();
 		}
 
 		@Override
