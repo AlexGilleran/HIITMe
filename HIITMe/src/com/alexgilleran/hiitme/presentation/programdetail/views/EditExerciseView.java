@@ -62,6 +62,8 @@ public class EditExerciseView extends TableLayout {
 		durationSeconds.setFilters(new InputFilter[]{new InputFilterMinMax("0", "59")});
 
 		name = (EditText) findViewById(R.id.exercise_edit_name);
+
+		render();
 	}
 
 	public Exercise update() {
@@ -84,11 +86,23 @@ public class EditExerciseView extends TableLayout {
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;
 
-		effortSpinner.setSelection(exercise.getEffortLevel().ordinal());
+		render();
+	}
 
-		durationMinutes.setText(String.format("%02d", exercise.getMinutes()));
-		durationSeconds.setText(String.format("%02d", exercise.getSeconds()));
+	private void render() {
+		if (effortSpinner != null) {
+			effortSpinner.setSelection(exercise.getEffortLevel().ordinal());
+		}
 
-		name.setText(exercise.getName());
+		if (durationMinutes != null) {
+			durationMinutes.setText(String.format("%02d", exercise.getMinutes()));
+		}
+		if (durationSeconds != null) {
+			durationSeconds.setText(String.format("%02d", exercise.getSeconds()));
+		}
+
+		if (name != null) {
+			name.setText(exercise.getName());
+		}
 	}
 }

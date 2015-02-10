@@ -37,8 +37,10 @@ public class ProgramNodeState {
 		children = new ArrayList<ProgramNodeState>(node.getChildren().size());
 		for (int i = 0; i < node.getChildren().size(); i++) {
 			Node child = node.getChildren().get(i);
-			if (!child.isEmpty() && child.getTotalReps() > 0) {
-				children.add(new ProgramNodeState(child));
+			ProgramNodeState state = new ProgramNodeState(child);
+
+			if (!state.isEmpty()) {
+				children.add(state);
 			}
 		}
 		reset();
@@ -92,11 +94,29 @@ public class ProgramNodeState {
 			throw new RuntimeException("getCurrentNode() called on finished ProgramNode");
 		}
 
-		if (wrappedNode.hasChildren()) {
+		if (!children.isEmpty()) {
 			return children.get(currentChildIndex);
 		} else {
 			return this;
 		}
+	}
+
+	public boolean isEmpty() {
+		if (wrappedNode.isEmpty() || wrappedNode.getTotalReps() == 0) {
+			return true;
+		}
+
+		if (wrappedNode.getAttachedExercise() != null) {
+			return false;
+		}
+
+		for (ProgramNodeState child : children) {
+			if (!child.isEmpty()) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public Exercise getCurrentExercise() {
@@ -118,7 +138,7 @@ public class ProgramNodeState {
 					"next() called on finished node - node must be reset before next() is called again");
 		}
 
-		if (wrappedNode.hasChildren()) {
+		if (!children.isEmpty()) {
 			// the next node.
 			ProgramNodeState currentNodeState = getCurrentNodeState();
 			currentNodeState.next();

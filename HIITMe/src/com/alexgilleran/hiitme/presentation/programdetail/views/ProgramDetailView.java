@@ -472,7 +472,9 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 				animateRestoreHoverCell();
 			}
 
-			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg);
+			if (recycleBin != null) {
+				recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg);
+			}
 		}
 	}
 
@@ -482,6 +484,10 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 	private void animateRestoreHoverCell() {
 		if (hoverViewAnimator != null && hoverViewAnimator.isRunning()) {
 			hoverViewAnimator.end();
+		}
+
+		if (hoverCellCurrentBounds == null) {
+			return;
 		}
 
 		hoverCellCurrentBounds.offsetTo(hoverCellOriginalBounds.left, ViewUtils.getYCoordOnScreen(dragView.asView())

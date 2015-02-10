@@ -115,7 +115,9 @@ public class ProgramRunnerImpl implements ProgramRunner {
 		countDown.cancel();
 		countDown = new ProgramCountDown(programMsRemaining, TICK_RATE);
 
-		observer.onPause();
+		if (observer != null) {
+			observer.onPause();
+		}
 	}
 
 	@Override
