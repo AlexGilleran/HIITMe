@@ -610,7 +610,7 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		@Override
 		public boolean onTouch(View v, final MotionEvent event) {
 			if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getTop(), null);
+				InsertionPoint insertionPoint = findInsertionPoint(scrollingView.getBottom(), null);
 				final ExerciseView view = insertionPoint.parent.addExercise(new Exercise(), insertionPoint.index);
 				view.setNewlyCreated(true);
 				scrollingView.lockScrollUntilTouchInMiddle();
@@ -638,7 +638,7 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 						scrollingView.getNodeView(), false);
 				view.init(node);
 				view.setDragManager(ProgramDetailView.this);
-				insertAt(view, findInsertionPoint(scrollingView.getTop(), view));
+				insertAt(view, findInsertionPoint(scrollingView.getBottom(), view));
 				view.setEditable(true);
 				view.setNewlyCreated(true);
 				scrollingView.lockScrollUntilTouchInMiddle();
