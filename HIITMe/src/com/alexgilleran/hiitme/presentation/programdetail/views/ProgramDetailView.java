@@ -40,7 +40,6 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.view.animation.PathInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -64,10 +63,10 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 	private TextView nameReadOnly;
 	private EditText nameEditable;
 	private LinearLayout editBar;
+	private ImageButton deleteButton;
 	private ImageButton editButton;
 	private ImageButton addExerciseButton;
 	private ImageButton addNodeButton;
-	private View recycleBin;
 
 	private Program program;
 	private boolean editable = false;
@@ -117,14 +116,13 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 
 		layoutInflater = LayoutInflater.from(getContext());
 
-		recycleBin = (View) findViewById(R.id.recycle_bin);
-
 		scrollingView = (ScrollingProgramView) findViewById(R.id.view_scrolling);
 
 		nameReadOnly = (TextView) findViewById(R.id.name_ro);
 		nameEditable = (EditText) findViewById(R.id.name_edit);
 		editBar = (LinearLayout) findViewById(R.id.layout_edit_button_bar);
 		editButton = (ImageButton) findViewById(R.id.button_edit);
+		deleteButton = (ImageButton) findViewById(R.id.button_recycle_bin);
 		addExerciseButton = (ImageButton) findViewById(R.id.button_add_exercise);
 		addNodeButton = (ImageButton) findViewById(R.id.button_add_node);
 
@@ -246,14 +244,6 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 			@Override
 			public void run() {
 				editBar.setVisibility(ViewUtils.getVisibilityInt(editable));
-
-//				if (editable) {
-//					editBar.setTranslationY(editBar.getHeight());
-//					editBar.animate().translationY(0);
-//				} else {
-//					editBar.setTranslationY(0);
-//					editBar.animate().translationY(editBar.getHeight());
-//				}
 			}
 		});
 
@@ -263,38 +253,6 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		if (!editable) {
 			nameReadOnly.setText(nameEditable.getText());
 		}
-
-	}
-
-	private void animateScrollViewSlide(boolean editable) {
-//		LayoutParams params = (LayoutParams) editBar.getLayoutParams();
-//		final float editBarHeight = params.height;
-//		final int originalHeight = getLayoutParams().height;
-//		getLayoutParams().height = getHeight() + (int) editBarHeight;
-//
-//		if (editable) {
-//			editBar.setVisibility(VISIBLE);
-//			setTranslationY(editBarHeight);
-//			ViewUtils.collapse(this);
-//			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
-//				@Override
-//				public void onAnimationEnd(Animator animation) {
-//					getLayoutParams().height = originalHeight;
-//					requestLayout();
-//				}
-//			});
-//		} else {
-//			ViewUtils.expand(this);
-//			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
-//				@Override
-//				public void onAnimationEnd(Animator animation) {
-//					editBar.setVisibility(GONE);
-//					setTranslationY(editBarHeight);
-//					getLayoutParams().height = originalHeight;
-//					requestLayout();
-//				}
-//			});
-//		}
 	}
 
 	/**
@@ -328,13 +286,11 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 			return;
 		}
 
-		if (hoverCellCurrentBounds.top > recycleBin.getTop() && hoverCellCurrentBounds.top < recycleBin.getBottom()) {
-			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg_hover);
+		if (hoverCellCurrentBounds.top > deleteButton.getTop() && hoverCellCurrentBounds.top < deleteButton.getBottom()) {
 			if (dragView.getParentNode() != null) {
 				dragView.getParentNode().removeChild(dragView);
 			}
 		} else {
-			recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg);
 			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
 
 			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
@@ -439,6 +395,7 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 				requestFocus();
 				// Make sure the edit button stays visible during the drag.
 				editButton.setVisibility(VISIBLE);
+				deleteButton.setVisibility(VISIBLE);
 
 				dragView.setBeingDragged(true);
 				hoverCell = getAndAddHoverView(dragView);
@@ -513,10 +470,6 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 
 				animateRestoreHoverCell();
 			}
-
-			if (recycleBin != null) {
-				recycleBin.setBackgroundResource(R.drawable.recycle_bin_bg);
-			}
 		}
 	}
 
@@ -584,10 +537,12 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		return fragmentManager;
 	}
 
-	private Runnable hideEditButtonRunnable = new Runnable() {
+	private Runnable hideEditDeleteButtonsRunnable = new Runnable() {
 		@Override
 		public void run() {
-			editButton.setVisibility(ViewUtils.getVisibilityInt(draggableViewFocused || currentlyDragging()));
+			int visibility = ViewUtils.getVisibilityInt(draggableViewFocused || currentlyDragging());
+			deleteButton.setVisibility(visibility);
+			editButton.setVisibility(visibility);
 		}
 	};
 
@@ -597,7 +552,7 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		if (focused) {
 			lastFocusedView = (DraggableView) focusedView;
 		}
-		postDelayed(hideEditButtonRunnable, 10);
+		postDelayed(hideEditDeleteButtonsRunnable, 10);
 	}
 
 	private final OnClickListener editListener = new OnClickListener() {

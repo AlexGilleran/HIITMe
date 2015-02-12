@@ -63,7 +63,9 @@ public class EditExerciseView extends TableLayout {
 
 		name = (EditText) findViewById(R.id.exercise_edit_name);
 
-		render();
+		if (exercise != null) {
+			render();
+		}
 	}
 
 	public Exercise update() {

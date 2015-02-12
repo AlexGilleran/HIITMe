@@ -48,36 +48,35 @@
     <LinearLayout
         android:id="@+id/layout_edit_button_bar"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="60dp"
+        android:background="@color/primary"
         android:visibility="gone"
-        android:gravity="right"
+        android:gravity="center"
         android:animateLayoutChanges="true"
         android:orientation="horizontal">
 
-        <ImageView
+        <ImageButton
             android:src="@drawable/ic_action_discard"
-            android:id="@+id/recycle_bin"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="45dp"
-            android:scaleType="center"
-            android:layout_margin="10dp"
-            android:background="@drawable/recycle_bin_bg"/>
+            android:id="@+id/button_recycle_bin"
+            android:layout_margin="0dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:adjustViewBounds="true"
+            android:padding="15dp"
+            android:visibility="gone"/>
 
         <ImageButton
             android:id="@+id/button_edit"
             android:padding="15dp"
-            android:layout_marginTop="2dp"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/ic_edit_dark"
+            android:src="@drawable/ic_action_edit"
             android:visibility="gone"/>
 
         <ImageButton
             android:id="@+id/button_add_exercise"
             android:padding="15dp"
-            android:layout_marginTop="2dp"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:adjustViewBounds="true"
@@ -86,7 +85,6 @@
         <ImageButton
             android:id="@+id/button_add_node"
             android:padding="15dp"
-            android:layout_marginTop="2dp"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:adjustViewBounds="true"
