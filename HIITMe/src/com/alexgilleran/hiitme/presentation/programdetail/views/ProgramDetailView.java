@@ -24,8 +24,10 @@ import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -129,6 +131,7 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		addExerciseButton.setOnTouchListener(addExerciseListener);
 		addNodeButton.setOnTouchListener(addNodeListener);
 		editButton.setOnClickListener(editListener);
+		deleteButton.setOnClickListener(deleteListener);
 
 		getViewTreeObserver().addOnGlobalLayoutListener(yOffsetObserver);
 
@@ -286,16 +289,10 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 			return;
 		}
 
-		if (hoverCellCurrentBounds.top > deleteButton.getTop() && hoverCellCurrentBounds.top < deleteButton.getBottom()) {
-			if (dragView.getParentNode() != null) {
-				dragView.getParentNode().removeChild(dragView);
-			}
-		} else {
-			final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
+		final InsertionPoint insertionPoint = findInsertionPoint(hoverCellCurrentBounds.top, dragView);
 
-			if (insertionPoint != null && insertionPoint.swapWith != dragView) {
-				insertAt(dragView, insertionPoint);
-			}
+		if (insertionPoint != null && insertionPoint.swapWith != dragView) {
+			insertAt(dragView, insertionPoint);
 		}
 	}
 
@@ -378,6 +375,10 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 	}
 
+	public boolean shouldDeleteButtonBeVisible() {
+		return lastFocusedView != null && lastFocusedView.getParentNode() != null && (draggableViewFocused || currentlyDragging());
+	}
+
 	public void startDrag(final DraggableView view, int downY, final int startTop) {
 		dragView = view;
 		this.downY = downY;
@@ -395,7 +396,7 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 				requestFocus();
 				// Make sure the edit button stays visible during the drag.
 				editButton.setVisibility(VISIBLE);
-				deleteButton.setVisibility(VISIBLE);
+				deleteButton.setVisibility(ViewUtils.getVisibilityInt(shouldDeleteButtonBeVisible()));
 
 				dragView.setBeingDragged(true);
 				hoverCell = getAndAddHoverView(dragView);
@@ -540,9 +541,8 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 	private Runnable hideEditDeleteButtonsRunnable = new Runnable() {
 		@Override
 		public void run() {
-			int visibility = ViewUtils.getVisibilityInt(draggableViewFocused || currentlyDragging());
-			deleteButton.setVisibility(visibility);
-			editButton.setVisibility(visibility);
+			deleteButton.setVisibility(ViewUtils.getVisibilityInt(shouldDeleteButtonBeVisible()));
+			editButton.setVisibility(ViewUtils.getVisibilityInt(draggableViewFocused || currentlyDragging()));
 		}
 	};
 
@@ -558,9 +558,37 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 	private final OnClickListener editListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			lastFocusedView.edit();
+			if (lastFocusedView != null) {
+				lastFocusedView.edit();
+			}
 		}
 	};
+
+	private final OnClickListener deleteListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			if (lastFocusedView != null) {
+				String type = getResources().getString(lastFocusedView instanceof NodeView ? R.string.node_name : R.string.exercise_name);
+				String message = getResources().getString(R.string.delete_warning) + " " + type + "?";
+
+				new AlertDialog.Builder(getContext()).setMessage(message)
+						.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								lastFocusedView.getParentNode().removeChild(lastFocusedView);
+
+								dialog.dismiss();
+							}
+						})
+						.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						}).show();
+			}
+		}
+	};
+
 
 	/**
 	 * This TypeEvaluator is used to animate the BitmapDrawable back to its final location when the user lifts their

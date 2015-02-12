@@ -37,4 +37,7 @@
     <string name="heading_edit_exercise">Edit Exercise</string>
     <string name="error_program_zero_duration">This program runs for 0 seconds! Add some exercises to it first!</string>
     <string name="error_no_connection">Lost connection to run service</string>
+    <string name="delete_warning">Are you sure you want to delete this</string>
+    <string name="node_name">group</string>
+    <string name="exercise_name">exercise</string>
 </resources>
