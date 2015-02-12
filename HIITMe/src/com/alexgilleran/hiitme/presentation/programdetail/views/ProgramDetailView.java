@@ -20,6 +20,7 @@ package com.alexgilleran.hiitme.presentation.programdetail.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
@@ -37,6 +38,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.view.animation.PathInterpolator;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -133,6 +137,25 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		if (program != null) {
 			render();
 		}
+
+		Interpolator interpolator = new AccelerateDecelerateInterpolator();
+
+		LayoutTransition openTransition = new LayoutTransition();
+		openTransition.setStartDelay(LayoutTransition.APPEARING, 0);
+		openTransition.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);
+		openTransition.setStartDelay(LayoutTransition.DISAPPEARING, 0);
+		openTransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		openTransition.setInterpolator(LayoutTransition.APPEARING, interpolator);
+		openTransition.setInterpolator(LayoutTransition.CHANGE_DISAPPEARING, interpolator);
+		openTransition.setInterpolator(LayoutTransition.DISAPPEARING, interpolator);
+		openTransition.setInterpolator(LayoutTransition.CHANGE_APPEARING, interpolator);
+//		openTransition.setStagger(LayoutTransition.APPEARING, 0);
+//		openTransition.setStagger(LayoutTransition.CHANGE_DISAPPEARING, 0);
+//		openTransition.setDuration(LayoutTransition.DISAPPEARING, 210);
+//		openTransition.setDuration(LayoutTransition.APPEARING, 210);
+		openTransition.setAnimator(LayoutTransition.DISAPPEARING, ObjectAnimator.ofFloat(null, View.TRANSLATION_Y, 0, editBar.getLayoutParams().height));
+		openTransition.setAnimator(LayoutTransition.APPEARING, ObjectAnimator.ofFloat(null, View.TRANSLATION_Y, editBar.getLayoutParams().height, 0));
+		setLayoutTransition(openTransition);
 	}
 
 	public String getName() {
@@ -145,6 +168,8 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		if (scrollingView != null) {
 			render();
 		}
+
+		requestLayout();
 	}
 
 	private void render() {
@@ -210,13 +235,27 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		return editable;
 	}
 
-	public void setEditable(boolean editable) {
+	public void setEditable(final boolean editable) {
 		this.editable = editable;
 
 		scrollingView.setEditable(editable);
 		nameReadOnly.setVisibility(ViewUtils.getVisibilityInt(!editable));
+		requestLayout();
 
-		animateScrollViewSlide(editable);
+		post(new Runnable() {
+			@Override
+			public void run() {
+				editBar.setVisibility(ViewUtils.getVisibilityInt(editable));
+
+//				if (editable) {
+//					editBar.setTranslationY(editBar.getHeight());
+//					editBar.animate().translationY(0);
+//				} else {
+//					editBar.setTranslationY(0);
+//					editBar.animate().translationY(editBar.getHeight());
+//				}
+			}
+		});
 
 		int editableVisibility = ViewUtils.getVisibilityInt(editable);
 		nameEditable.setVisibility(editableVisibility);
@@ -224,35 +263,38 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		if (!editable) {
 			nameReadOnly.setText(nameEditable.getText());
 		}
+
 	}
 
 	private void animateScrollViewSlide(boolean editable) {
-		LayoutParams params = (LayoutParams) editBar.getLayoutParams();
-		float editBarHeight = params.height;
-		final int originalHeight = getLayoutParams().height;
-		getLayoutParams().height = getHeight() + (int) editBarHeight;
-
-		if (editable) {
-			setTranslationY(-editBarHeight);
-			editBar.setVisibility(VISIBLE);
-			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					getLayoutParams().height = originalHeight;
-					requestLayout();
-				}
-			});
-		} else {
-			animate().translationY(-editBarHeight).setListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					editBar.setVisibility(GONE);
-					setTranslationY(0);
-					getLayoutParams().height = originalHeight;
-					requestLayout();
-				}
-			});
-		}
+//		LayoutParams params = (LayoutParams) editBar.getLayoutParams();
+//		final float editBarHeight = params.height;
+//		final int originalHeight = getLayoutParams().height;
+//		getLayoutParams().height = getHeight() + (int) editBarHeight;
+//
+//		if (editable) {
+//			editBar.setVisibility(VISIBLE);
+//			setTranslationY(editBarHeight);
+//			ViewUtils.collapse(this);
+//			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
+//				@Override
+//				public void onAnimationEnd(Animator animation) {
+//					getLayoutParams().height = originalHeight;
+//					requestLayout();
+//				}
+//			});
+//		} else {
+//			ViewUtils.expand(this);
+//			animate().translationY(0).setListener(new AnimatorListenerAdapter() {
+//				@Override
+//				public void onAnimationEnd(Animator animation) {
+//					editBar.setVisibility(GONE);
+//					setTranslationY(editBarHeight);
+//					getLayoutParams().height = originalHeight;
+//					requestLayout();
+//				}
+//			});
+//		}
 	}
 
 	/**

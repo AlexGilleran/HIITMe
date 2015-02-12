@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
@@ -108,13 +109,13 @@ public class ProgramDetailFragment extends Fragment {
 	}
 
 	public void stopEditing(boolean save) {
-		detailView.setEditable(false);
-
 		if (save) {
 			save();
 		} else {
 			refreshProgram(true);
 			detailView.setProgram(program);
 		}
+
+		detailView.setEditable(false);
 	}
 }

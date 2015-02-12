@@ -4,9 +4,46 @@
     android:id="@+id/layout_root"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView
+        android:id="@+id/view_scrolling"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="false">
+
+        <LinearLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name_ro"
+                style="@style/EditableText"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="0dp"
+                android:layout_marginTop="19dp"
+                android:layout_marginBottom="13dp"
+                android:singleLine="true"/>
+
+            <EditText
+                android:id="@+id/name_edit"
+                style="@style/EditableText"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp"
+                android:singleLine="true"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView>
 
     <LinearLayout
         android:id="@+id/layout_edit_button_bar"
@@ -55,40 +92,4 @@
             android:adjustViewBounds="true"
             android:src="@drawable/ic_node_add"/>
     </LinearLayout>
-
-    <com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView
-        android:id="@+id/view_scrolling"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="false">
-
-        <LinearLayout
-            android:id="@+id/root"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/name_ro"
-                style="@style/EditableText"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="0dp"
-                android:layout_marginTop="19dp"
-                android:layout_marginBottom="13dp"
-                android:singleLine="true"/>
-
-            <EditText
-                android:id="@+id/name_edit"
-                style="@style/EditableText"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="0dp"
-                android:layout_marginRight="0dp"
-                android:singleLine="true"
-                android:visibility="gone"/>
-        </LinearLayout>
-    </com.alexgilleran.hiitme.presentation.programdetail.views.ScrollingProgramView>
-
 </com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailView>
