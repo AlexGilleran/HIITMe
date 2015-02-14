@@ -1,5 +1,22 @@
 <resources>
 
+    <style name="TourOverlay" parent="ShowcaseView.Light">
+        <item name="sv_backgroundColor">#ce000000</item>
+        <item name="sv_showcaseColor">@color/primary</item>
+
+        <item name="sv_titleTextAppearance">@style/TourTitleText</item>
+        <item name="sv_detailTextAppearance">@style/TourDetailText</item>
+    </style>
+
+    <style name="TourTitleText" parent="TextAppearance.ShowcaseView.Title">
+        <item name="android:textColor">@color/accent</item>
+
+    </style>
+
+    <style name="TourDetailText" parent="TextAppearance.ShowcaseView.Detail">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
 
 
 </resources>

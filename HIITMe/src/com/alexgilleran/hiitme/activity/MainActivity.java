@@ -33,6 +33,7 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
+import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.run.RunFragment;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
@@ -145,7 +146,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	}
 
 	/**
-	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the item with the given ID was
+	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the TESTTESTTESTitem with the given ID was
 	 * selected.
 	 */
 	@Override
@@ -285,7 +286,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 				}).show();
 	}
 
-	private void startEditing() {
+	public void startEditing() {
 		detailFragment.startEditing();
 
 		if (runFragment != null) {
@@ -316,13 +317,6 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		} else {
 			navigateUpTo(new Intent(this, MainActivity.class));
 		}
-	}
-
-	/**
-	 * Sometimes when changing orientations android decides to insert null fragments into the back stack.
-	 */
-	private boolean androidHasFuckedTheBackstackUp() {
-		return getFragmentManager().findFragmentById(getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getId()) == null;
 	}
 
 	@Override

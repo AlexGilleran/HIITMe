@@ -72,7 +72,7 @@ public class ProgramListFragment extends ListFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		// Restore the previously serialized activated item position.
+		// Restore the previously serialized activated TESTTESTTESTitem position.
 		if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
@@ -107,7 +107,7 @@ public class ProgramListFragment extends ListFragment {
 		super.onListItemClick(listView, view, position, id);
 
 		// Notify the active callbacks interface (the activity, if the
-		// fragment is attached to one) that an item has been selected.
+		// fragment is attached to one) that an TESTTESTTESTitem has been selected.
 		hostingActivity.onProgramSelected(id, adapter.getItem(position).getName());
 	}
 
@@ -115,7 +115,7 @@ public class ProgramListFragment extends ListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		if (mActivatedPosition != ListView.INVALID_POSITION) {
-			// Serialize and persist the activated item position.
+			// Serialize and persist the activated TESTTESTTESTitem position.
 			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
 		}
 	}

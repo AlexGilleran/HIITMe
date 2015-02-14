@@ -339,6 +339,28 @@ public class NodeView extends LinearLayout implements DraggableView {
 		this.newlyCreated = placed;
 	}
 
+	public ExerciseView getFirstExerciseView() {
+		for (int i = 1; i < getChildCount(); i++) {
+			View view = getChildAt(i);
+
+			if (view instanceof ExerciseView) {
+				return (ExerciseView) view;
+			} else if (view instanceof NodeView) {
+				ExerciseView exerciseView = ((NodeView) view).getFirstExerciseView();
+
+				if (exerciseView != null) {
+					return exerciseView;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public View getHeader() {
+		return header;
+	}
+
 	public void edit() {
 		EditNodeFragment dialog = new EditNodeFragment();
 		dialog.setNode(getCurrentNode());

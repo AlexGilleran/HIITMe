@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
@@ -72,6 +71,14 @@ public class ProgramDetailFragment extends Fragment {
 		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_EDITING_KEY)) {
 			detailView.setEditable(true);
 		}
+
+		View editButton = getActivity().findViewById(R.id.actionbar_icon_edit);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
 	}
 
 	@Override
@@ -106,6 +113,9 @@ public class ProgramDetailFragment extends Fragment {
 
 	public void startEditing() {
 		detailView.setEditable(true);
+
+		ProgramDetailTour tour = new ProgramDetailTour((MainActivity) getActivity(), R.id.button_edit, detailView.getRootNodeView(), detailView.getFirstExerciseView());
+		tour.init();
 	}
 
 	public void stopEditing(boolean save) {

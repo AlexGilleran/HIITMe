@@ -555,6 +555,14 @@ public class ProgramDetailView extends LinearLayout implements DragManager {
 		postDelayed(hideEditDeleteButtonsRunnable, 10);
 	}
 
+	public ExerciseView getFirstExerciseView() {
+		return scrollingView.getNodeView().getFirstExerciseView();
+	}
+
+	public NodeView getRootNodeView() {
+		return scrollingView.getNodeView();
+	}
+
 	private final OnClickListener editListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
