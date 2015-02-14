@@ -19,6 +19,8 @@
 package com.alexgilleran.hiitme.presentation.programdetail;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,8 @@ import com.alexgilleran.hiitme.presentation.programdetail.views.ProgramDetailVie
 
 public class ProgramDetailFragment extends Fragment {
 	private final static String IS_EDITING_KEY = "IS_EDITING";
+	private final static String PREFS_NAME = "DetailFragmentPrefs";
+	private final static String HAS_DONE_TOUR_KEY = "HAS_DONE_TOUR";
 
 	private Program program;
 	private ProgramDetailView detailView;
@@ -114,8 +118,12 @@ public class ProgramDetailFragment extends Fragment {
 	public void startEditing() {
 		detailView.setEditable(true);
 
-		ProgramDetailTour tour = new ProgramDetailTour((MainActivity) getActivity(), R.id.button_edit, detailView.getRootNodeView(), detailView.getFirstExerciseView());
-		tour.init();
+		SharedPreferences prefs = getActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+		if (!prefs.getBoolean(HAS_DONE_TOUR_KEY, false)) {
+			ProgramDetailTour tour = new ProgramDetailTour((MainActivity) getActivity(), R.id.button_edit, detailView.getRootNodeView(), detailView.getFirstExerciseView());
+			tour.init();
+			prefs.edit().putBoolean(HAS_DONE_TOUR_KEY, true).commit();
+		}
 	}
 
 	public void stopEditing(boolean save) {
