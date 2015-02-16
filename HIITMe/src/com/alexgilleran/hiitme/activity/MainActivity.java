@@ -332,7 +332,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
 
 		menu.findItem(R.id.actionbar_icon_about).setVisible(shouldShowListButtons());
-		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowListButtons());
+		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowListButtons() && !isRunning());
 
 		menu.findItem(R.id.actionbar_icon_delete_program).setVisible(isViewingProgram() && !isRunning());
 		menu.findItem(R.id.actionbar_icon_edit).setVisible(isViewingProgram() && !isRunning());

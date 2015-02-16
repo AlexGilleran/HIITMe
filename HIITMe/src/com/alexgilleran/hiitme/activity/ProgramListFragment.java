@@ -99,9 +99,7 @@ public class ProgramListFragment extends ListFragment {
 	}
 
 	public void refresh() {
-		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext()).getProgramList());
-
-		setListAdapter(adapter);
+		adapter.setProgramList(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext()).getProgramList());
 	}
 
 	@Override
@@ -114,6 +112,8 @@ public class ProgramListFragment extends ListFragment {
 
 	public void setEnabled(boolean enabled) {
 		getListView().setEnabled(enabled);
+
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -155,10 +155,16 @@ public class ProgramListFragment extends ListFragment {
 	private class ProgramAdapter extends BaseAdapter {
 		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
 				Context.LAYOUT_INFLATER_SERVICE);
-		private final List<ProgramMetaData> programList;
+		private List<ProgramMetaData> programList;
 
 		private ProgramAdapter(List<ProgramMetaData> programList) {
 			this.programList = programList;
+		}
+
+		public void setProgramList(List<ProgramMetaData> programList) {
+			this.programList = programList;
+
+			notifyDataSetChanged();
 		}
 
 		@Override
@@ -184,6 +190,7 @@ public class ProgramListFragment extends ListFragment {
 
 			TextView textView = (TextView) convertView.findViewById(R.id.name);
 			textView.setText(programList.get(position).getName());
+			textView.setEnabled(getListView().isEnabled());
 
 			return convertView;
 		}
