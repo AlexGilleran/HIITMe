@@ -42,6 +42,8 @@ public interface ProgramBinder {
 
 	void registerCountDownObserver(CountDownObserver observer);
 
+	void unregisterCountDownObserver(CountDownObserver observer);
+
 	Node getCurrentNode();
 
 	Exercise getCurrentExercise();

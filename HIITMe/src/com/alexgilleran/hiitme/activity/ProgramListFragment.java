@@ -39,9 +39,10 @@ import java.util.List;
 public class ProgramListFragment extends ListFragment {
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 	private Callbacks hostingActivity;
-	private int mActivatedPosition = ListView.INVALID_POSITION;
+	private int activatedPosition = ListView.INVALID_POSITION;
 	private ProgramAdapter adapter;
 	private boolean activateOnItemClick = false;
+	private boolean enabled = true;
 
 	public interface Callbacks {
 		public void onProgramSelected(long id, String name);
@@ -61,11 +62,18 @@ public class ProgramListFragment extends ListFragment {
 
 		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext())
 				.getProgramList());
+		getListView().setEnabled(enabled);
 		setListAdapter(adapter);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
 			// In lollipop this shows an orange ripple, otherwise use straight orange
 			getListView().setSelector(R.color.accent);
+		}
+
+		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
+
+		if (activateOnItemClick && activatedPosition > 0) {
+			setActivatedPosition(activatedPosition);
 		}
 	}
 
@@ -73,7 +81,9 @@ public class ProgramListFragment extends ListFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		// Restore the previously serialized activated TESTTESTTESTitem position.
+		getView().setBackgroundColor(android.R.color.white);
+
+		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
@@ -94,8 +104,6 @@ public class ProgramListFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 	}
 
 	public void refresh() {
@@ -111,26 +119,36 @@ public class ProgramListFragment extends ListFragment {
 	}
 
 	public void setEnabled(boolean enabled) {
-		getListView().setEnabled(enabled);
+		this.enabled = enabled;
 
-		adapter.notifyDataSetChanged();
+		if (getView() != null && getListView().isEnabled() != enabled) {
+			getListView().setEnabled(enabled);
+
+			adapter.notifyDataSetChanged();
+
+			if (enabled) {
+				setActivatedPosition(activatedPosition);
+			}
+		}
 	}
 
 	@Override
 	public void onListItemClick(ListView listView, View view, int position, long id) {
 		super.onListItemClick(listView, view, position, id);
 
+		activatedPosition = position;
+
 		// Notify the active callbacks interface (the activity, if the
-		// fragment is attached to one) that an TESTTESTTESTitem has been selected.
+		// fragment is attached to one) that an item has been selected.
 		hostingActivity.onProgramSelected(id, adapter.getItem(position).getName());
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		if (mActivatedPosition != ListView.INVALID_POSITION) {
-			// Serialize and persist the activated TESTTESTTESTitem position.
-			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+		if (activatedPosition != ListView.INVALID_POSITION) {
+			// Serialize and persist the activated item position.
+			outState.putInt(STATE_ACTIVATED_POSITION, activatedPosition);
 		}
 	}
 
@@ -140,16 +158,21 @@ public class ProgramListFragment extends ListFragment {
 	 */
 	public void setActivateOnItemClick(boolean activateOnItemClick) {
 		this.activateOnItemClick = activateOnItemClick;
+
+		if (getView() != null) {
+			setActivatedPosition(activatedPosition);
+		}
 	}
 
 	private void setActivatedPosition(int position) {
 		if (position == ListView.INVALID_POSITION) {
-			getListView().setItemChecked(mActivatedPosition, false);
+			getListView().setItemChecked(activatedPosition, false);
 		} else {
 			getListView().setItemChecked(position, true);
 		}
 
-		mActivatedPosition = position;
+		activatedPosition = position;
+
 	}
 
 	private class ProgramAdapter extends BaseAdapter {
@@ -187,6 +210,8 @@ public class ProgramListFragment extends ListFragment {
 			if (convertView == null) {
 				convertView = inflater.inflate(R.layout.program_list_item, parent, false);
 			}
+
+			convertView.setActivated(position == activatedPosition);
 
 			TextView textView = (TextView) convertView.findViewById(R.id.name);
 			textView.setText(programList.get(position).getName());

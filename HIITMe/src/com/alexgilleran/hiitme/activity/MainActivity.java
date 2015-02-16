@@ -90,10 +90,6 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 			getFragmentManager().beginTransaction()
 					.replace(listFragmentContainerId, listFragment, LIST_FRAGMENT_TAG).commit();
-
-			if (tabletLayout) {
-				listFragment.setActivateOnItemClick(true);
-			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
 
@@ -101,6 +97,8 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 			detailFragment = (ProgramDetailFragment) getFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
 			runFragment = (RunFragment) getFragmentManager().findFragmentByTag(RUN_FRAGMENT_TAG);
 		}
+
+		listFragment.setActivateOnItemClick(tabletLayout);
 
 		if (ACTION_CONTINUE_RUN.equals(getIntent().getAction())) {
 			onProgramSelected(getIntent().getLongExtra(ARG_PROGRAM_ID, 0), getIntent().getStringExtra(ARG_PROGRAM_NAME));
@@ -259,7 +257,9 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		}
 
 		FragmentTransaction tran = getFragmentManager().beginTransaction();
-		runFragment = new RunFragment();
+		if (runFragment != null) {
+			runFragment = new RunFragment();
+		}
 		runFragment.setArguments(buildProgramIdBundle());
 		tran.replace(R.id.single_activity_container, runFragment, RUN_FRAGMENT_TAG);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit();

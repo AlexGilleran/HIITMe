@@ -253,6 +253,11 @@ public class ProgramRunService extends IntentService {
 		}
 
 		@Override
+		public void unregisterCountDownObserver(CountDownObserver observer) {
+			observers.remove(observer);
+		}
+
+		@Override
 		public Node getCurrentNode() {
 			return programRunner.getCurrentNode();
 		}

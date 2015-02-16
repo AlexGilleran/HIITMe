@@ -137,12 +137,24 @@ public class RunFragment extends Fragment {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void onStop() {
+		super.onStop();
 
-		if (programBinder != null && !programBinder.isRunning() && !getActivity().isChangingConfigurations()) {
-			getActivity().unbindService(connection);
+		if (programBinder != null) {
+			programBinder.unregisterCountDownObserver(countDownObserver);
+
+			if (!programBinder.isRunning() && !getActivity().isChangingConfigurations()) {
+				getActivity().unbindService(connection);
+				getActivity().stopService(serviceIntent);
+			}
 		}
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+
+		hostingActivity = null;
 	}
 
 	@Override
@@ -157,19 +169,35 @@ public class RunFragment extends Fragment {
 	}
 
 	private void onRunFinish() {
-		hostingActivity.onProgramRunStopped();
+		if (hostingActivity != null) {
+			hostingActivity.onProgramRunStopped();
+		}
+
 		refreshPauseState();
-		programProgressBar.setProgress(ProgressWheel.getMax());
-		exerciseProgressBar.setProgress(ProgressWheel.getMax());
 
-		programProgressBar.setTextLine1(formatTime(0));
-		programProgressBar.setTextLine2(formatTime(0));
-		exerciseName.setVisibility(View.INVISIBLE);
-		effortLevelText.setVisibility(View.INVISIBLE);
-		effortLevelIcon.setVisibility(View.INVISIBLE);
+		if (programProgressBar != null) {
+			programProgressBar.setProgress(ProgressWheel.getMax());
+			programProgressBar.setTextLine1(formatTime(0));
+			programProgressBar.setTextLine2(formatTime(0));
+			programProgressBar.invalidate();
+		}
 
-		exerciseProgressBar.invalidate();
-		programProgressBar.invalidate();
+		if (exerciseProgressBar != null) {
+			exerciseProgressBar.invalidate();
+			exerciseProgressBar.setProgress(ProgressWheel.getMax());
+		}
+
+		if (exerciseName != null) {
+			exerciseName.setVisibility(View.INVISIBLE);
+		}
+
+		if (effortLevelText != null) {
+			effortLevelText.setVisibility(View.INVISIBLE);
+		}
+
+		if (effortLevelIcon != null) {
+			effortLevelIcon.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	public void stop() {
@@ -345,12 +373,19 @@ public class RunFragment extends Fragment {
 				public void onProgramReady(Program program) {
 					programBinder.registerCountDownObserver(countDownObserver);
 
+					if (program.getId() != getArguments().getLong(MainActivity.ARG_PROGRAM_ID)) {
+
+					}
+
 					duration = program.getAssociatedNode().getDuration();
 				}
 			});
 
 			if (programBinder.isActive()) {
+				hostingActivity.onProgramRunStarted();
 				updateProgress(programBinder.getExerciseMsRemaining(), programBinder.getProgramMsRemaining());
+			} else {
+				hostingActivity.onProgramRunStopped();
 			}
 			updateExercise();
 
@@ -390,7 +425,11 @@ public class RunFragment extends Fragment {
 		@Override
 		public void onStart() {
 			isFinished = false;
-			hostingActivity.onProgramRunStarted();
+
+			if (hostingActivity != null) {
+				hostingActivity.onProgramRunStarted();
+			}
+
 			refreshPauseState();
 			updateExercise();
 		}
