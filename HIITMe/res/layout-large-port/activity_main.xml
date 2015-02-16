@@ -15,19 +15,18 @@
         android:layout_weight="0.5"
         android:baselineAligned="false" >
 
-        <fragment
-            android:id="@+id/program_list"
-            android:name="com.alexgilleran.hiitme.activity.ProgramListFragment"
+        <FrameLayout
+            android:id="@+id/program_list_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.5"
+            android:layout_weight="0.33"
             tools:layout="@android:layout/list_content" />
 
         <FrameLayout
             android:id="@+id/program_detail_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.5" />
+            android:layout_weight="0.66" />
     </LinearLayout>
 
     <FrameLayout

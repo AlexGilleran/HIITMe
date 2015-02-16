@@ -249,12 +249,12 @@ public class RunFragment extends Fragment {
 			programProgressBar.setBarLength(getDegrees(programBinder.getProgramMsRemaining(), duration));
 			programProgressBar.spin();
 		} else {
-			if (exerciseProgressBar.isSpinning()) {
+			if (exerciseProgressBar != null && exerciseProgressBar.isSpinning()) {
 				// Be careful with this, it tends to reset the amount of progress.
 				exerciseProgressBar.stopSpinning();
 			}
 
-			if (programProgressBar.isSpinning()) {
+			if (programProgressBar != null && programProgressBar.isSpinning()) {
 				programProgressBar.stopSpinning();
 			}
 		}

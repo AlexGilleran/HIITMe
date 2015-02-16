@@ -33,7 +33,6 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.presentation.programdetail.ProgramDetailFragment;
-import com.alexgilleran.hiitme.presentation.programdetail.views.NodeView;
 import com.alexgilleran.hiitme.presentation.run.RunFragment;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
@@ -87,12 +86,13 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 		if (savedInstanceState == null) {
 			listFragment = new ProgramListFragment();
+			int listFragmentContainerId = tabletLayout ? R.id.program_list_container : R.id.single_activity_container;
+
+			getFragmentManager().beginTransaction()
+					.replace(listFragmentContainerId, listFragment, LIST_FRAGMENT_TAG).commit();
+
 			if (tabletLayout) {
-				((ProgramListFragment) getFragmentManager().findFragmentById(R.id.program_list))
-						.setActivateOnItemClick(true);
-			} else {
-				getFragmentManager().beginTransaction()
-						.replace(R.id.single_activity_container, listFragment, LIST_FRAGMENT_TAG).commit();
+				listFragment.setActivateOnItemClick(true);
 			}
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
@@ -184,11 +184,15 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	@Override
 	public void onProgramRunStarted() {
 		invalidateOptionsMenu();
+
+		listFragment.setEnabled(false);
 	}
 
 	@Override
 	public void onProgramRunStopped() {
 		invalidateOptionsMenu();
+
+		listFragment.setEnabled(true);
 	}
 
 	private Bundle buildProgramIdBundle() {
@@ -304,6 +308,10 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		}
 
 		invalidateOptionsMenu();
+
+		if (save) {
+			listFragment.refresh();
+		}
 	}
 
 	@Override
@@ -326,9 +334,9 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		menu.findItem(R.id.actionbar_icon_about).setVisible(shouldShowListButtons());
 		menu.findItem(R.id.actionbar_icon_new_program).setVisible(shouldShowListButtons());
 
-		menu.findItem(R.id.actionbar_icon_delete_program).setVisible(isViewingProgram());
-		menu.findItem(R.id.actionbar_icon_edit).setVisible(isViewingProgram());
-		menu.findItem(R.id.actionbar_icon_run).setVisible(shouldShowRunButton());
+		menu.findItem(R.id.actionbar_icon_delete_program).setVisible(isViewingProgram() && !isRunning());
+		menu.findItem(R.id.actionbar_icon_edit).setVisible(isViewingProgram() && !isRunning());
+		menu.findItem(R.id.actionbar_icon_run).setVisible(shouldShowRunButton() && !isRunning());
 
 		menu.findItem(R.id.actionbar_icon_save).setVisible(isEditing());
 		menu.findItem(R.id.actionbar_icon_discard_changes).setVisible(isEditing());

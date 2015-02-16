@@ -41,6 +41,7 @@ public class ProgramListFragment extends ListFragment {
 	private Callbacks hostingActivity;
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 	private ProgramAdapter adapter;
+	private boolean activateOnItemClick = false;
 
 	public interface Callbacks {
 		public void onProgramSelected(long id, String name);
@@ -90,8 +91,17 @@ public class ProgramListFragment extends ListFragment {
 		hostingActivity = (Callbacks) activity;
 	}
 
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+
+		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
+	}
+
 	public void refresh() {
-		adapter.setProgramList(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext()).getProgramList());
+		adapter = new ProgramAdapter(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext()).getProgramList());
+
+		setListAdapter(adapter);
 	}
 
 	@Override
@@ -100,6 +110,10 @@ public class ProgramListFragment extends ListFragment {
 
 		// Reset the active callbacks interface to the dummy implementation.
 		hostingActivity = null;
+	}
+
+	public void setEnabled(boolean enabled) {
+		getListView().setEnabled(enabled);
 	}
 
 	@Override
@@ -125,7 +139,7 @@ public class ProgramListFragment extends ListFragment {
 	 * touched.
 	 */
 	public void setActivateOnItemClick(boolean activateOnItemClick) {
-		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
+		this.activateOnItemClick = activateOnItemClick;
 	}
 
 	private void setActivatedPosition(int position) {
@@ -141,13 +155,9 @@ public class ProgramListFragment extends ListFragment {
 	private class ProgramAdapter extends BaseAdapter {
 		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
 				Context.LAYOUT_INFLATER_SERVICE);
-		private List<ProgramMetaData> programList;
+		private final List<ProgramMetaData> programList;
 
 		private ProgramAdapter(List<ProgramMetaData> programList) {
-			this.programList = programList;
-		}
-
-		protected void setProgramList(List<ProgramMetaData> programList) {
 			this.programList = programList;
 		}
 
@@ -178,6 +188,4 @@ public class ProgramListFragment extends ListFragment {
 			return convertView;
 		}
 	}
-
-	;
 }
