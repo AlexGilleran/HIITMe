@@ -41,7 +41,6 @@ public class ProgramDetailFragment extends Fragment {
 	private Program program;
 	private ProgramDetailView detailView;
 
-
 	/**
 	 * Mandatory empty constructor
 	 */
@@ -75,8 +74,6 @@ public class ProgramDetailFragment extends Fragment {
 		if (savedInstanceState != null && savedInstanceState.getBoolean(IS_EDITING_KEY)) {
 			detailView.setEditable(true);
 		}
-
-		View editButton = getActivity().findViewById(R.id.actionbar_icon_edit);
 	}
 
 	@Override
@@ -105,7 +102,6 @@ public class ProgramDetailFragment extends Fragment {
 		long programId = getArguments().getLong(MainActivity.ARG_PROGRAM_ID);
 		program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(programId, skipCache);
 	}
-
 
 	public boolean isBeingEdited() {
 		return detailView.isEditable();

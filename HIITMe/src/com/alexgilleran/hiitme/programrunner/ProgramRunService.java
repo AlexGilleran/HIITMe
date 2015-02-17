@@ -236,21 +236,6 @@ public class ProgramRunService extends Service {
 
 		@Override
 		public void registerCountDownObserver(CountDownObserver observer) {
-			// This is a hack but fragments won't always unregister themselves so this is what happens.
-			if (observer.isExclusive()) {
-				List<CountDownObserver> toRemove = new ArrayList<>();
-
-				for (CountDownObserver otherObserver : observers) {
-					if (otherObserver.isExclusive()) {
-						toRemove.add(otherObserver);
-					}
-				}
-
-				for (CountDownObserver obsToRemove : toRemove) {
-					observers.remove(obsToRemove);
-				}
-			}
-
 			observers.add(observer);
 		}
 
@@ -335,11 +320,6 @@ public class ProgramRunService extends Service {
 		@Override
 		public void onError(ProgramError error) {
 		}
-
-		@Override
-		public boolean isExclusive() {
-			return false;
-		}
 	};
 
 	private CountDownObserver soundObserver = new CountDownObserver() {
@@ -369,11 +349,6 @@ public class ProgramRunService extends Service {
 
 		@Override
 		public void onError(ProgramError error) {
-		}
-
-		@Override
-		public boolean isExclusive() {
-			return false;
 		}
 	};
 
@@ -423,11 +398,6 @@ public class ProgramRunService extends Service {
 			for (CountDownObserver observer : observers) {
 				observer.onError(error);
 			}
-		}
-
-		@Override
-		public boolean isExclusive() {
-			return false;
 		}
 	}
 }

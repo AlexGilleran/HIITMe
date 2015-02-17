@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
@@ -361,6 +362,11 @@ public class RunFragment extends Fragment {
 			}
 
 			if (programBinder == null) {
+				if (duration == 0) {
+					showAlertThenGoBack(getString(R.string.error_program_zero_duration));
+					return;
+				}
+
 				getActivity().startService(serviceIntent);
 				getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
 			} else {
@@ -444,12 +450,7 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onError(ProgramError error) {
-			showAlertThenGoBack(getString(R.string.error_program_zero_duration));
-		}
-
-		@Override
-		public boolean isExclusive() {
-			return true;
+			Toast.makeText(getView().getContext(), error.toString(), Toast.LENGTH_SHORT);
 		}
 	};
 
