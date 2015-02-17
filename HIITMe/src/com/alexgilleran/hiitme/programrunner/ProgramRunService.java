@@ -89,9 +89,23 @@ public class ProgramRunService extends Service {
 	@Override
 	public void onDestroy() {
 		stop();
+		cleanUp();
 		soundPlayer.cleanUp();
 
 		super.onDestroy();
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
+
+		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId, false);
+		duration = program.getAssociatedNode().getDuration();
+		notificationTitle = getString(R.string.app_name) + ": " + program.getName();
+
+		start();
+
+		return START_REDELIVER_INTENT;
 	}
 
 	private void pause() {
@@ -104,7 +118,7 @@ public class ProgramRunService extends Service {
 
 		if (duration <= 0) {
 			masterObserver.onError(ProgramError.ZERO_DURATION);
-			stop();
+			cleanUp();
 			return;
 		}
 
@@ -125,15 +139,17 @@ public class ProgramRunService extends Service {
 	}
 
 	private void stop() {
+		if (programRunner != null && !programRunner.isStopped()) {
+			programRunner.stop();
+			programRunner = null;
+		}
+	}
+
+	private void cleanUp() {
 		try {
 			unregisterReceiver(headphonesUnpluggedReceiver);
 		} catch (IllegalArgumentException e) {
 			// Already unregistered, oh well.
-		}
-
-		if (programRunner != null && !programRunner.isStopped()) {
-			programRunner.stop();
-			programRunner = null;
 		}
 
 		if (wakeLock != null && wakeLock.isHeld()) {
@@ -141,7 +157,6 @@ public class ProgramRunService extends Service {
 		}
 
 		stopForeground(true);
-
 		stopSelf();
 	}
 
@@ -180,19 +195,6 @@ public class ProgramRunService extends Service {
 		builder.append(ViewUtils.getTimeText(programRunner.getExerciseMsRemaining()));
 
 		return builder.toString();
-	}
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
-
-		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId, false);
-		duration = program.getAssociatedNode().getDuration();
-		notificationTitle = getString(R.string.app_name) + ": " + program.getName();
-
-		start();
-
-		return START_REDELIVER_INTENT;
 	}
 
 	@Override
@@ -376,7 +378,7 @@ public class ProgramRunService extends Service {
 				observer.onProgramFinish();
 			}
 
-			stop();
+			cleanUp();
 		}
 
 		@Override

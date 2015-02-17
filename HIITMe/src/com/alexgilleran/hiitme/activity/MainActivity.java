@@ -262,8 +262,9 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 		FragmentTransaction tran = getFragmentManager().beginTransaction();
 		if (runFragment != null) {
-			runFragment = new RunFragment();
+			tran.remove(runFragment);
 		}
+		runFragment = new RunFragment();
 		runFragment.setArguments(buildProgramIdBundle());
 		tran.replace(R.id.single_activity_container, runFragment, RUN_FRAGMENT_TAG);
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack(null).commit();

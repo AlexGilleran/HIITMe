@@ -86,8 +86,6 @@ public class RunFragment extends Fragment {
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
 		serviceIntent.putExtra(ProgramMetaData.PROGRAM_ID_NAME, getArguments().getLong(MainActivity.ARG_PROGRAM_ID));
-
-		getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
 	}
 
 	@Override
@@ -98,6 +96,13 @@ public class RunFragment extends Fragment {
 
 		program = ProgramDAOSqlite.getInstance(activity).getProgram(getArguments().getLong(MainActivity.ARG_PROGRAM_ID), false);
 		duration = program.getAssociatedNode().getDuration();
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
 	}
 
 	@Override
