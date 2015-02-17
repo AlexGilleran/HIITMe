@@ -29,14 +29,19 @@ import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.model.Exercise;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
-	private HashMap<String, String> speechParams = new HashMap<String, String>();
-	private TextToSpeech textToSpeech;
+	private final Queue<UtteranceEndListener> endListeners = new LinkedList<>();
+	private final HashMap<String, String> speechParams = new HashMap<String, String>();
+	private final TextToSpeech textToSpeech;
+
 	private boolean init = false;
 	private String missedExText = null;
 	private AudioManager audioManager;
 	private Context context;
+
 
 	public TextToSpeechPlayer(Context context, AudioManager audioManager) {
 		this.audioManager = audioManager;
@@ -45,7 +50,6 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 		textToSpeech = new TextToSpeech(context, this);
 		textToSpeech.setSpeechRate(1.3f);
 		textToSpeech.setOnUtteranceProgressListener(utteranceListener);
-		;
 
 		speechParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_MUSIC));
 		// mandatory to listen to utterances even though we don't care about the ID.
@@ -102,9 +106,18 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 
 	@Override
 	public void cleanUp() {
-		textToSpeech.stop();
-		textToSpeech.shutdown();
+		if (textToSpeech.isSpeaking()) {
+			endListeners.add(new UtteranceEndListener() {
+				@Override
+				public void onUtteranceEnded() {
+					textToSpeech.shutdown();
+				}
+			});
+		} else {
+			textToSpeech.shutdown();
+		}
 	}
+
 
 	@Override
 	public void onInit(int status) {
@@ -137,12 +150,20 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 
 		@Override
 		public void onDone(String utteranceId) {
-			audioManager.abandonAudioFocus(afChangeListener);
+			abandon();
 		}
 
 		@Override
 		public synchronized void onError(String utteranceId) {
+			abandon();
+		}
+
+		private void abandon() {
 			audioManager.abandonAudioFocus(afChangeListener);
+
+			while (endListeners.size() > 0) {
+				endListeners.poll().onUtteranceEnded();
+			}
 		}
 
 		@Override
@@ -151,4 +172,8 @@ public class TextToSpeechPlayer implements SoundPlayer, OnInitListener {
 					AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
 		}
 	};
+
+	private interface UtteranceEndListener {
+		void onUtteranceEnded();
+	}
 }
