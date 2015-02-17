@@ -30,8 +30,6 @@ public interface ProgramBinder {
 
 	void pause();
 
-	void getProgram(ProgramCallback callback);
-
 	boolean isRunning();
 
 	boolean isActive();
@@ -53,8 +51,4 @@ public interface ProgramBinder {
 	int getProgramMsRemaining();
 
 	int getExerciseMsRemaining();
-
-	interface ProgramCallback {
-		void onProgramReady(Program program);
-	}
 }

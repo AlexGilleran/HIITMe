@@ -31,6 +31,8 @@ public interface CountDownObserver {
 
 	void onError(CountDownObserver.ProgramError error);
 
+	boolean isExclusive();
+
 	public enum ProgramError {
 		ZERO_DURATION;
 	}

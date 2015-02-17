@@ -18,10 +18,10 @@
 
 package com.alexgilleran.hiitme.programrunner;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,17 +42,14 @@ import com.alexgilleran.hiitme.model.Node;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.programrunner.CountDownObserver.ProgramError;
-import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.sound.SoundPlayer;
 import com.alexgilleran.hiitme.sound.TextToSpeechPlayer;
 import com.alexgilleran.hiitme.util.ViewUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-public class ProgramRunService extends IntentService {
+public class ProgramRunService extends Service {
 	/**
 	 * We will only update the notification once for every TICK_RATE_DIVISOR ticks - should result
 	 * in being notified once per second.
@@ -60,6 +57,8 @@ public class ProgramRunService extends IntentService {
 	private static final int TICK_RATE_DIVISOR = 1000 / ProgramRunner.TICK_RATE;
 	private static final int NOTIFICATION_ID = 2;
 	private static final IntentFilter noisyIntentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+
+	private final MasterCountDownObserver masterObserver = new MasterCountDownObserver();
 
 	private String notificationTitle;
 	private NotificationManager notificationManager;
@@ -70,11 +69,6 @@ public class ProgramRunService extends IntentService {
 	private int duration;
 
 	private final List<CountDownObserver> observers = new ArrayList<CountDownObserver>();
-	private Queue<ProgramCallback> programCallbacks = new LinkedList<ProgramCallback>();
-
-	public ProgramRunService() {
-		super("HIIT Me");
-	}
 
 	@Override
 	public void onCreate() {
@@ -107,7 +101,27 @@ public class ProgramRunService extends IntentService {
 
 	private void start() {
 		registerReceiver(headphonesUnpluggedReceiver, noisyIntentFilter);
-		programRunner.start();
+
+		if (duration <= 0) {
+			masterObserver.onError(ProgramError.ZERO_DURATION);
+			stop();
+			return;
+		}
+
+		if (programRunner == null || programRunner.isStopped()) {
+			wakeLock.acquire();
+
+			startForeground(NOTIFICATION_ID, buildNotification());
+
+			programRunner = new ProgramRunnerImpl(program, masterObserver);
+
+			programRunner.start();
+		} else if (programRunner.isPaused()) {
+			programRunner.start();
+		} else if (programRunner.isRunning()) {
+			Log.wtf(getPackageName(),
+					"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
+		}
 	}
 
 	private void stop() {
@@ -122,24 +136,13 @@ public class ProgramRunService extends IntentService {
 			programRunner = null;
 		}
 
-		stopForeground(true);
-
 		if (wakeLock != null && wakeLock.isHeld()) {
 			wakeLock.release();
 		}
-	}
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
+		stopForeground(true);
 
-		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId, false);
-		duration = program.getAssociatedNode().getDuration();
-		notificationTitle = getString(R.string.app_name) + ": " + program.getName();
-
-		while (!programCallbacks.isEmpty()) {
-			programCallbacks.poll().onProgramReady(program);
-		}
+		stopSelf();
 	}
 
 	private Notification buildNotification() {
@@ -180,6 +183,19 @@ public class ProgramRunService extends IntentService {
 	}
 
 	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		long programId = intent.getLongExtra(ProgramMetaData.PROGRAM_ID_NAME, -1);
+
+		program = ProgramDAOSqlite.getInstance(getApplicationContext()).getProgram(programId, false);
+		duration = program.getAssociatedNode().getDuration();
+		notificationTitle = getString(R.string.app_name) + ": " + program.getName();
+
+		start();
+
+		return START_REDELIVER_INTENT;
+	}
+
+	@Override
 	public IBinder onBind(Intent intent) {
 		return new ProgramBinderImpl();
 	}
@@ -200,27 +216,7 @@ public class ProgramRunService extends IntentService {
 	public class ProgramBinderImpl extends Binder implements ProgramBinder {
 		@Override
 		public void start() {
-			MasterCountDownObserver masterObserver = new MasterCountDownObserver(observers);
-
-			if (duration <= 0) {
-				masterObserver.onError(ProgramError.ZERO_DURATION);
-				return;
-			}
-
-			wakeLock.acquire();
-
-			if (programRunner == null || programRunner.isStopped()) {
-				startForeground(NOTIFICATION_ID, buildNotification());
-
-				programRunner = new ProgramRunnerImpl(program, masterObserver);
-
-				ProgramRunService.this.start();
-			} else if (programRunner.isPaused()) {
-				ProgramRunService.this.start();
-			} else if (programRunner.isRunning()) {
-				Log.wtf(getPackageName(),
-						"Trying to start a run when one is already running, this is STRICTLY VERBOTEN");
-			}
+			ProgramRunService.this.start();
 		}
 
 		@Override
@@ -234,21 +230,27 @@ public class ProgramRunService extends IntentService {
 		}
 
 		@Override
-		public void getProgram(ProgramCallback callback) {
-			if (program != null) {
-				callback.onProgramReady(program);
-			} else {
-				programCallbacks.add(callback);
-			}
-		}
-
-		@Override
 		public boolean isRunning() {
 			return programRunner != null ? programRunner.isRunning() : false;
 		}
 
 		@Override
 		public void registerCountDownObserver(CountDownObserver observer) {
+			// This is a hack but fragments won't always unregister themselves so this is what happens.
+			if (observer.isExclusive()) {
+				List<CountDownObserver> toRemove = new ArrayList<>();
+
+				for (CountDownObserver otherObserver : observers) {
+					if (otherObserver.isExclusive()) {
+						toRemove.add(otherObserver);
+					}
+				}
+
+				for (CountDownObserver obsToRemove : toRemove) {
+					observers.remove(obsToRemove);
+				}
+			}
+
 			observers.add(observer);
 		}
 
@@ -333,6 +335,11 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void onError(ProgramError error) {
 		}
+
+		@Override
+		public boolean isExclusive() {
+			return false;
+		}
 	};
 
 	private CountDownObserver soundObserver = new CountDownObserver() {
@@ -363,18 +370,17 @@ public class ProgramRunService extends IntentService {
 		@Override
 		public void onError(ProgramError error) {
 		}
+
+		@Override
+		public boolean isExclusive() {
+			return false;
+		}
 	};
 
 	/**
 	 * Listens for count down events and proxies them to a number of other {@link CountDownObserver}s.
 	 */
 	private class MasterCountDownObserver implements CountDownObserver {
-		private final List<CountDownObserver> observers;
-
-		public MasterCountDownObserver(List<CountDownObserver> observers) {
-			this.observers = observers;
-		}
-
 		@Override
 		public void onTick(long exerciseMsRemaining, long programMsRemaining) {
 			for (CountDownObserver observer : observers) {
@@ -417,6 +423,11 @@ public class ProgramRunService extends IntentService {
 			for (CountDownObserver observer : observers) {
 				observer.onError(error);
 			}
+		}
+
+		@Override
+		public boolean isExclusive() {
+			return false;
 		}
 	}
 }

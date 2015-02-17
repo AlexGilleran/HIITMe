@@ -36,16 +36,15 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.activity.MainActivity;
+import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
 import com.alexgilleran.hiitme.model.Exercise;
 import com.alexgilleran.hiitme.model.Program;
 import com.alexgilleran.hiitme.model.ProgramMetaData;
 import com.alexgilleran.hiitme.programrunner.CountDownObserver;
 import com.alexgilleran.hiitme.programrunner.ProgramBinder;
-import com.alexgilleran.hiitme.programrunner.ProgramBinder.ProgramCallback;
 import com.alexgilleran.hiitme.programrunner.ProgramRunService;
 import com.alexgilleran.hiitme.util.ViewUtils;
 import com.todddavies.components.progressbar.ProgressWheel;
@@ -71,6 +70,8 @@ public class RunFragment extends Fragment {
 	private RunnerServiceConnection connection;
 	private ProgramBinder programBinder;
 
+	private long programId;
+	private Program program;
 	private int duration;
 	private Intent serviceIntent;
 	private boolean isFinished = false;
@@ -84,8 +85,8 @@ public class RunFragment extends Fragment {
 		// Bind to LocalService
 		serviceIntent = new Intent(getActivity(), ProgramRunService.class);
 		serviceIntent.putExtra(ProgramMetaData.PROGRAM_ID_NAME, getArguments().getLong(MainActivity.ARG_PROGRAM_ID));
-		getActivity().bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-		getActivity().startService(serviceIntent);
+
+		getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
 	}
 
 	@Override
@@ -93,6 +94,9 @@ public class RunFragment extends Fragment {
 		super.onAttach(activity);
 
 		hostingActivity = (Callbacks) activity;
+
+		program = ProgramDAOSqlite.getInstance(activity).getProgram(getArguments().getLong(MainActivity.ARG_PROGRAM_ID), false);
+		duration = program.getAssociatedNode().getDuration();
 	}
 
 	@Override
@@ -142,12 +146,9 @@ public class RunFragment extends Fragment {
 
 		if (programBinder != null) {
 			programBinder.unregisterCountDownObserver(countDownObserver);
-
-			if (!programBinder.isRunning() && !getActivity().isChangingConfigurations()) {
-				getActivity().unbindService(connection);
-				getActivity().stopService(serviceIntent);
-			}
 		}
+
+		getActivity().unbindService(connection);
 	}
 
 	@Override
@@ -268,14 +269,18 @@ public class RunFragment extends Fragment {
 		if (programBinder != null && programBinder.isPaused()) {
 			int progress = isFinished ? exerciseProgressBar.getMax() : 0;
 
-			exerciseProgressBar.setProgress(0);
-			exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
-					.getCurrentExercise().getDuration()));
-			exerciseProgressBar.spin();
+			if (exerciseProgressBar != null) {
+				exerciseProgressBar.setProgress(0);
+				exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
+						.getCurrentExercise().getDuration()));
+				exerciseProgressBar.spin();
+			}
 
-			programProgressBar.setProgress(0);
-			programProgressBar.setBarLength(getDegrees(programBinder.getProgramMsRemaining(), duration));
-			programProgressBar.spin();
+			if (programProgressBar != null) {
+				programProgressBar.setProgress(0);
+				programProgressBar.setBarLength(getDegrees(programBinder.getProgramMsRemaining(), duration));
+				programProgressBar.spin();
+			}
 		} else {
 			if (exerciseProgressBar != null && exerciseProgressBar.isSpinning()) {
 				// Be careful with this, it tends to reset the amount of progress.
@@ -355,10 +360,15 @@ public class RunFragment extends Fragment {
 				return;
 			}
 
-			if (programBinder.isRunning()) {
-				programBinder.pause();
+			if (programBinder == null) {
+				getActivity().startService(serviceIntent);
+				getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
 			} else {
-				programBinder.start();
+				if (programBinder.isRunning()) {
+					programBinder.pause();
+				} else {
+					programBinder.start();
+				}
 			}
 		}
 	};
@@ -367,19 +377,7 @@ public class RunFragment extends Fragment {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			programBinder = (ProgramBinder) service;
-
-			programBinder.getProgram(new ProgramCallback() {
-				@Override
-				public void onProgramReady(Program program) {
-					programBinder.registerCountDownObserver(countDownObserver);
-
-					if (program.getId() != getArguments().getLong(MainActivity.ARG_PROGRAM_ID)) {
-
-					}
-
-					duration = program.getAssociatedNode().getDuration();
-				}
-			});
+			programBinder.registerCountDownObserver(countDownObserver);
 
 			if (programBinder.isActive()) {
 				hostingActivity.onProgramRunStarted();
@@ -396,7 +394,7 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
-			Toast.makeText(getActivity(), R.string.error_no_connection, Toast.LENGTH_SHORT).show();
+			programBinder = null;
 		}
 	}
 
@@ -424,19 +422,34 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onStart() {
-			isFinished = false;
+			getView().post(new Runnable() {
+				@Override
+				public void run() {
+					isFinished = false;
 
-			if (hostingActivity != null) {
-				hostingActivity.onProgramRunStarted();
-			}
+					if (programProgressBar != null) {
+						programProgressBar.setProgress(0);
+						programProgressBar.invalidate();
+					}
 
-			refreshPauseState();
-			updateExercise();
+					if (hostingActivity != null) {
+						hostingActivity.onProgramRunStarted();
+					}
+
+					refreshPauseState();
+					updateExercise();
+				}
+			});
 		}
 
 		@Override
 		public void onError(ProgramError error) {
 			showAlertThenGoBack(getString(R.string.error_program_zero_duration));
+		}
+
+		@Override
+		public boolean isExclusive() {
+			return true;
 		}
 	};
 
