@@ -149,7 +149,11 @@ public class RunFragment extends Fragment {
 			programBinder.unregisterCountDownObserver(countDownObserver);
 		}
 
-		getActivity().unbindService(connection);
+		try {
+			getActivity().unbindService(connection);
+		} catch (IllegalArgumentException e) {
+			// Service was never bound, meh
+		}
 	}
 
 	@Override
@@ -428,24 +432,19 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onStart() {
-			getView().post(new Runnable() {
-				@Override
-				public void run() {
-					isFinished = false;
+			isFinished = false;
 
-					if (programProgressBar != null) {
-						programProgressBar.setProgress(0);
-						programProgressBar.invalidate();
-					}
+			if (programProgressBar != null) {
+				programProgressBar.setProgress(0);
+				programProgressBar.invalidate();
+			}
 
-					if (hostingActivity != null) {
-						hostingActivity.onProgramRunStarted();
-					}
+			if (hostingActivity != null) {
+				hostingActivity.onProgramRunStarted();
+			}
 
-					refreshPauseState();
-					updateExercise();
-				}
-			});
+			refreshPauseState();
+			updateExercise();
 		}
 
 		@Override

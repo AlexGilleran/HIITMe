@@ -161,7 +161,7 @@ public class ProgramRunService extends Service {
 
 		builder.setSmallIcon(R.drawable.notification_icon);
 		builder.setOngoing(true);
-		builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, continueIntent, 0));
+		builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, continueIntent, PendingIntent.FLAG_CANCEL_CURRENT));
 
 		return builder.build();
 	}

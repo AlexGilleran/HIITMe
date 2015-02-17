@@ -101,9 +101,13 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		listFragment.setActivateOnItemClick(tabletLayout);
 
 		if (ACTION_CONTINUE_RUN.equals(getIntent().getAction())) {
-			onProgramSelected(getIntent().getLongExtra(ARG_PROGRAM_ID, 0), getIntent().getStringExtra(ARG_PROGRAM_NAME));
+			long programId = getIntent().getLongExtra(ARG_PROGRAM_ID, 0);
 
-			if (!tabletLayout) {
+			onProgramSelected(programId, getIntent().getStringExtra(ARG_PROGRAM_NAME));
+
+			if (tabletLayout) {
+				listFragment.setActivatedProgram(programId);
+			} else {
 				run();
 			}
 		}

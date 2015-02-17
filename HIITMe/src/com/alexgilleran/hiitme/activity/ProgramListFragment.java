@@ -43,6 +43,7 @@ public class ProgramListFragment extends ListFragment {
 	private ProgramAdapter adapter;
 	private boolean activateOnItemClick = false;
 	private boolean enabled = true;
+	private long activatedId = -1;
 
 	public interface Callbacks {
 		public void onProgramSelected(long id, String name);
@@ -72,16 +73,24 @@ public class ProgramListFragment extends ListFragment {
 
 		getListView().setChoiceMode(activateOnItemClick ? ListView.CHOICE_MODE_SINGLE : ListView.CHOICE_MODE_NONE);
 
-		if (activateOnItemClick && activatedPosition > 0) {
-			setActivatedPosition(activatedPosition);
+		if (activateOnItemClick) {
+			if (activatedPosition > 0) {
+				setActivatedPosition(activatedPosition);
+			} else if (activatedId > 0) {
+				for (int location = 0; location < adapter.getProgramList().size(); location++) {
+					if (adapter.getItem(location).getId() == activatedId) {
+						setActivatedPosition(location);
+						return;
+					}
+				}
+			}
 		}
 	}
+
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		getView().setBackgroundColor(android.R.color.white);
 
 		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
@@ -164,6 +173,10 @@ public class ProgramListFragment extends ListFragment {
 		}
 	}
 
+	public void setActivatedProgram(long id) {
+		this.activatedId = id;
+	}
+
 	private void setActivatedPosition(int position) {
 		if (position == ListView.INVALID_POSITION) {
 			getListView().setItemChecked(activatedPosition, false);
@@ -175,49 +188,53 @@ public class ProgramListFragment extends ListFragment {
 
 	}
 
-	private class ProgramAdapter extends BaseAdapter {
-		private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
-				Context.LAYOUT_INFLATER_SERVICE);
-		private List<ProgramMetaData> programList;
+private class ProgramAdapter extends BaseAdapter {
+	private final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+			Context.LAYOUT_INFLATER_SERVICE);
+	private List<ProgramMetaData> programList;
 
-		private ProgramAdapter(List<ProgramMetaData> programList) {
-			this.programList = programList;
-		}
-
-		public void setProgramList(List<ProgramMetaData> programList) {
-			this.programList = programList;
-
-			notifyDataSetChanged();
-		}
-
-		@Override
-		public int getCount() {
-			return programList.size();
-		}
-
-		@Override
-		public ProgramMetaData getItem(int location) {
-			return programList.get(location);
-		}
-
-		@Override
-		public long getItemId(int location) {
-			return programList.get(location).getId();
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.program_list_item, parent, false);
-			}
-
-			convertView.setActivated(position == activatedPosition);
-
-			TextView textView = (TextView) convertView.findViewById(R.id.name);
-			textView.setText(programList.get(position).getName());
-			textView.setEnabled(getListView().isEnabled());
-
-			return convertView;
-		}
+	private ProgramAdapter(List<ProgramMetaData> programList) {
+		this.programList = programList;
 	}
+
+	public void setProgramList(List<ProgramMetaData> programList) {
+		this.programList = programList;
+
+		notifyDataSetChanged();
+	}
+
+	public List<ProgramMetaData> getProgramList() {
+		return programList;
+	}
+
+	@Override
+	public int getCount() {
+		return programList.size();
+	}
+
+	@Override
+	public ProgramMetaData getItem(int location) {
+		return programList.get(location);
+	}
+
+	@Override
+	public long getItemId(int location) {
+		return programList.get(location).getId();
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		if (convertView == null) {
+			convertView = inflater.inflate(R.layout.program_list_item, parent, false);
+		}
+
+		convertView.setActivated(position == activatedPosition);
+
+		TextView textView = (TextView) convertView.findViewById(R.id.name);
+		textView.setText(programList.get(position).getName());
+		textView.setEnabled(getListView().isEnabled());
+
+		return convertView;
+	}
+}
 }
