@@ -136,10 +136,17 @@ public class RunFragment extends Fragment {
 		stopButton.setOnClickListener(stopButtonListener);
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean(FINISHED_KEY)) {
-			isFinished = true;
-
 			exerciseProgressBar.setBarColor(savedInstanceState.getInt(EXERCISE_WHEEL_COLOR_KEY, R.color.primary));
 
+			onRunFinish();
+		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		if (isStopped()) {
 			onRunFinish();
 		} else {
 			refreshPauseState();
@@ -180,6 +187,8 @@ public class RunFragment extends Fragment {
 	}
 
 	private void onRunFinish() {
+		isFinished = true;
+
 		if (hostingActivity != null) {
 			hostingActivity.onProgramRunStopped();
 		}
@@ -194,8 +203,8 @@ public class RunFragment extends Fragment {
 		}
 
 		if (exerciseProgressBar != null) {
-			exerciseProgressBar.invalidate();
 			exerciseProgressBar.setProgress(ProgressWheel.getMax());
+			exerciseProgressBar.invalidate();
 		}
 
 		if (exerciseName != null) {
@@ -209,6 +218,8 @@ public class RunFragment extends Fragment {
 		if (effortLevelIcon != null) {
 			effortLevelIcon.setVisibility(View.INVISIBLE);
 		}
+
+		programBinder = null;
 	}
 
 	public void stop() {
@@ -243,7 +254,6 @@ public class RunFragment extends Fragment {
 		return programBinder != null && programBinder.isRunning();
 	}
 
-
 	public boolean isPaused() {
 		return programBinder != null && programBinder.isPaused();
 	}
@@ -276,9 +286,7 @@ public class RunFragment extends Fragment {
 			playButton.setImageResource(getPlayButtonResource());
 		}
 
-		if (programBinder != null && programBinder.isPaused()) {
-			int progress = isFinished ? exerciseProgressBar.getMax() : 0;
-
+		if (isPaused()) {
 			if (exerciseProgressBar != null) {
 				exerciseProgressBar.setProgress(0);
 				exerciseProgressBar.setBarLength(getDegrees(programBinder.getExerciseMsRemaining(), programBinder
@@ -304,15 +312,13 @@ public class RunFragment extends Fragment {
 	}
 
 	private int getPlayButtonResource() {
-		if (programBinder != null) {
-			if (isRunning()) {
-				return R.drawable.ic_pause;
-			} else if (isStopped()) {
-				return R.drawable.ic_repeat;
-			}
+		if (isRunning()) {
+			return R.drawable.ic_pause;
+		} else if (isStopped()) {
+			return R.drawable.ic_repeat;
+		} else {
+			return R.drawable.ic_play_dark;
 		}
-
-		return R.drawable.ic_play_dark;
 	}
 
 	private String formatTime(long mseconds) {
@@ -426,7 +432,6 @@ public class RunFragment extends Fragment {
 
 		@Override
 		public void onProgramFinish() {
-			isFinished = true;
 			onRunFinish();
 		}
 
