@@ -72,7 +72,6 @@ public class RunFragment extends Fragment {
 	private ProgramBinder programBinder;
 
 	private long programId;
-	private Program program;
 	private int duration;
 	private Intent serviceIntent;
 	private boolean isFinished = false;
@@ -93,9 +92,6 @@ public class RunFragment extends Fragment {
 		super.onAttach(activity);
 
 		hostingActivity = (Callbacks) activity;
-
-		program = ProgramDAOSqlite.getInstance(activity).getProgram(getArguments().getLong(MainActivity.ARG_PROGRAM_ID), false);
-		duration = program.getAssociatedNode().getDuration();
 	}
 
 	@Override
@@ -145,6 +141,8 @@ public class RunFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		refreshDuration();
 
 		if (isStopped()) {
 			onRunFinish();
@@ -377,6 +375,8 @@ public class RunFragment extends Fragment {
 			}
 
 			if (programBinder == null) {
+				refreshDuration();
+
 				if (duration == 0) {
 					showAlertThenGoBack(getString(R.string.error_program_zero_duration));
 					return;
@@ -393,6 +393,11 @@ public class RunFragment extends Fragment {
 			}
 		}
 	};
+
+	private void refreshDuration() {
+		Program program = ProgramDAOSqlite.getInstance(getActivity()).getProgram(getArguments().getLong(MainActivity.ARG_PROGRAM_ID), false);
+		duration = program.getAssociatedNode().getDuration();
+	}
 
 	private class RunnerServiceConnection implements ServiceConnection {
 		@Override
