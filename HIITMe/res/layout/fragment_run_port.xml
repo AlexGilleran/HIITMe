@@ -8,14 +8,13 @@
     <RelativeLayout
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="260dp"
         android:layout_gravity="center_horizontal">
 
         <com.todddavies.components.progressbar.ProgressWheel
             android:id="@+id/progressbar_program"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
             android:layout_centerInParent="true"
             progresswheel:barColor="#0097D6"
             progresswheel:barLength="60dp"
@@ -30,8 +29,8 @@
 
         <com.todddavies.components.progressbar.ProgressWheel
             android:id="@+id/progressbar_exercise"
-            android:layout_width="260dp"
-            android:layout_height="260dp"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
             android:layout_centerInParent="true"
             progresswheel:barColor="#0097D6"
             progresswheel:barLength="60dp"
@@ -43,10 +42,10 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_weight="0"
+        android:layout_weight="1"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
