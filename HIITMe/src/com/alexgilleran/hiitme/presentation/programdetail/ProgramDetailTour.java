@@ -77,7 +77,7 @@ public class ProgramDetailTour {
 	}
 
 	private void tourAddExerciseButton(final ImageButton view) {
-		showShowCase("Touch and drag the add exercise button to add an exercise", view, new OnNextListener() {
+		showShowCase(activity.getString(R.string.tour_exercise_button), view, new OnNextListener() {
 			@Override
 			public void onShowcaseViewHide(ShowcaseView showcaseView) {
 				tourAddGroupButton();
@@ -86,7 +86,7 @@ public class ProgramDetailTour {
 	}
 
 	private void tourAddGroupButton() {
-		showShowCase("Touch and drag the add group button to add a group", activity.findViewById(R.id.button_add_node), new OnNextListener() {
+		showShowCase(activity.getString(R.string.tour_group_button), activity.findViewById(R.id.button_add_node), new OnNextListener() {
 			@Override
 			public void onShowcaseViewHide(ShowcaseView showcaseView) {
 				tourNodeView();
@@ -96,7 +96,7 @@ public class ProgramDetailTour {
 
 	private void tourNodeView() {
 		exampleNodeView.getHeader().requestFocus();
-		showShowCase("Tap the top of a group to select it, or hold down then drag to move it", exampleNodeView.getHeader(), new OnNextListener() {
+		showShowCase(activity.getString(R.string.tour_group_header), exampleNodeView.getHeader(), new OnNextListener() {
 			@Override
 			public void onShowcaseViewHide(ShowcaseView showcaseView) {
 				waitForViewToExist(R.id.button_edit, new ViewExistenceListener() {
@@ -110,7 +110,7 @@ public class ProgramDetailTour {
 	}
 
 	private void tourEditButton(final View editButton) {
-		showShowCase("With a group or exercise selected, you can edit by tapping this button", editButton, new OnNextListener() {
+		showShowCase(activity.getString(R.string.tour_edit_button), editButton, new OnNextListener() {
 			@Override
 			public void onShowcaseViewHide(ShowcaseView showcaseView) {
 				if (exampleExerciseView != null) {
@@ -121,7 +121,7 @@ public class ProgramDetailTour {
 	}
 
 	private void tourExerciseView() {
-		showShowCase("You can also tap exercises to select them, or hold down and drag to move them", exampleExerciseView, OnShowcaseEventListener.NONE);
+		showShowCase(activity.getString(R.string.tour_exercise_view), exampleExerciseView, OnShowcaseEventListener.NONE);
 	}
 
 	private void showShowCase(String text, View target, OnShowcaseEventListener listener) {
@@ -160,19 +160,12 @@ public class ProgramDetailTour {
 	}
 
 	public abstract class OnNextListener implements OnShowcaseEventListener {
-//		@Override
-//		public void onShowcaseViewHide(ShowcaseView showcaseView) {
-//
-//		}
-
 		@Override
 		public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-
 		}
 
 		@Override
 		public void onShowcaseViewShow(ShowcaseView showcaseView) {
-
 		}
 	}
 }
