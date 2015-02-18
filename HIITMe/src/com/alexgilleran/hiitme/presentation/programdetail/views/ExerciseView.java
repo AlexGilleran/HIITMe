@@ -74,19 +74,6 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 		effortLevel = (ImageView) findViewById(R.id.imageview_effort_level);
 		duration = (TextView) findViewById(R.id.exercise_duration);
 		name = (TextView) findViewById(R.id.exercise_name);
-
-
-		this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				if (effortLevel != null) {
-					effortLevel.getLayoutParams().height = ExerciseView.this
-							.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom();
-					effortLevel.setLayoutParams(effortLevel.getLayoutParams());
-					getViewTreeObserver().removeOnGlobalLayoutListener(this);
-				}
-			}
-		});
 	}
 
 	public DraggableView getNodeView() {
@@ -117,6 +104,18 @@ public class ExerciseView extends RelativeLayout implements DraggableView {
 					effortLevel.getHeight() - name.getHeight()));
 			name.setVisibility(GONE);
 		}
+
+		this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				if (effortLevel != null) {
+					effortLevel.getLayoutParams().height = ExerciseView.this
+							.getHeight() - ExerciseView.this.getPaddingTop() - ExerciseView.this.getPaddingBottom();
+					effortLevel.setLayoutParams(effortLevel.getLayoutParams());
+					getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				}
+			}
+		});
 	}
 
 	@Override
