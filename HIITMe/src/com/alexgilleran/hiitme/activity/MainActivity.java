@@ -94,11 +94,10 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		} else {
 			currentProgramId = savedInstanceState.getLong(ARG_PROGRAM_ID, 0);
 
-			listFragment = (ProgramListFragment) getFragmentManager().findFragmentByTag(LIST_FRAGMENT_TAG);
-			detailFragment = (ProgramDetailFragment) getFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
-			runFragment = (RunFragment) getFragmentManager().findFragmentByTag(RUN_FRAGMENT_TAG);
+			listFragment = (ProgramListFragment) getFragmentManager().getFragment(savedInstanceState, LIST_FRAGMENT_TAG);
+			detailFragment = (ProgramDetailFragment) getFragmentManager().getFragment(savedInstanceState, DETAIL_FRAGMENT_TAG);
+			runFragment = (RunFragment) getFragmentManager().getFragment(savedInstanceState, RUN_FRAGMENT_TAG);
 		}
-
 		listFragment.setActivateOnItemClick(tabletLayout);
 
 		if (ACTION_CONTINUE_RUN.equals(getIntent().getAction())) {
@@ -138,6 +137,18 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		if (currentProgramId > 0) {
 			outState.putLong(ARG_PROGRAM_ID, currentProgramId);
 			outState.putString(ARG_PROGRAM_NAME, currentProgramName);
+		}
+
+		if (listFragment != null) {
+			getFragmentManager().putFragment(outState, LIST_FRAGMENT_TAG, listFragment);
+		}
+
+		if (isRunFragmentVisible()) {
+			getFragmentManager().putFragment(outState, RUN_FRAGMENT_TAG, runFragment);
+		}
+
+		if (isDetailFragmentVisible()) {
+			getFragmentManager().putFragment(outState, DETAIL_FRAGMENT_TAG, detailFragment);
 		}
 
 		super.onSaveInstanceState(outState);
@@ -189,6 +200,8 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		invalidateOptionsMenu();
 
 		listFragment.setEnabled(false);
+
+		setTitle(getString(R.string.title_run));
 	}
 
 	@Override
@@ -325,7 +338,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 
 		invalidateOptionsMenu();
 
-		if (save) {
+		if (save && listFragment != null && listFragment.isVisible()) {
 			listFragment.refresh();
 		}
 	}

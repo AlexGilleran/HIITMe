@@ -95,13 +95,6 @@ public class RunFragment extends Fragment {
 	}
 
 	@Override
-	public void onStart() {
-		super.onStart();
-
-		getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		int layout = shouldShowLandscapeLayout() ? R.layout.fragment_run_land : R.layout.fragment_run_port;
 
@@ -136,6 +129,13 @@ public class RunFragment extends Fragment {
 
 			onRunFinish();
 		}
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		getActivity().bindService(serviceIntent, connection, Context.BIND_ABOVE_CLIENT);
 	}
 
 	@Override

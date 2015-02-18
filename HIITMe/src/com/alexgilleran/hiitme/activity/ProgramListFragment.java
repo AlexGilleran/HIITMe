@@ -83,7 +83,7 @@ public class ProgramListFragment extends ListFragment {
 	}
 
 	private void refreshActivatedItem() {
-		if (adapter != null) {
+		if (adapter != null  && getView() != null) {
 			if (activatedId == ListView.INVALID_POSITION) {
 				setActivatedPosition(ListView.INVALID_POSITION);
 				return;
