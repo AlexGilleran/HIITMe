@@ -77,11 +77,22 @@ public class ProgramListFragment extends ListFragment {
 			if (activatedPosition > 0) {
 				setActivatedPosition(activatedPosition);
 			} else if (activatedId > 0) {
-				for (int location = 0; location < adapter.getProgramList().size(); location++) {
-					if (adapter.getItem(location).getId() == activatedId) {
-						setActivatedPosition(location);
-						return;
-					}
+				refreshActivatedItem();
+			}
+		}
+	}
+
+	private void refreshActivatedItem() {
+		if (adapter != null) {
+			if (activatedId == ListView.INVALID_POSITION) {
+				setActivatedPosition(ListView.INVALID_POSITION);
+				return;
+			}
+
+			for (int location = 0; location < adapter.getProgramList().size(); location++) {
+				if (adapter.getItem(location).getId() == activatedId) {
+					setActivatedPosition(location);
+					return;
 				}
 			}
 		}
@@ -117,6 +128,8 @@ public class ProgramListFragment extends ListFragment {
 
 	public void refresh() {
 		adapter.setProgramList(ProgramDAOSqlite.getInstance(getActivity().getApplicationContext()).getProgramList());
+
+		refreshActivatedItem();
 	}
 
 	@Override
@@ -175,6 +188,8 @@ public class ProgramListFragment extends ListFragment {
 
 	public void setActivatedProgram(long id) {
 		this.activatedId = id;
+
+		refreshActivatedItem();
 	}
 
 	private void setActivatedPosition(int position) {

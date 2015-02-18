@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import com.alexgilleran.hiitme.R;
 import com.alexgilleran.hiitme.data.ProgramDAOSqlite;
@@ -148,7 +149,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 	}
 
 	/**
-	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the TESTTESTTESTitem with the given ID was
+	 * Callback method from {@link ProgramListFragment.Callbacks} indicating that the item with the given ID was
 	 * selected.
 	 */
 	@Override
@@ -252,6 +253,7 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 		long id = ProgramDAOSqlite.getInstance(getApplicationContext()).saveProgram(program);
 		onProgramSelected(id, null);
 
+		listFragment.setActivatedProgram(id);
 		listFragment.refresh();
 	}
 
@@ -281,8 +283,17 @@ public class MainActivity extends ActionBarActivity implements ProgramListFragme
 				.setPositiveButton(android.R.string.yes, new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						getFragmentManager().popBackStack();
+						if (tabletLayout) {
+							FragmentTransaction transaction = getFragmentManager().beginTransaction();
+							transaction.remove(runFragment);
+							transaction.remove(detailFragment);
+							transaction.commit();
+						} else {
+							getFragmentManager().popBackStack();
+						}
+
 						ProgramDAOSqlite.getInstance(getApplicationContext()).deleteProgram(currentProgramId);
+						listFragment.setActivatedProgram(ListView.INVALID_POSITION);
 						listFragment.refresh();
 						dialog.dismiss();
 					}
